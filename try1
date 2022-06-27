@@ -1,0 +1,229 @@
+var configuration = {
+    type: Phaser.AUTO,
+    pixelArt : true,
+    width : 600,
+    height : 600,
+    backgroundColor : '#FFFFFF',
+    scene:{
+        preload : preload,
+        create : create,
+        update : update
+    },
+    physics :{
+        default : 'arcade',
+        arcade :{
+                    debug : true,
+                    gravity : {y : 500}
+                }
+    }
+}
+
+
+
+var game = new Phaser.Game(configuration);
+
+var keys; // liste des mouvements
+var compteur = 0; //correspond a l'indice de keys
+var touches; //touches clavier
+var leRobot; // robot
+var EntreClavier = "";
+var entreclav; //affichage entree clavier
+//var timeEvent;
+var chrono = 300; // delai mise a jour des touches
+var timedEvent;
+
+
+    function preload(){
+
+            //chargement image 
+            this.load.spritesheet('robot','assets/RobotIdle.png',{frameWidth: 190, frameHeight: 211});
+            this.load.spritesheet('robotWalk','assets/RobotWalk.png',{frameWidth: 190, frameHeight: 211});
+            this.load.spritesheet('robotRotate','assets/leRobotRotate.png',{frameWidth: 190, frameHeight: 211});
+            this.load.image('background','assets/Trame1trsprt.png');
+            this.load.image('ground','assets/solPave.png');
+                    console.log('enculax');
+    }
+
+
+
+    function create(){
+
+            //setup + affichage
+
+            
+                this.add.sprite(200, 200, 'background'); // image background
+                var sol1 = this.add.sprite(200, 570, 'ground'); //image sol
+                
+                touches = this.input.keyboard.createCursorKeys();//gestion touches clavier
+
+                var keysCombo = [[40, 39, 32],[40, 37, 32],[40, 38, 32]]
+                var combo1 = this.input.keyboard.createCombo(keysCombo[0], {resetOnMatch:true, maxKeyDelay:300}); //300ms pour taper le combo, sinon se reinitialise
+                var combo2 = this.input.keyboard.createCombo([40, 37, 32], {resetOnMatch:true, maxKeyDelay:300}); //300ms pour taper le combo, sinon se reinitialise
+                var combo3 = this.input.keyboard.createCombo([40, 38, 32], {resetOnMatch:true, maxKeyDelay:300});
+                var combo4 = this.input.keyboard.createCombo([37, 40, 39, 32], {resetOnMatch:true, maxKeyDelay:500});
+                var combo5 = this.input.keyboard.createCombo([39, 40, 37, 32], {resetOnMatch:true, maxKeyDelay:500});
+
+                
+            //animation set
+                this.anims.create({
+                    key: 'idle',
+                    frames: this.anims.generateFrameNumbers('robot',{frames: [0, 1, 2, 3, 4, 5, 6]}),
+                    frameRate: 4,
+                    repeat: -1
+                })
+                this.anims.create({
+                    key: 'walk',
+                    frames: this.anims.generateFrameNumbers('robotWalk',{frames: [0, 1, 2, 3, 4, 5]}),
+                    frameRate: 4,
+                    repeat: -1
+                })
+                this.anims.create({
+                    key: 'rotate',
+                    frames: this.anims.generateFrameNumbers('robotRotate',{frames: [0, 1, 2, 3, 4, 5, 6, 7]}),
+                    frameRate: 8,
+                    repeat: -1
+                })
+                
+            
+            //const keys : ['idle', 'walk'];
+                leRobot = this.physics.add.sprite(200, 200,'robot');
+                leRobot.setScale(1);
+                leRobot.play('idle');
+                leRobot.body.setSize(80, 191)
+            
+                keys = ['idle','walk','rotate', 'idle','walk'];
+
+                // let compteur = 0;
+                this.input.on('pointerdown', function () { //click souris
+                    compteur++;
+                    console.log('keys est egal à : '+keys[compteur]);
+                    if (compteur === keys.length)
+                    {                
+                        compteur = 0;
+                    }
+                    leRobot.play(keys[compteur]);
+                    current.setText('Playing: ' + keys[compteur]);
+                });
+            ///////////////////////////////////////////////////////////////////////////////////////////////
+
+                timedEvent = new Phaser.Time.TimerEvent({ delay: 1000 , callback : resetEntry,  callbackScope: this});
+
+
+                this.input.keyboard.on('keydown', () => {
+                    console.log('start time');
+                    this.time.addEvent(timedEvent);
+                }, this);
+
+
+                // this.input.keyboard.on('keycombomatch', function(combo){ //verification du keycodes entré
+                //     let number = 2;
+                //     if(combo === combo1){
+                //         console.log('bim');
+                //     }
+                //     if(combo === combo2){
+                //         console.log('bam');
+                //     }
+                //     if(combo === combo3){
+                //         console.log('bOOm');
+                //     }
+                //     if(combo === combo4){
+                //         console.log('bwem');
+                //     }
+                // })
+
+                
+                // this.input.keyboard.on('keydown', function(){ //touches clavier
+
+                //     let test = "idle,idle,"
+                //     EntreClavier =  EntreClavier + keys[compteur] + ",";
+                //     console.log('entree clavier : '+EntreClavier);   
+                //     entreclav.setText(EntreClavier)
+                //     if(EntreClavier === test){
+                //         console.log('fdp');
+                //     }                 
+                // })
+
+                //timeEvent = this.time.addEvent({delay:3000, callBack: onEvent, callBackScope: this})
+
+
+
+
+            
+            var platform = this.physics.add.staticGroup();  //définit la valeur d'une plateforme
+            platform.add(sol1)                              //asigne
+            this.physics.add.collider(platform,leRobot)
+            
+            const current = this.add.text(48, 50, 'Playing: idle', { color: '#000000' });
+            entreclav = this.add.text(48, 70)
+
+    }
+
+    function resetEntry(){
+        // chrono = this.time.delayedCall(5000, onEvent,[],this)  
+
+        EntreClavier = "";
+        
+        console.log("onEvent : "+ EntreClavier);
+    
+        timedEvent.remove(true);
+    }
+
+    function update(time, delta){
+
+             //se met a jour en permanence, logique du jeu
+
+             var progress = timedEvent.getProgress();
+                
+                if(this.input.keyboard.checkDown(touches.left,chrono)){ //true toutes 300ms // chrono = 300
+                    leRobot.setVelocityX(-150)
+                    EntreClavier = EntreClavier + ',left'
+                    console.log(EntreClavier);
+                    
+                }
+                if(this.input.keyboard.checkDown(touches.right,chrono)){ //true toutes 300ms
+                    leRobot.setVelocityX(150)
+                    EntreClavier = EntreClavier + ',right'
+                    console.log(EntreClavier);
+                  
+                }
+                if(this.input.keyboard.checkDown(touches.up,4000)){ //true toutes 300ms
+                    leRobot.setVelocityY(-400)
+                    EntreClavier = EntreClavier + ',up'
+                    console.log(EntreClavier);
+    
+                }
+                if(this.input.keyboard.checkDown(touches.space,chrono)){ 
+                    EntreClavier = EntreClavier + ',attack'
+                    console.log(EntreClavier);
+             
+                }
+             
+
+                if(touches.down.isDown){
+                    EntreClavier = ',down';
+
+                    //console.log('down');
+                }
+                // if(touches.space.isDown){
+                //     //console.log('attack');
+                // }
+                if(touches.left.isUp && touches.right.isUp){
+                    leRobot.setVelocityX(0);
+                }
+                // if(entreclav /= 2){
+                //     console.log('oups');
+                // }
+                
+                
+                //combo
+                
+                
+                
+    }
+    
+
+
+
+    
+//game.state.add('theGame', theGame);
+//game.state.start('theGame');
