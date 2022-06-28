@@ -3,7 +3,7 @@ var configuration = {
     pixelArt : true,
     width : 800,
     height : 600,
-    //backgroundColor : '#FFFFFF',
+    backgroundColor : '#353535',
     scale:{
         mode : Phaser.Scale.FIT,
         autoCenter: 1,
@@ -30,6 +30,7 @@ var touchesAttack;
 var counterMove;
 var attackOneDuree;
 var box;
+var boxHealth;
 var playerFlip;
 var colideATK1; // collision attaque 1
 var colideATK2; // collision attaque 1
@@ -56,41 +57,43 @@ function create(){
     var skyBg = this.add.image(200, 200,'sky').setScale(3); //background
 
     var sol1 = this.add.sprite(200, 570, 'ground').setScale(3);//image sol
-    var sol2 = this.add.sprite(1200, 500, 'ground').setScale(3);//image sol
+    var sol2 = this.add.sprite(1412, 500, 'ground').setScale(3);//image sol
     
     box = this.physics.add.group({
         key : 'box',
-        repeat : 10,
-        setXY:{x: 50, y :60, stepX: 200},
+        repeat : 5,
+        setXY:{x: 50, y :60, stepX: 400},
         setScale : {x : 3},
     }); //caisse en bois
     box.children.iterateLocal('setSize', 35,35)
 
     player = this.physics.add.sprite(200, 310,'hero').setScale(3);// player
     player.body.setSize(20, 45 ) // hitbox player
-    // player.setCollideWorldBounds(true); // definit si le player touche les limites du monde
 
-    colideATK1 = this.physics.add.group({
+    // colideATK1 = this.physics.add.group({
+    //     key : 'ATK1',
+    //     active : false,
+    //     visible : false,
+    //     enable : false,
+    //     bounceX : 0.5,
+    //     bounceY : 0.5,
+    //     dragX : 0,
+    //     dragY : 0,
+    // });
+
+    colideATK2 = this.physics.add.group({
         key : 'ATK1',
-        //maxSize : 12,
-        active : false,
+        allowGravity : false,
+        disableBody : true,
+        //setScale : {x : 3},
+        // enable : false,
+        // active : false,
         visible : false,
-        enable : false,
-        //collideWorldBounds : true,
-        bounceX : 0.5,
-        bounceY : 0.5,
-        dragX : 0,
-        dragY : 0,
-    });
-    colideATK2 = this.add.sprite({
-        key : 'ATK1',
-        active : false,
-        visible : false,
-        enable : false,
-        setXY : {}
+        setXY : {x : -999, y : -999}
     })
-
-    
+   
+    console.log(colideATK2);
+    var boxHealth = 4;
 
     
     //Camera
@@ -103,21 +106,32 @@ function create(){
         platform.add(sol2)//asigne
 
         this.physics.add.collider(platform,player)//collision entre la plateforrme et le joueur 
-        this.physics.add.collider(platform,box , function(platform, box){
-            
-            
-        })//collision entre la plateforrme et le joueur 
+        this.physics.add.collider(platform,box)
         this.physics.add.collider(box, player, function (box,player){})//collision entre la plateforrme et le joueur 
-        this.physics.add.overlap(colideATK1, box, function (colideATK1, box){
-            box.anims.play('damageLast', true)
-            console.log('oulah');
+
+        // this.physics.add.overlap(colideATK1, box, function (colideATK1, box){
+        //     box.anims.play('damageLast', true)
+        //     console.log('oulah');
+        // })
+
+
+        this.physics.add.overlap(colideATK2, box, function(colAtk2, box){
+
+            boxHealth = boxHealth - 1;
+            colAtk2.disableBody(false);
+            colAtk2.destroy()
+
+            if(boxHealth === 3){box.anims.play('damageOne', true);}
+            else if(boxHealth === 2){box.anims.play('damageTwo', true);}
+            else if(boxHealth === 1){
+                box.anims.play('damageLast', true);
+                box.on('animationcomplete',()=>{box.destroy(); boxHealth = 3})
+            }
+            console.log('patatrac'+ boxHealth);
         })
-        
-        this.physics.add.overlap(box, colideATK1, destroyCollideBox, null, this)
-        this.physics.add.overlap(box, box, function(box, box){
-            //box.setBounceY(box.x / 10)
-            //console.log(box.x);
-        })
+
+
+        // this.physics.add.overlap(box, colideATK1, destroyCollideBox, null, this)
 
         
 
@@ -156,7 +170,6 @@ function create(){
         frameRate: 14,
         //repeat: -1
     })
-    
 
     this.anims.create({
         key: 'attackTwo',
@@ -178,15 +191,22 @@ function create(){
     });
     this.anims.create({
         key: 'jumpAtk',
-        frames: this.anims.generateFrameNumbers('herojumpAtk',{frames: [0, 1, 2, 3, 4, 5, 6,7]}),
+        frames: this.anims.generateFrameNumbers('herojumpAtk',{frames: [0, 1, 2, 3, 4, 5, 6, 6]}),
         frameRate: 12,
         //repeat: -1
     });
 
-    // animation box
+    ///// animation box
+
     this.anims.create({
         key: 'damageOne',
         frames: this.anims.generateFrameNumbers('box',{frames: [0, 1, 2, 3, 4, 5, 6, 7]}),
+        frameRate: 15,
+        //repeat: -1
+    });
+    this.anims.create({
+        key: 'damageTwo',
+        frames: this.anims.generateFrameNumbers('box',{frames: [8, 9, 10, 11, 12,]}),
         frameRate: 15,
         //repeat: -1
     });
@@ -200,25 +220,28 @@ function create(){
     
 }
 
-function collideBox(playerx, playery){
-    var ctk = colideATK1.get();
-        if(!ctk) return;
-        if(playerFlip === true){ctk.enableBody(true, playerx -122,playery,true, true)}
-        if(playerFlip === false){ctk.enableBody(true, playerx +122,playery,true, true)}
-        // ctk.enableBody(true, playerx,playery,true, true)
+//apparition collision attaque 1
+// function collideBox(playerx, playery){ 
+//     var ctk = colideATK1.get();
+//         if(!ctk) return;
+//         if(playerFlip === true){ctk.enableBody(true, playerx -122,playery,true, true)}
+//         if(playerFlip === false){ctk.enableBody(true, playerx +122,playery,true, true)}
+//         // ctk.enableBody(true, playerx,playery,true, true)
+// }
 
-}
+// function destroyCollideBox(player,cAtk){
+//     cAtk.disableBody(true,true);
+// }
 
-function destroyCollideBox(player,cAtk){
-    cAtk.disableBody(true,true);
-}
 
 //////////////////////////////////////////////////////////////////////////////////////////////// UPDATE
 
 function update(time, delta){
 
-    box.setVelocityX(0);
+    // if(playerFlip === true && counterMove === 0){colideATK2.setXY(player.x, player.y)} // collision attaque2 qui suit le joueur
+    // if(playerFlip === false && counterMove === 0){colideATK2.setXY(player.x, player.y)} // collision attaque2 qui suit le joueur
 
+    box.setVelocityX(0);
     // console.log(counterMove);
     // console.log(isjump);
 
@@ -264,7 +287,7 @@ function update(time, delta){
     //     // box.setVelocityX(0);
     // })
     
-    
+  
 }
 
 function attackComboOne(){
@@ -278,6 +301,9 @@ function attackComboOne(){
 
     }
         var nameAttack = 'attackOne'
+        var colAtk2 = colideATK2.get();
+        colAtk2.visible = false;
+
         //console.log(player.anims.currentAnim.key);// key of attackOne
     
             player.on('animationupdate', ()=>{
@@ -286,7 +312,9 @@ function attackComboOne(){
                 if(nameAttack === player.anims.currentAnim.key){
                     if(3 === player.anims.currentFrame.index){
                         //APPARITION DU COLLIDER ATTACK
-                        collideBox(player.x,player.y)
+                            //collideBox(player.x,player.y)
+                            if(playerFlip === true){colAtk2.setX(player.x -130);colAtk2.setY(player.y)}
+                            if(playerFlip === false){colAtk2.setX(player.x +130);colAtk2.setY(player.y)}    
                     };
                     if(player.anims.currentFrame.index <= 4){
                         if(playerFlip === true){player.setVelocityX(-1000)}
@@ -295,19 +323,21 @@ function attackComboOne(){
                     }
                     if(player.anims.currentFrame.index >= 5){
                         touchesAttack.enabled = true; 
+                        colAtk2.setY(player.y - 9999)//position en dehors de l'éccran
                     }
                     if(8 === player.anims.currentFrame.index){//reset counterMove : 0
-                        //console.log('badaboom');
                         counterMove = 0;
                     }
                 }
-                //console.log(player.anims.currentFrame.index);
             })
 }
 function attackComboTwo(){
     console.log('deux');
     player.anims.play('attackTwo', true);
     var nameAttack2 = 'attackTwo'
+    var colAtk2 = colideATK2.get();
+    colAtk2.visible = false;
+
    
     player.on('animationupdate', ()=>{
         if(nameAttack2 === player.anims.currentAnim.key){
@@ -316,28 +346,44 @@ function attackComboTwo(){
                 if(playerFlip === false){player.setVelocityX(1200)}
                 touchesAttack.enabled = false; 
             }
-            if(player.anims.currentFrame.index >= 4){
-                touchesAttack.enabled = true; 
+            if(player.anims.currentFrame.index === 4){
+                if(playerFlip === true){colAtk2.setX(player.x -130);colAtk2.setY(player.y)}
+                if(playerFlip === false){colAtk2.setX(player.x +130);colAtk2.setY(player.y)}
+            }
+            if(player.anims.currentFrame.index >= 5){
+                touchesAttack.enabled = true;
+                colAtk2.setY(player.y - 9999)//position en dehors de l'éccran
             }
             if(7 === player.anims.currentFrame.index){//reset counterMove : 0
                 counterMove = 0;
             }
         }
     });
+
 }
 function attackComboThree(){
     player.anims.play('attackThree', true);
     var nameAttack3 = 'attackThree'
+    var colAtk2 = colideATK2.get();
+    colAtk2.visible = false;
+
 
     player.on('animationupdate', ()=>{
         if(nameAttack3 === player.anims.currentAnim.key){
+            if(player.anims.currentFrame.index === 4){
+                if(playerFlip === true){colAtk2.setX(player.x -140);colAtk2.setY(player.y)}
+                if(playerFlip === false){colAtk2.setX(player.x +140);colAtk2.setY(player.y)} 
+            }
             if(player.anims.currentFrame.index <= 6){
                 if(playerFlip === true){player.setVelocityX(-1000)}
                 if(playerFlip === false){player.setVelocityX(1000)}
                 touchesAttack.enabled = false; 
             }
-            if(player.anims.currentFrame.index >= 7){
+
+            if(player.anims.currentFrame.index >= 8){
                 touchesAttack.enabled = true; 
+                colAtk2.setY(player.y - 9999)//position en dehors de l'éccran
+
             }
             if(10 === player.anims.currentFrame.index){//reset counterMove : 0
                 counterMove = 0;
