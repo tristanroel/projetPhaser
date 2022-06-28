@@ -4,7 +4,10 @@ var configuration = {
     width : 800,
     height : 600,
     //backgroundColor : '#FFFFFF',
-    
+    scale:{
+        mode : Phaser.Scale.FIT,
+        autoCenter: 1,
+    },
     scene:{
         preload : preload,
         create : create,
@@ -13,7 +16,7 @@ var configuration = {
     physics :{
         default : 'arcade',
         arcade :{
-                    debug : true,
+                    //debug : true,
                     gravity : {y : 1000}
                 }
     }
