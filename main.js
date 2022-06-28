@@ -47,6 +47,7 @@ function preload(){
     this.load.spritesheet('herorun', 'assets/herorunright.png',{frameWidth: 100, frameHeight: 100});
     this.load.spritesheet('herojump', 'assets/jumpright.png',{frameWidth: 100, frameHeight: 100});
     this.load.spritesheet('herojumpAtk', 'assets/jumpingAttack.png',{frameWidth: 100, frameHeight: 100});
+    this.load.spritesheet('powerSlash', 'assets/PowerSlash.png',{frameWidth: 100, frameHeight: 100});
     this.load.spritesheet('box', 'assets/box.png',{frameWidth: 62, frameHeight: 62});
 
 }
@@ -96,11 +97,11 @@ function create(){
     var boxHealth = 4;
 
     
-    //Camera
+    //CAMERA
     this.cameras.main.startFollow(player);       
 
 
-    //Collision
+    //COLISIONS
     var platform = this.physics.add.staticGroup();//définit la valeur d'une plateforme
         platform.add(sol1)//asigne
         platform.add(sol2)//asigne
@@ -116,7 +117,7 @@ function create(){
 
 
         this.physics.add.overlap(colideATK2, box, function(colAtk2, box){
-
+            
             boxHealth = boxHealth - 1;
             colAtk2.disableBody(false);
             colAtk2.destroy()
@@ -125,7 +126,7 @@ function create(){
             else if(boxHealth === 2){box.anims.play('damageTwo', true);}
             else if(boxHealth === 1){
                 box.anims.play('damageLast', true);
-                box.on('animationcomplete',()=>{box.destroy(); boxHealth = 3})
+                box.on('animationcomplete',()=>{box.destroy(); boxHealth = 4})
             }
             console.log('patatrac'+ boxHealth);
         })
@@ -139,12 +140,20 @@ function create(){
     attackOneDuree = 3000;
 
     
-    //Touches joueurs
+    //Touches joueurs / ENTREE CLAVIER
 
     touchesClavier = this.input.keyboard.addKeys('left, up, down, right');
     touchesAttack = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+    var specialAtkOne = this.input.keyboard.createCombo([40, 39, 32], {resetOnMatch:true, maxKeyDelay:500}); //300ms pour taper le combo, sinon se reinitialise
 
+    this.input.keyboard.on('keycombomatch', function(combo){ //verification du secialAtk entré
+        if(combo === specialAtkOne && player.body.touching.down && counterMove === 0){
+            console.log('connaldemelde');
+            counterMove = 32;
+            atkSpeOne();
+        }
 
+    }) 
     //animation player
     this.anims.create({
         key: 'idle',
@@ -166,14 +175,14 @@ function create(){
     })
     firstAtk = this.anims.create({
         key: 'attackOne',
-        frames: this.anims.generateFrameNumbers('heroAttack',{frames: [0, 1, 2, 3, 4, 5, 5, 5]}),
+        frames: this.anims.generateFrameNumbers('heroAttack',{frames: [0, 1, 2, 3, 4, 5, 5, 5, 5, 20, 20]}),
         frameRate: 14,
         //repeat: -1
     })
 
     this.anims.create({
         key: 'attackTwo',
-        frames: this.anims.generateFrameNumbers('heroAttack',{frames: [6, 7, 8, 9, 10, 10, 10]}),
+        frames: this.anims.generateFrameNumbers('heroAttack',{frames: [6, 7, 7, 8, 9, 10, 10, 10, 10, 10, 20]}),
         frameRate: 13,
         //repeat: -1
     })
@@ -193,6 +202,12 @@ function create(){
         key: 'jumpAtk',
         frames: this.anims.generateFrameNumbers('herojumpAtk',{frames: [0, 1, 2, 3, 4, 5, 6, 6]}),
         frameRate: 12,
+        //repeat: -1
+    });
+    this.anims.create({
+        key: 'PowerSlash',
+        frames: this.anims.generateFrameNumbers('powerSlash',{frames: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]}),
+        frameRate: 16,
         //repeat: -1
     });
 
@@ -242,7 +257,7 @@ function update(time, delta){
     // if(playerFlip === false && counterMove === 0){colideATK2.setXY(player.x, player.y)} // collision attaque2 qui suit le joueur
 
     box.setVelocityX(0);
-    // console.log(counterMove);
+     console.log(counterMove);
     // console.log(isjump);
 
     if (touchesClavier.left.isDown && counterMove === 0){
@@ -268,13 +283,12 @@ function update(time, delta){
             }
         }
     
-    if (touchesClavier.up.isDown && player.body.touching.down){
+    if (touchesClavier.up.isDown && player.body.touching.down && counterMove === 0){
             player.setVelocityY(-500);
             jumpAction();
         }
 
     if(Phaser.Input.Keyboard.JustDown(touchesAttack)){
-        console.log(touchesAttack);
         counterMove = counterMove + 1;
         if(counterMove === 1){attackComboOne();}
         if(counterMove === 2){attackComboTwo();}
@@ -310,22 +324,22 @@ function attackComboOne(){
                
                 // if(playerFlip === false){ colideATK1 = this.add.image(player.x +112, player.y -0, 'ATK1')}
                 if(nameAttack === player.anims.currentAnim.key){
-                    if(3 === player.anims.currentFrame.index){
+                    if(2 === player.anims.currentFrame.index){
                         //APPARITION DU COLLIDER ATTACK
                             //collideBox(player.x,player.y)
                             if(playerFlip === true){colAtk2.setX(player.x -130);colAtk2.setY(player.y)}
                             if(playerFlip === false){colAtk2.setX(player.x +130);colAtk2.setY(player.y)}    
                     };
-                    if(player.anims.currentFrame.index <= 4){
+                    if(player.anims.currentFrame.index <= 3){
                         if(playerFlip === true){player.setVelocityX(-1000)}
                         if(playerFlip === false){player.setVelocityX(1000)}
-                        touchesAttack.enabled = false; 
+                        touchesAttack.enabled = false;
                     }
-                    if(player.anims.currentFrame.index >= 5){
+                    if(player.anims.currentFrame.index >= 4){
                         touchesAttack.enabled = true; 
                         colAtk2.setY(player.y - 9999)//position en dehors de l'éccran
                     }
-                    if(8 === player.anims.currentFrame.index){//reset counterMove : 0
+                    if(11 === player.anims.currentFrame.index){//reset counterMove : 0
                         counterMove = 0;
                     }
                 }
@@ -354,7 +368,7 @@ function attackComboTwo(){
                 touchesAttack.enabled = true;
                 colAtk2.setY(player.y - 9999)//position en dehors de l'éccran
             }
-            if(7 === player.anims.currentFrame.index){//reset counterMove : 0
+            if(11 === player.anims.currentFrame.index){//reset counterMove : 0
                 counterMove = 0;
             }
         }
@@ -406,5 +420,10 @@ function jumpAction(){
             }
         }
     });
+}
+
+function atkSpeOne(){
+    player.anims.play('PowerSlash', true);
+    
 }
 
