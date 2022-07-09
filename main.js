@@ -45,21 +45,26 @@ var attackintheair; // verifie si peut attaquer en l'air (booleen)
 var skyBg; //ciel
 var skyBgAnim;
 var coin; //pieces
+var text;
+
 
 
 function preload(){
-    this.load.image('sky','assets/cloud.png');
+    //this.load.image('sky','assets/cloud.png');
+    this.load.image('sky','assets/Thesky.png');
     this.load.image('ground','assets/solPave.png');
     this.load.image('ATK1','assets/TRlogo.png');
     this.load.spritesheet('skyAnim', 'assets/Bakcloudanim.png', {frameWidth : 404, frameHeight : 274});
     this.load.spritesheet('piecette','assets/Coin.png', {frameWidth : 8, frameHeight : 8});
     this.load.spritesheet('hero', 'assets/Sprites/stancearmed.png',{frameWidth: 170, frameHeight: 170});
-    this.load.spritesheet('heroAttack', 'assets/Sprites/sword_attack_move .png',{frameWidth: 170, frameHeight: 170});
+    this.load.spritesheet('heroAttack', 'assets/Sprites/sword_attack_move.png',{frameWidth: 170, frameHeight: 170});
     this.load.spritesheet('herorun', 'assets/Sprites/walkarmed.png',{frameWidth: 170, frameHeight: 170});
     this.load.spritesheet('herojump', 'assets/Sprites/jumparmed.png',{frameWidth: 170, frameHeight: 170});
     this.load.spritesheet('herojumpAtk', 'assets/Sprites/jump_sword_attack.png',{frameWidth: 170, frameHeight: 170});
     this.load.spritesheet('powerSlash', 'assets/PowerSlash.png',{frameWidth: 100, frameHeight: 100});
     this.load.spritesheet('box', 'assets/box.png',{frameWidth: 62, frameHeight: 62});
+    this.load.spritesheet('theEnemy', 'assets/Enemy/enemiaxe1.png',{frameWidth: 170, frameHeight: 170});
+    this.load.spritesheet('theEnemyfall', 'assets/Enemy/enemi1falling.png',{frameWidth: 170, frameHeight: 170});
 
 }
 
@@ -70,25 +75,26 @@ function create(){
     
     
 
-    skyBg = this.add.tileSprite(0, -300, 800, 500, 'sky').setScale(3); //image ciel
+    skyBg = this.add.tileSprite(0, 200, 800, 500, 'sky').setScale(3); //image ciel
     var sol1 = this.add.sprite(200, 570, 'ground').setScale(3);//image sol
     var sol2 = this.add.sprite(1412, 500, 'ground').setScale(3);//image sol
-
-    var text = this.add.text(-150,510, '* CONTROL\n← = press "Q"\n→ = press "D"\n↑  = press "Z"\n\n🗡 = press "J"' , {font : '16px Courier'});
 
     coin = this.physics.add.sprite(0, 0,'piecette').setScale(3);  // piecettes
 
     box = this.physics.add.group({ //caisse en bois
         key : 'box',
-        repeat : 5,
-        setXY:{x: 50, y :60, stepX: 400},
+        repeat : 1,
+        setXY:{x: 50, y :60, stepX: 1000},
         setScale : {x : 3},
     }); //caisse en bois
     box.children.iterateLocal('setSize', 35,35)
+    
+    var enemy = this.physics.add.sprite(400, 366,'theEnemy').setScale(3).setSize(25, 56); // enemy
+    
 
     player = this.physics.add.sprite(200, 310,'hero').setScale(3); // player
     player.body.setSize(25, 58) // hitbox player
-
+    
 
     colideATK2 = this.physics.add.group({
         key : 'ATK1',
@@ -100,6 +106,7 @@ function create(){
         visible : false,
         setXY : {x : -999, y : -999}
     })
+    text = this.add.text(-150,510, '* CONTROL\n← = press "Q"\n→ = press "D"\n↑  = press "Z"\n\n🗡 = press "J"' , {font : '16px Courier'});
    
     console.log(colideATK2);
     var boxHealth = 4;
@@ -118,19 +125,17 @@ function create(){
 
         this.physics.add.collider(platform,player)//collision entre la plateforrme et le joueur 
         this.physics.add.collider(platform,box)
-        this.physics.add.collider(box, player, function (box,player){})//collision entre la plateforrme et le joueur 
+        this.physics.add.collider(platform,enemy)
+        this.physics.add.collider(box, player, function (box,player){})//collision entre box et le joueur 
         this.physics.add.collider(coin, platform)
-
+        
         this.physics.add.overlap(colideATK2, box, function(colAtk2, box){
             boxHealth = boxHealth - 1;
             colAtk2.disableBody(false);
             colAtk2.destroy()
-
+            
             player.anims.pause();
-                        setTimeout(()=>{
-                            player.anims.resume()
-                            console.log('salutation');
-                        },200)
+            setTimeout(()=>{player.anims.resume()},200)
             
 
             if(boxHealth === 3){box.anims.play('damageOne', true);}
@@ -139,8 +144,19 @@ function create(){
                 box.anims.play('damageLast', true);
                 box.on('animationcomplete',()=>{box.destroy(); boxHealth = 4})
             }
-            console.log('patatrac'+ boxHealth);
+            //console.log('patatrac'+ boxHealth);
         })
+        this.physics.add.collider(enemy,player);//collision entre l'enemy et le joueur 
+
+        this.physics.add.overlap(colideATK2, enemy, function(enemy, colAtk2){
+            colAtk2.destroy();
+            enemy.anims.play('fallenemy1', true);
+
+            player.anims.pause();
+            setTimeout(()=>{player.anims.resume()},200)
+            console.log('ouille !!!');
+        });
+
 
 
 console.log(box.health);
@@ -196,14 +212,14 @@ console.log(box.health);
     })
     firstAtk = this.anims.create({
         key: 'attackOne',
-        frames: this.anims.generateFrameNumbers('heroAttack',{frames: [ 0, 1, 2, 3, 4, 5, 6, 6, 6, 6, 6,]}),
+        frames: this.anims.generateFrameNumbers('heroAttack',{frames: [ 0, 1, 2, 3, 4, 5, 6, 6, 6, 6, 6, 6, 6]}),
         frameRate: 20,
         //repeat: -1
     })
 
     this.anims.create({
         key: 'attackTwo',
-        frames: this.anims.generateFrameNumbers('heroAttack',{frames: [7, 8, 9, 10, 11, 12, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13]}),
+        frames: this.anims.generateFrameNumbers('heroAttack',{frames: [7, 8, 9, 10, 11, 12, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13]}),
         frameRate: 20,
         //repeat: -1
     })
@@ -252,23 +268,40 @@ console.log(box.health);
         frameRate: 15,
         //repeat: -1
     });
-    // this.anims.create({
-    //     key: 'lescloud',
-    //     frames: this.anims.generateFrameNumbers('skyAnim',{frames : [1, 2, 3, 4, 5, 6, 7, 8, 9]}),
-    //     frameRate: 15,
-    //     repeat: -1
-    // });
+
+    this.anims.create({
+        key: 'stancenemy1',
+        frames: this.anims.generateFrameNumbers('theEnemy',{frames : [0]}),
+        frameRate: 6,
+        
+    });
+    this.anims.create({
+        key: 'knockbackenemy1',
+        frames: this.anims.generateFrameNumbers('theEnemy',{frames : [8 ,9 , 0]}),
+        frameRate: 6,
+        
+    });
+    this.anims.create({
+        key: 'fallenemy1',
+        frames: this.anims.generateFrameNumbers('theEnemyfall',{frames : [0, 1, 2, 3]}),
+        frameRate: 8,
+    });
+
     this.anims.create({
         key: 'turnPiecette',
         frames: this.anims.generateFrameNumbers('piecette',{frames: [0, 1, 2, 3]}),
         frameRate: 8,
         repeat: -1
     });
+
+
     // coin.getChildren().forEach(function() {
     //skyBgAnim.anims.play('lescloud', true)
     coin.anims.play('turnPiecette', true);
     coin.setOrigin(box.x, box.y)
     coin.setBounce(0.6)   
+    enemy.anims.play('stancenemy1', true);
+
     // })
     // coin.callAll('animation.add','turnPiecette', 'piecette',[0, 1, 2, 3], true);
     // coin.callAll('animation.play', 'turnPiecette', 'piecette');
@@ -294,6 +327,9 @@ console.log(box.health);
 function update(time, delta){
 
     skyBg.x = player.body.position.x // position du ciel
+    text.x = player.body.position.x - 300;
+    text.y = player.body.position.y + 250;
+    
     skyBg.tilePositionX += 0.5;
 
 
@@ -403,7 +439,7 @@ function attackComboOne(){
                         colAtk2.destroy()
 
                     }
-                    if(11 === player.anims.currentFrame.index){//reset counterMove : 0
+                    if(13 === player.anims.currentFrame.index){//reset counterMove : 0
                         counterMove = 0;
                     }
                 }
@@ -509,6 +545,7 @@ function attackJump(){
             if(9 === player.anims.currentFrame.index){//reset counterMove : 0
                 counterMove = 0;
                 touchesAttack.enabled = true;
+                colAtk4.destroy();
             }
         }
     });
