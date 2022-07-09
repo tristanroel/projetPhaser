@@ -19,7 +19,7 @@ var configuration = {
     physics :{
         default : 'arcade',
         arcade :{
-                    debug : true,
+                    debug : false,
                     gravity : {y : 1000}
                 }
     }
@@ -68,12 +68,13 @@ function create(){
 
     
     
-    // skyBg = this.add.image(200, 250,'sky').setScale(3); //background
+    
 
-    skyBg = this.add.tileSprite(0, -300, 800, 500, 'sky').setScale(3);
-
+    skyBg = this.add.tileSprite(0, -300, 800, 500, 'sky').setScale(3); //image ciel
     var sol1 = this.add.sprite(200, 570, 'ground').setScale(3);//image sol
     var sol2 = this.add.sprite(1412, 500, 'ground').setScale(3);//image sol
+
+    var text = this.add.text(-150,510, '* CONTROL\n← = press "Q"\n→ = press "D"\n↑  = press "Z"\n\n🗡 = press "J"' , {font : '16px Courier'});
 
     coin = this.physics.add.sprite(0, 0,'piecette').setScale(3);  // piecettes
 
@@ -105,7 +106,9 @@ function create(){
 
     
     //CAMERA
-    this.cameras.main.startFollow(player);       
+    this.cameras.main.startFollow(player);
+
+
 
 
     //COLISIONS
@@ -151,8 +154,8 @@ console.log(box.health);
     
     //Touches joueurs / ENTREE CLAVIER
 
-    touchesClavier = this.input.keyboard.addKeys('left, up, down, right');
-    touchesAttack = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+    touchesClavier = this.input.keyboard.addKeys('Q, Z, S, D');
+    touchesAttack = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.J);
     var specialAtkOne = this.input.keyboard.createCombo([40, 39, 32], {resetOnMatch:true, maxKeyDelay:700}); //300ms pour taper le combo, sinon se reinitialise
 
     this.input.keyboard.on('keycombomatch', function(combo){ //verification du secialAtk entré
@@ -299,7 +302,7 @@ function update(time, delta){
 
     // console.log(attackintheair);
 
-    if (touchesClavier.left.isDown && counterMove === 0){
+    if (touchesClavier.Q.isDown && counterMove === 0){
             player.setVelocityX(-350);
             playerFlip = player.flipX=true;
 
@@ -307,7 +310,7 @@ function update(time, delta){
                 player.anims.play('runLeft', true);
             }
         }
-    else if (touchesClavier.right.isDown && counterMove === 0){
+    else if (touchesClavier.D.isDown && counterMove === 0){
             player.setVelocityX(350);
             playerFlip = player.flipX=false;
            
@@ -324,7 +327,7 @@ function update(time, delta){
             }
         }
     
-    if (Phaser.Input.Keyboard.JustDown(touchesClavier.up) && player.body.touching.down && counterMove === 0 || //clavier
+    if (Phaser.Input.Keyboard.JustDown(touchesClavier.Z) && player.body.touching.down && counterMove === 0 || //clavier
          gamepad.A && player.body.touching.down && counterMove === 0){ //manette
         // console.log(gamepad);
         // console.log(gamepad.gamepads);
