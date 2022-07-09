@@ -118,19 +118,26 @@ function create(){
         this.physics.add.collider(box, player, function (box,player){})//collision entre la plateforrme et le joueur 
         this.physics.add.collider(coin, platform)
 
-        // this.physics.add.overlap(colideATK2, box, function(colAtk2, box){
-        //     boxHealth = boxHealth - 1;
-        //     colAtk2.disableBody(false);
-        //     colAtk2.destroy()
+        this.physics.add.overlap(colideATK2, box, function(colAtk2, box){
+            boxHealth = boxHealth - 1;
+            colAtk2.disableBody(false);
+            colAtk2.destroy()
 
-        //     if(boxHealth === 3){box.anims.play('damageOne', true);}
-        //     else if(boxHealth === 2){box.anims.play('damageTwo', true);}
-        //     else if(boxHealth <= 1){
-        //         box.anims.play('damageLast', true);
-        //         box.on('animationcomplete',()=>{box.destroy(); boxHealth = 4})
-        //     }
-        //     console.log('patatrac'+ boxHealth);
-        // })
+            player.anims.pause();
+                        setTimeout(()=>{
+                            player.anims.resume()
+                            console.log('salutation');
+                        },200)
+            
+
+            if(boxHealth === 3){box.anims.play('damageOne', true);}
+            else if(boxHealth === 2){box.anims.play('damageTwo', true);}
+            else if(boxHealth <= 1){
+                box.anims.play('damageLast', true);
+                box.on('animationcomplete',()=>{box.destroy(); boxHealth = 4})
+            }
+            console.log('patatrac'+ boxHealth);
+        })
 
 
 console.log(box.health);
@@ -186,7 +193,7 @@ console.log(box.health);
     })
     firstAtk = this.anims.create({
         key: 'attackOne',
-        frames: this.anims.generateFrameNumbers('heroAttack',{frames: [ 0, 1, 2, 3, 3, 4, 5, 6, 6, 6, 6,]}),
+        frames: this.anims.generateFrameNumbers('heroAttack',{frames: [ 0, 1, 2, 3, 4, 5, 6, 6, 6, 6, 6,]}),
         frameRate: 20,
         //repeat: -1
     })
@@ -283,16 +290,9 @@ console.log(box.health);
 
 function update(time, delta){
 
-    // if(playerFlip === true && counterMove === 0){colideATK2.setXY(player.x, player.y)} // collision attaque2 qui suit le joueur
-    // if(playerFlip === false && counterMove === 0){colideATK2.setXY(player.x, player.y)} // collision attaque2 qui suit le joueur
-    //console.log(attackintheair);
     skyBg.x = player.body.position.x // position du ciel
     skyBg.tilePositionX += 0.5;
-    // skyBg.tileScaleX = 3;
-    // skyBg.tileScaleY = 3;
-    this.physics.add.overlap(colideATK2, box, function(colideATK2, box){
-        console.log('ben dit donc');
-    });
+
 
     box.setVelocityX(0);
     //  console.log(counterMove);
@@ -380,11 +380,12 @@ function attackComboOne(){
                     };
 
                     if(5 === player.anims.currentFrame.index){
-                        player.anims.pause();
-                        setTimeout(()=>{
-                            player.anims.resume()
-                            console.log('salutation');
-                        },200)
+                        
+                        // player.anims.pause();
+                        // setTimeout(()=>{
+                        //     player.anims.resume()
+                        //     console.log('salutation');
+                        // },200)
                     }
 
                     if(player.anims.currentFrame.index <= 2){
@@ -396,7 +397,8 @@ function attackComboOne(){
                     if(player.anims.currentFrame.index >= 6){
                         touchesAttack.enabled = true;
                         gamepad.enabled = true; 
-                        colAtk2.setY(player.y - 9999)//position en dehors de l'éccran
+                        colAtk2.destroy()
+
                     }
                     if(11 === player.anims.currentFrame.index){//reset counterMove : 0
                         counterMove = 0;
@@ -427,7 +429,7 @@ function attackComboTwo(){
             if(player.anims.currentFrame.index >= 5){
                 touchesAttack.enabled = true;
                 gamepad.enabled = true;
-                colAtk2.setY(player.y - 9999)//position en dehors de l'éccran
+                colAtk2.destroy()
             }
             if(14 === player.anims.currentFrame.index){//reset counterMove : 0
                 counterMove = 0;
@@ -513,4 +515,5 @@ function atkSpeOne(){
     player.anims.play('PowerSlash', true);
     
 }
+
 
