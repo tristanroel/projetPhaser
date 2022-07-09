@@ -4,6 +4,10 @@ var configuration = {
     width : 800,
     height : 600,
     backgroundColor : '#353535',
+    fps: {
+        target: 58,
+        forceSetTimeOut: true
+      },
     input : {
         gamepad : true
     },
@@ -19,8 +23,8 @@ var configuration = {
     physics :{
         default : 'arcade',
         arcade :{
-                    debug : false,
-                    gravity : {y : 1000}
+                    debug : true,
+                    gravity : {y : 1000},
                 }
     }
 }
@@ -72,7 +76,7 @@ function preload(){
 function create(){
 
     
-    
+    // this.physics.world.setFPS(15)
     
 
     skyBg = this.add.tileSprite(0, 200, 800, 500, 'sky').setScale(3); //image ciel
@@ -83,8 +87,8 @@ function create(){
 
     box = this.physics.add.group({ //caisse en bois
         key : 'box',
-        repeat : 1,
-        setXY:{x: 50, y :60, stepX: 1000},
+        repeat : 2,
+        setXY:{x: -100, y :60, stepX: 1000},
         setScale : {x : 3},
     }); //caisse en bois
     box.children.iterateLocal('setSize', 35,35)
@@ -532,6 +536,7 @@ function attackJump(){
             if(player.anims.currentFrame.index === 4){
                 if(playerFlip === true){colAtk4.setX(player.x -140);colAtk4.setY(player.y +50)}
                 if(playerFlip === false){colAtk4.setX(player.x +140);colAtk4.setY(player.y +50)} 
+                
             }
             if(player.anims.currentFrame.index <= 6){
                 if(playerFlip === true){player.setVelocityX(-1000)}
@@ -540,12 +545,12 @@ function attackJump(){
             }
             if(8 === player.anims.currentFrame.index){
                 attackintheair = false;
+                colAtk4.destroy();
             }
 
             if(9 === player.anims.currentFrame.index){//reset counterMove : 0
                 counterMove = 0;
                 touchesAttack.enabled = true;
-                colAtk4.destroy();
             }
         }
     });
