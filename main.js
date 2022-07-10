@@ -76,14 +76,14 @@ function preload(){
 function create(){
 
     
-    // this.physics.world.setFPS(15)
+   //OBJECT
     
 
     skyBg = this.add.tileSprite(0, 200, 800, 500, 'sky').setScale(3); //image ciel
     var sol1 = this.add.sprite(200, 570, 'ground').setScale(3);//image sol
     var sol2 = this.add.sprite(1412, 500, 'ground').setScale(3);//image sol
 
-    coin = this.physics.add.sprite(0, 0,'piecette').setScale(3);  // piecettes
+    coin = this.physics.add.sprite(0, 370,'piecette').setScale(3);  // piecettes
 
     box = this.physics.add.group({ //caisse en bois
         key : 'box',
@@ -105,12 +105,12 @@ function create(){
         allowGravity : false,
         disableBody : true,
         //setScale : {x : 3},
-        // enable : false,
-        // active : false,
+        //enable : false,
+        //active : false,
         visible : false,
         setXY : {x : -999, y : -999}
     })
-    text = this.add.text(-150,510, '* CONTROL\n← = press "Q"\n→ = press "D"\n↑  = press "Z"\n\n🗡 = press "J"' , {font : '16px Courier'});
+    text = this.add.text(-150,510, '<< CONTROL >>\n← = press "Q"\n→ = press "D"\n↑  = press "Z"\n\n🗡 = press "J"' , {font : '16px Courier'});
    
     console.log(colideATK2);
     var boxHealth = 4;
@@ -123,7 +123,7 @@ function create(){
 
 
     //COLISIONS
-    var platform = this.physics.add.staticGroup();//définit la valeur d'une plateforme
+    var platform = this.physics.add.staticGroup();// groupe plateforme
         platform.add(sol1)//asigne
         platform.add(sol2)//asigne
 
@@ -150,7 +150,13 @@ function create(){
             }
             //console.log('patatrac'+ boxHealth);
         })
-        this.physics.add.collider(enemy,player);//collision entre l'enemy et le joueur 
+
+        this.physics.add.overlap(enemy,player, function(enemy, player){ //collision entre l'enemy et le joueur 
+           
+            
+            console.log('enculax : '+playerFlip);
+            
+        });
 
         this.physics.add.overlap(colideATK2, enemy, function(enemy, colAtk2){
             colAtk2.destroy();
@@ -163,8 +169,8 @@ function create(){
 
 
 
-console.log(box.health);
-        // this.physics.add.overlap(box, colideATK1, destroyCollideBox, null, this)
+    console.log(box.health);
+    // this.physics.add.overlap(box, colideATK1, destroyCollideBox, null, this)
 
         
     attackintheair = false;
@@ -303,7 +309,7 @@ console.log(box.health);
     //skyBgAnim.anims.play('lescloud', true)
     coin.anims.play('turnPiecette', true);
     coin.setOrigin(box.x, box.y)
-    coin.setBounce(0.6)   
+    coin.setBounce(0.8)   
     enemy.anims.play('stancenemy1', true);
 
     // })
@@ -397,12 +403,9 @@ function attackComboOne(){
     if(player.body.touching.down){
         player.anims.play('attackOne', true);
         
-    }
+    
      
-    else if(!player.body.touching.down && attackintheair === false){
-        attackJump()
-        attackintheair = true;
-    }
+    
 
         var nameAttack = 'attackOne'
         var colAtk2 = colideATK2.get();
@@ -417,7 +420,7 @@ function attackComboOne(){
                     if(4 === player.anims.currentFrame.index){
                         //APPARITION DU COLLIDER ATTACK
                             //collideBox(player.x,player.y)
-                            if(playerFlip === true){colAtk2.setX(player.x -130);colAtk2.setY(player.y)}
+                            if(playerFlip === true){colAtk2.setX(player.x -130);colAtk2.setY(player.y);}
                             if(playerFlip === false){colAtk2.setX(player.x +130);colAtk2.setY(player.y)}
                             
                     };
@@ -448,6 +451,11 @@ function attackComboOne(){
                     }
                 }
             })
+    }
+    else if(!player.body.touching.down && attackintheair === false){
+                attackJump()
+                attackintheair = true;
+    }
 }
 function attackComboTwo(){
     console.log('deux');
@@ -521,7 +529,7 @@ function jumpAction(){
             }
             if(8 >= player.anims.currentFrame.index){//reset counterMove : 0
                 counterMove = 0;
-                touchesAttack.enabled = true;
+                //touchesAttack.enabled = true;
             }
         }
     });
@@ -529,23 +537,24 @@ function jumpAction(){
 function attackJump(){
     player.anims.play('jumpAtk', true);
     var nameAttack4 = 'jumpAtk';
-    var colAtk4 = colideATK2.get();
-    colAtk4.visible = false;
+    var colAtk2 = colideATK2.get();
+    colAtk2.visible = false;
+
     player.on('animationupdate', ()=>{
         if(nameAttack4 === player.anims.currentAnim.key){
             if(player.anims.currentFrame.index === 4){
-                if(playerFlip === true){colAtk4.setX(player.x -140);colAtk4.setY(player.y +50)}
-                if(playerFlip === false){colAtk4.setX(player.x +140);colAtk4.setY(player.y +50)} 
+                if(playerFlip === true){colAtk2.setX(player.x -140);colAtk2.setY(player.y +50)}
+                if(playerFlip === false){colAtk2.setX(player.x +140);colAtk2.setY(player.y +50)} 
                 
             }
-            if(player.anims.currentFrame.index <= 6){
-                if(playerFlip === true){player.setVelocityX(-1000)}
-                if(playerFlip === false){player.setVelocityX(1000)}
+            if(player.anims.currentFrame.index <= 8){
+                if(playerFlip === true){player.setVelocityX(-500)}
+                if(playerFlip === false){player.setVelocityX(500)}
                 touchesAttack.enabled = false; 
             }
             if(8 === player.anims.currentFrame.index){
                 attackintheair = false;
-                colAtk4.destroy();
+                colAtk2.destroy();
             }
 
             if(9 === player.anims.currentFrame.index){//reset counterMove : 0
