@@ -104,8 +104,8 @@ function create(){
         setXY:{x: 400, y :366},
         setScale : {x : 3}
     });
-    enemy.children.iterateLocal('setData', 'pv', 6)
-    enemy.children.iterateLocal('setSize', 25,56)
+    enemy.children.iterateLocal('setData', 'pv', 5)
+    enemy.children.iterateLocal('setSize', 26,56)
 
 
     player = this.physics.add.sprite(200, 310,'hero').setScale(3); // player
@@ -173,7 +173,9 @@ function create(){
             else if(boite.data.list.pv === 2){boite.anims.play('damageTwo', true);}
             else if(boite.data.list.pv <= 1){
                 boite.anims.play('damageLast', true);
-                boite.on('animationcomplete',()=>{createCoin(boite);boite.destroy();})
+                boite.on('animationcomplete',()=>{
+                    for(var i = 0;i < 20;i++){ createCoin(boite)};
+                    boite.destroy();})
             }
         })
 
@@ -196,7 +198,6 @@ function create(){
             setTimeout(()=>{player.anims.resume()},200)
             console.log('ouille !!!');
             if(theEnemy.data.list.pv <= 0){
-                // this.physics.world.removeCollider(enemyPlayerContact);
                 theEnemy.anims.play('fallenemy1', true);
                 enemyPlayerContact.active = false;            }
         });
@@ -317,8 +318,8 @@ function create(){
     });
     this.anims.create({
         key: 'knockbackenemy1',
-        frames: this.anims.generateFrameNumbers('theEnemy',{frames : [8 ,9 , 0]}),
-        frameRate: 6,
+        frames: this.anims.generateFrameNumbers('theEnemy',{frames : [8 ,9 ,9, 0]}),
+        frameRate: 8,
         
     });
     this.anims.create({
@@ -596,7 +597,7 @@ function attackJump(){
     });
 }
 function createCoin(thebox){
-    var randomNbr = Phaser.Math.Between(-20,20);
+    var randomNbr = Phaser.Math.Between(-20,30);
     var piece = Coin.create(thebox.x + randomNbr, thebox.y + randomNbr,'piecette',0,true);
     piece.anims.play('turnPiecette',true)
     piece.setScale(3)
