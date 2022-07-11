@@ -5,7 +5,7 @@ var configuration = {
     height : 600,
     backgroundColor : '#353535',
     fps: {
-        target: 58,
+        target: 60,
         forceSetTimeOut: true
       },
     input : {
@@ -65,6 +65,7 @@ function preload(){
     this.load.spritesheet('herorun', 'assets/Sprites/walkarmed.png',{frameWidth: 170, frameHeight: 170});
     this.load.spritesheet('herojump', 'assets/Sprites/jumparmed.png',{frameWidth: 170, frameHeight: 170});
     this.load.spritesheet('herojumpAtk', 'assets/Sprites/jump_sword_attack.png',{frameWidth: 170, frameHeight: 170});
+    this.load.spritesheet('heroGuard', 'assets/Sprites/guard.png',{frameWidth: 170, frameHeight: 170});
     this.load.spritesheet('powerSlash', 'assets/PowerSlash.png',{frameWidth: 100, frameHeight: 100});
     this.load.spritesheet('box', 'assets/box.png',{frameWidth: 62, frameHeight: 62});
     this.load.spritesheet('theEnemy', 'assets/Enemy/enemiaxe1.png',{frameWidth: 170, frameHeight: 170});
@@ -84,7 +85,7 @@ function create(){
     var sol2 = this.add.sprite(1412, 500, 'ground').setScale(3);//image sol
 
     Coin = this.physics.add.group({ // piecettes
-        key :'piecette',
+        //key :'piecette',
         setXY:{x: -800, y :60},
         visible : false,
     });
@@ -158,6 +159,20 @@ function create(){
         this.physics.add.collider(box, player, function (box,player){box.setVelocityX(0);player.setVelocityX(0)})//collision entre box et le joueur 
         this.physics.add.collider(Coin, platform)
 
+        this.physics.add.overlap(colideATK2, enemy, function(colAtk2, theEnemy){ // collision attaque sur l'enemy
+            colAtk2.destroy();
+            theEnemy.data.list.pv = theEnemy.data.list.pv - 1;
+            theEnemy.anims.play('knockbackenemy1', true);
+
+            player.anims.pause();
+            setTimeout(()=>{player.anims.resume()},200)
+            console.log('ouille !!!');
+            if(theEnemy.data.list.pv <= 0){
+                // theEnemy.anims.play('fallenemy1', true);
+                dieEnemyOne(theEnemy);
+                enemyPlayerContact.active = false;
+                setTimeout(()=>{theEnemy.destroy()},2000)            }
+        });
 
         this.physics.add.overlap(colideATK2, box, function(colAtk2, boite){ // collision entre attaque et boites 
             boite.data.list.pv = boite.data.list.pv - 1;
@@ -188,20 +203,6 @@ function create(){
             console.log('enculax : '+playerFlip);
             
         });
-
-        this.physics.add.overlap(colideATK2, enemy, function(colAtk2, theEnemy){ // collision attaque sur l'enemy
-            colAtk2.destroy();
-            theEnemy.data.list.pv = theEnemy.data.list.pv - 1;
-            theEnemy.anims.play('knockbackenemy1', true);
-
-            player.anims.pause();
-            setTimeout(()=>{player.anims.resume()},200)
-            console.log('ouille !!!');
-            if(theEnemy.data.list.pv <= 0){
-                theEnemy.anims.play('fallenemy1', true);
-                enemyPlayerContact.active = false;            }
-        });
-
         
     attackintheair = false;
     counterMove = 0;
@@ -210,8 +211,10 @@ function create(){
     
     //Touches joueurs / ENTREE CLAVIER
 
-    touchesClavier = this.input.keyboard.addKeys('Q, Z, S, D');
-    touchesAttack = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.J);
+    touchesClavier = this.input.keyboard.addKeys('Q, Z, S, D'); //direction
+    touchesAttack = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.J); //attack
+    touchesGuard = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.I); //Guard
+
     var specialAtkOne = this.input.keyboard.createCombo([40, 39, 32], {resetOnMatch:true, maxKeyDelay:700}); //300ms pour taper le combo, sinon se reinitialise
 
     this.input.keyboard.on('keycombomatch', function(combo){ //verification du secialAtk entré
@@ -220,7 +223,6 @@ function create(){
             counterMove = 32;
             atkSpeOne();
         }
-
     }) 
   
     gamepad = this.input.gamepad.on('down', function(pad, button, index){
@@ -252,14 +254,14 @@ function create(){
     firstAtk = this.anims.create({
         key: 'attackOne',
         frames: this.anims.generateFrameNumbers('heroAttack',{frames: [ 0, 1, 2, 3, 4, 5, 6, 6, 6, 6, 6, 6, 6]}),
-        frameRate: 20,
+        frameRate: 22,
         //repeat: -1
     })
 
     this.anims.create({
         key: 'attackTwo',
         frames: this.anims.generateFrameNumbers('heroAttack',{frames: [7, 8, 9, 10, 11, 12, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13]}),
-        frameRate: 20,
+        frameRate: 22,
         //repeat: -1
     })
     this.anims.create({
@@ -278,6 +280,12 @@ function create(){
         key: 'jumpAtk',
         frames: this.anims.generateFrameNumbers('herojumpAtk',{frames: [0, 1, 2, 3, 4, 5, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6 , 6, 6]}),
         frameRate: 25,
+        //repeat: -1
+    });
+    this.anims.create({
+        key: 'guard',
+        frames: this.anims.generateFrameNumbers('heroGuard',{frames: [0]}),
+        frameRate: 8,
         //repeat: -1
     });
     this.anims.create({
@@ -319,12 +327,12 @@ function create(){
     this.anims.create({
         key: 'knockbackenemy1',
         frames: this.anims.generateFrameNumbers('theEnemy',{frames : [8 ,9 ,9, 0]}),
-        frameRate: 8,
+        frameRate: 9,
         
     });
     this.anims.create({
         key: 'fallenemy1',
-        frames: this.anims.generateFrameNumbers('theEnemyfall',{frames : [0, 1, 2, 3]}),
+        frames: this.anims.generateFrameNumbers('theEnemyfall',{frames : [0, 1, 2, 3, 3, 3]}),
         frameRate: 8,
     });
 
@@ -377,7 +385,7 @@ function update(time, delta){
     
     skyBg.tilePositionX += 0.5;
 
-    //  console.log(counterMove);
+    console.log(counterMove);
 
     // console.log(attackintheair);
 
@@ -395,26 +403,31 @@ function update(time, delta){
            
             if(player.body.touching.down){
                 player.anims.play('runRight', true);
-
             }
         }
     else if (player.setVelocityX(0)){
             if(player.body.touching.down && counterMove === 0){
                 player.anims.play('idle', true);
-
-
             }
         }
     
-    if (Phaser.Input.Keyboard.JustDown(touchesClavier.Z) && player.body.touching.down && counterMove === 0 || //clavier
-         gamepad.A && player.body.touching.down && counterMove === 0){ //manette
+    if (Phaser.Input.Keyboard.JustDown(touchesClavier.Z) && player.body.touching.down && counterMove === 0 || //jump
+         gamepad.A && player.body.touching.down && counterMove === 0){ //gamepad
         // console.log(gamepad);
         // console.log(gamepad.gamepads);
             player.setVelocityY(-500);
             jumpAction();
         }
 
-    if(Phaser.Input.Keyboard.JustDown(touchesAttack)){
+    if (touchesGuard.isDown && player.body.touching.down && counterMove === 0){ //guard
+        //counterMove = 20;
+        player.anims.play('guard', true);
+        
+
+        console.log('yeye');
+    }
+    
+    if(Phaser.Input.Keyboard.JustDown(touchesAttack)){ //attack
         counterMove = counterMove + 1;
         if(counterMove === 1){attackComboOne();}
         if(counterMove === 2){attackComboTwo();}
@@ -596,6 +609,18 @@ function attackJump(){
         }
     });
 }
+function dieEnemyOne(enemyOne){
+    enemyOne.anims.play('fallenemy1', true)
+    enemyOne.on('animationupdate', ()=>{
+        if(enemyOne.anims.currentFrame.index <= 2){
+            enemyOne.setVelocityX(400)
+        }
+        if(enemyOne.anims.currentFrame.index === 4){
+            enemyOne.setVelocityX(0)
+        }
+    })
+}
+
 function createCoin(thebox){
     var randomNbr = Phaser.Math.Between(-20,30);
     var piece = Coin.create(thebox.x + randomNbr, thebox.y + randomNbr,'piecette',0,true);
