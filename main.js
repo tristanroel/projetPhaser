@@ -31,11 +31,15 @@ var configuration = {
 
 var game = new Phaser.Game(configuration);
 
-var touchesClavier; //touches de direction
+//var touchesClavier; //touches de direction
+var leftkey;
+var rightkey;
+var upkey;
 var touchesAttack; // touche d'attaque
 
 var gamepad;
-//var player;
+var player;
+var playerVelocityX;
 var counterMove; // compteur combo attack : number
 var attackOneDuree;
 var box; // caisse en bois : sprite
@@ -52,6 +56,7 @@ var text; // info command list
 var Score = 0; // Score
 var scoreText;
 
+var countTest = 0;
 
 
 function preload(){
@@ -89,16 +94,19 @@ function create(){
         setXY:{x: -800, y :60},
         visible : false,
     });
-
+    hittableObject = this.physics.add.group()
     box = this.physics.add.group({ //caisse en bois
         key : 'box',
         name : 'woodBox',
+        allowGravity : false,
         repeat : 4,
-        setXY:{x: -100, y :60, stepX: 500},
+        setXY:{x: -100, y :90, stepX: 500},
         setScale : {x : 3},
     });
     box.children.iterateLocal('setData', 'pv', 4)
     box.children.iterateLocal('setSize', 35,35)
+    box.setVelocityY(600)
+    //box.setGravityY(0);
     
     var enemy = this.physics.add.group({   //enemy
         key :'theEnemy',
@@ -117,16 +125,12 @@ function create(){
         key : 'ATK1',
         allowGravity : false,
         disableBody : true,
-        //setScale : {x : 3},
-        //enable : false,
-        //active : false,
         visible : false,
         setXY : {x : -999, y : -999}
     })
 
-    //info control text
-    text = this.add.text(-150,510, '╔══════════════╗\n║ << CONTROL >> \n║ ← = press "Q"\n║ → = press "D"\n║ ↑  = press "Z"\n║\n║ 🗡 = press "J"\n╚══════════════╝' , {font : '16px Courier'});
-   
+    // TEXT
+    text = this.add.text(-150,510, ' << CONTROL >> \n ← = press "Q"\n → = press "D"\n ↑  = press "Z"\n\n 🗡 = press "J"\n' , {font : '16px Courier'}); 
     scoreText = this.add.text(10,10, 'SCORE : 0',{ font : '16px Arial Black', color : '#353535'})
     console.log(colideATK2);
     var boxHealth = 4;
@@ -143,7 +147,9 @@ function create(){
         platform.add(sol1)//asigne
         platform.add(sol2)//asigne
 
-        this.physics.add.collider(platform,player)//collision entre la plateforrme et le joueur 
+        this.physics.add.collider(platform,player, function( pl4yer,theplatform){
+            attackintheair = false;
+        })//collision entre la plateforrme et le joueur 
         this.physics.add.collider(platform,box) //collision plateforme et boites
         this.physics.add.collider(box,box, function(box2, box1){ // collisions entre boites
             if(playerFlip === false){}
@@ -153,10 +159,16 @@ function create(){
         this.physics.add.overlap(Coin, player, function(theplayer, piepiece){ // collision pieces et joueur 
             Score++;
             piepiece.destroy();
-            console.log('Score : '+Score);
+            //console.log('Score : '+Score);
             })
         this.physics.add.collider(platform,enemy)
-        this.physics.add.collider(box, player, function (box,player){box.setVelocityX(0);player.setVelocityX(0)})//collision entre box et le joueur 
+
+        this.physics.add.collider(box, player, function (thebox,theplayer){ //collision entre box et le joueur 
+            thebox.setVelocityX(0);
+            theplayer.setVelocityX(0)
+            if(theplayer.body.touching.up){}
+        });
+
         this.physics.add.collider(Coin, platform)
 
         this.physics.add.overlap(colideATK2, enemy, function(colAtk2, theEnemy){ // collision attaque sur l'enemy
@@ -207,11 +219,14 @@ function create(){
     attackintheair = false;
     counterMove = 0;
     attackOneDuree = 3000;
+    playerVelocityX = 350;
 
     
     //Touches joueurs / ENTREE CLAVIER
-
-    touchesClavier = this.input.keyboard.addKeys('Q, Z, S, D'); //direction
+    leftkey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Q);
+    rightkey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
+    upkey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Z);
+    //touchesClavier = this.input.keyboard.addKeys('Q, Z, S, D'); //direction
     touchesAttack = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.J); //attack
     touchesGuard = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.I); //Guard
 
@@ -254,7 +269,7 @@ function create(){
     firstAtk = this.anims.create({
         key: 'attackOne',
         frames: this.anims.generateFrameNumbers('heroAttack',{frames: [ 0, 1, 2, 3, 4, 5, 6, 6, 6, 6, 6, 6, 6]}),
-        frameRate: 22,
+        frameRate: 25,
         //repeat: -1
     })
 
@@ -325,6 +340,13 @@ function create(){
         
     });
     this.anims.create({
+        key: 'attackenemy1',
+        frames: this.anims.generateFrameNumbers('theEnemy',{frames : [5, 6, 7]}),
+        frameRate: 9,
+        repeat : -1,
+        
+    });
+    this.anims.create({
         key: 'knockbackenemy1',
         frames: this.anims.generateFrameNumbers('theEnemy',{frames : [8 ,9 ,9, 0]}),
         frameRate: 9,
@@ -349,7 +371,7 @@ function create(){
     //coin.anims.play('turnPiecette', true);
     //coin.setOrigin(box.x, box.y)   
     //enemy.anims.play('stancenemy1', true);
-    // coin.playAnimation('turnPiecette');
+    //enemy.playAnimation('attackenemy1');
 
 
     // })
@@ -386,19 +408,22 @@ function update(time, delta){
     skyBg.tilePositionX += 0.5;
 
     console.log(counterMove);
-
-    // console.log(attackintheair);
-
-    if (touchesClavier.Q.isDown && counterMove === 0){
-            player.setVelocityX(-350);
+    //console.log(player.anims.currentAnim);
+    //console.log(player.anims.currentAnim);
+    //console.log(attackintheair);
+    if(!player.body.touching.down ){
+        //console.log('en l\'air');
+    }
+    if (leftkey.isDown && counterMove === 0){
+            player.setVelocityX(-playerVelocityX);
             playerFlip = player.flipX=true;
 
             if(player.body.touching.down){
                 player.anims.play('runLeft', true);
             }
         }
-    else if (touchesClavier.D.isDown && counterMove === 0){
-            player.setVelocityX(350);
+    else if (rightkey.isDown && counterMove === 0){
+            player.setVelocityX(playerVelocityX);
             playerFlip = player.flipX=false;
            
             if(player.body.touching.down){
@@ -411,27 +436,29 @@ function update(time, delta){
             }
         }
     
-    if (Phaser.Input.Keyboard.JustDown(touchesClavier.Z) && player.body.touching.down && counterMove === 0 || //jump
+    if (Phaser.Input.Keyboard.JustDown(upkey) && player.body.touching.down && counterMove === 0 || //jump
          gamepad.A && player.body.touching.down && counterMove === 0){ //gamepad
-        // console.log(gamepad);
-        // console.log(gamepad.gamepads);
             player.setVelocityY(-500);
             jumpAction();
         }
+    
 
     if (touchesGuard.isDown && player.body.touching.down && counterMove === 0){ //guard
-        //counterMove = 20;
+        upkey.enabled = false;
+        leftkey.enabled = false;
+        rightkey.enabled = false;
+        touchesAttack.enabled = false;
         player.anims.play('guard', true);
-        
-
         console.log('yeye');
     }
     
     if(Phaser.Input.Keyboard.JustDown(touchesAttack)){ //attack
-        counterMove = counterMove + 1;
-        if(counterMove === 1){attackComboOne();}
-        if(counterMove === 2){attackComboTwo();}
-        //if(counterMove === 3){attackComboThree();}
+        counterMove++;
+        if(counterMove === 1 && player.body.touching.down){attackComboOne();}
+        else if (counterMove >= 2 && player.body.touching.down){attackComboTwo();}
+        else if(counterMove === 1 && !player.body.touching.down){attackJump();}
+        // else{counterMove = 0}
+        //if(counterMove === 3){attackComboThree();}  
     }
 
     // this.physics.world.collide(box, box, function(){
@@ -446,7 +473,7 @@ function update(time, delta){
 function attackComboOne(){
     //var t = setTimeout()
     
-    if(player.body.touching.down){
+    // if(player.body.touching.down){
         player.anims.play('attackOne', true);
 
         var nameAttack = 'attackOne'
@@ -462,74 +489,105 @@ function attackComboOne(){
                     if(4 === player.anims.currentFrame.index){
                         //APPARITION DU COLLIDER ATTACK
                             //collideBox(player.x,player.y)
-                            if(playerFlip === true){colAtk2.setX(player.x -130);colAtk2.setY(player.y);}
-                            if(playerFlip === false){colAtk2.setX(player.x +130);colAtk2.setY(player.y)}
-                            
+                            if(playerFlip === true){colAtk2.setX(player.x -135);colAtk2.setY(player.y);}
+                            if(playerFlip === false){colAtk2.setX(player.x +135);colAtk2.setY(player.y)}      
                     };
-
-                    if(5 === player.anims.currentFrame.index){
-                        
-                        // player.anims.pause();
-                        // setTimeout(()=>{
-                        //     player.anims.resume()
-                        //     console.log('salutation');
-                        // },200)
-                    }
-
-                    if(player.anims.currentFrame.index <= 2){
+                    if(player.anims.currentFrame.index >= 2 && player.anims.currentFrame.index <= 3){
                         // if(playerFlip === true){player.setVelocityX(-1000)}
                         // if(playerFlip === false){player.setVelocityX(1000)}
-                        touchesAttack.enabled = false;
+                        //touchesAttack.enabled = false;
                         gamepad.enabled = false;
                     }
                     if(player.anims.currentFrame.index >= 6){
                         touchesAttack.enabled = true;
-                        gamepad.enabled = true; 
+                        //gamepad.enabled = true; 
                         colAtk2.destroy()
-
                     }
+                    if(player.anims.currentFrame.index >= 7){countTest = 1};
                     if(13 === player.anims.currentFrame.index){//reset counterMove : 0
                         counterMove = 0;
                     }
                 }
             })
-    }
-    else if(!player.body.touching.down && attackintheair === false){
-                attackJump()
-                attackintheair = true;
-    }
+    // }
+    // else if(!player.body.touching.down && attackintheair === false){
+    //             attackJump()
+    //             attackintheair = true;
+    // }
 }
 function attackComboTwo(){
-    //console.log('deux');
-    player.anims.play('attackTwo', true);
+
+
+if(player.anims.currentAnim.key === 'attackOne'){
+    if(countTest === 1){
+        console.log('bam');
+        player.anims.play('attackTwo', true);
     var nameAttack2 = 'attackTwo'
     var colAtk2 = colideATK2.get();
     colAtk2.visible = false;
 
-   
+
     player.on('animationupdate', ()=>{
         if(nameAttack2 === player.anims.currentAnim.key){
             if(player.anims.currentFrame.index <= 3){
                 // if(playerFlip === true){player.setVelocityX(-1200)}
                 // if(playerFlip === false){player.setVelocityX(1200)}
-                touchesAttack.enabled = false;
+                //touchesAttack.enabled = false;
                 gamepad.enabled = false; 
             }
             if(player.anims.currentFrame.index === 4){
-                if(playerFlip === true){colAtk2.setX(player.x -130);colAtk2.setY(player.y)}
-                if(playerFlip === false){colAtk2.setX(player.x +130);colAtk2.setY(player.y)}
+                if(playerFlip === true){colAtk2.setX(player.x -135);colAtk2.setY(player.y)}
+                if(playerFlip === false){colAtk2.setX(player.x +135);colAtk2.setY(player.y)}
             }
             if(player.anims.currentFrame.index >= 5){
-                touchesAttack.enabled = true;
+                //touchesAttack.enabled = false;
                 gamepad.enabled = true;
                 colAtk2.destroy()
             }
-            if(14 === player.anims.currentFrame.index){//reset counterMove : 0
+            if(player.anims.currentFrame.index >= 7){touchesAttack.enabled = true;}
+
+            if(12 === player.anims.currentFrame.index){//reset counterMove : 0
                 counterMove = 0;
+                countTest = 0
             }
         }
     });
+    }
+}
+else{
 
+    // player.anims.play('attackTwo', true);
+    // var nameAttack2 = 'attackTwo'
+    // var colAtk2 = colideATK2.get();
+    // colAtk2.visible = false;
+
+
+    // player.on('animationupdate', ()=>{
+    //     if(nameAttack2 === player.anims.currentAnim.key){
+    //         if(player.anims.currentFrame.index <= 3){
+    //             // if(playerFlip === true){player.setVelocityX(-1200)}
+    //             // if(playerFlip === false){player.setVelocityX(1200)}
+    //             //touchesAttack.enabled = false;
+    //             gamepad.enabled = false; 
+    //         }
+    //         if(player.anims.currentFrame.index === 4){
+    //             if(playerFlip === true){colAtk2.setX(player.x -130);colAtk2.setY(player.y)}
+    //             if(playerFlip === false){colAtk2.setX(player.x +130);colAtk2.setY(player.y)}
+    //         }
+    //         if(player.anims.currentFrame.index >= 5){
+    //             //touchesAttack.enabled = false;
+    //             gamepad.enabled = true;
+    //             colAtk2.destroy()
+    //         }
+    //         if(player.anims.currentFrame.index >= 7){touchesAttack.enabled = true;}
+
+    //         if(14 === player.anims.currentFrame.index){//reset counterMove : 0
+    //             counterMove = 0;
+    //             countTest = 0
+    //         }
+    //     }
+    // });
+}
 }
 function attackComboThree(){
     player.anims.play('attackThree', true);
@@ -566,12 +624,8 @@ function jumpAction(){
     var nameAction = 'jump'
     player.on('animationupdate', ()=>{
         if(nameAction === player.anims.currentAnim.key){
-            if(player.anims.currentFrame.index <= 6){
-                // counterMove = 99;
-            }
-            if(8 >= player.anims.currentFrame.index){//reset counterMove : 0
-                counterMove = 0;
-                //touchesAttack.enabled = true;
+            if(player.body.touching.down ){
+                //counterMove = 0;
             }
         }
     });
@@ -579,36 +633,39 @@ function jumpAction(){
 function attackJump(){
     player.anims.play('jumpAtk', true);
     var nameAttack4 = 'jumpAtk';
-    var colAtk2 = colideATK2.get();
-    colAtk2.visible = false;
-
+    var colAtk5 = colideATK2.get();
+    colAtk5.visible = false;
+    attackintheair = true;
     player.on('animationupdate', ()=>{
         if(nameAttack4 === player.anims.currentAnim.key){
             if(player.anims.currentFrame.index === 4){
-                if(playerFlip === true){colAtk2.setX(player.x -150);colAtk2.setY(player.y +50)}
-                if(playerFlip === false){colAtk2.setX(player.x +150);colAtk2.setY(player.y +50)} 
-                
+                if(playerFlip === true){colAtk5.setX(player.x -150);colAtk5.setY(player.y +50)}
+                if(playerFlip === false){colAtk5.setX(player.x +150);colAtk5.setY(player.y +50)} 
             }
-            if(player.anims.currentFrame.index <= 8){
-                if(playerFlip === true){player.setVelocityX(-500)}
-                if(playerFlip === false){player.setVelocityX(500)}
-                touchesAttack.enabled = false; 
-            }
-            if(8 === player.anims.currentFrame.index){
-                //attackintheair = false;
-                colAtk2.destroy();
-            }
+            // if(player.anims.currentFrame.index <= 8){
+            //     // if(playerFlip === true){player.setVelocityX(-500)}
+            //     // if(playerFlip === false){player.setVelocityX(500)}
+            //     // touchesAttack.enabled = false; 
+            // }
+            // if(8 === player.anims.currentFrame.index){
+            //     //attackintheair = false;
+            //     //colAtk2.destroy();
+            // }
 
-            if(25 === player.anims.currentFrame.index){//reset counterMove : 0
-                counterMove = 0;
+            // // if(25 === player.anims.currentFrame.index){//reset counterMove : 0
+            // //     counterMove = 0;
+            // //     //touchesAttack.enabled = true;
+            // // }
+            if(player.body.touching.down || player.anims.currentFrame.index >= 25){
                 //touchesAttack.enabled = true;
-            }
-            if(player.body.touching.down){touchesAttack.enabled = true;counterMove = 0; attackintheair = false;}
-           
-            
+                counterMove = 0; 
+                colAtk5.destroy();
+                // attackintheair = false
+            ;}
         }
     });
 }
+
 function dieEnemyOne(enemyOne){
     enemyOne.anims.play('fallenemy1', true)
     enemyOne.on('animationupdate', ()=>{
@@ -622,7 +679,7 @@ function dieEnemyOne(enemyOne){
 }
 
 function createCoin(thebox){
-    var randomNbr = Phaser.Math.Between(-20,30);
+    var randomNbr = Phaser.Math.Between(-30,30);
     var piece = Coin.create(thebox.x + randomNbr, thebox.y + randomNbr,'piecette',0,true);
     piece.anims.play('turnPiecette',true)
     piece.setScale(3)
@@ -630,6 +687,11 @@ function createCoin(thebox){
     piece.setVelocityX(Phaser.Math.Between(-100, 100))
    
     //setTimeout(()=>{piece.setVelocityX(0);},1000)
+}
+function createBox(){
+    var woodbox = hittableObject.create(200, 200,'box',0,true);
+    woodbox.setScale(3)
+    woodbox.allowGravity(true)
 }
 
 function atkSpeOne(){
