@@ -45,17 +45,16 @@ var player;
 var playerVelocityX;
 var playerInGround; // : boolean
 var counterMove; // compteur combo attack : number
-var box; // caisse en bois : sprite
 var playerFlip; // direction du joueur : boulean
+var PlayerTouchEnemy; // : boolean
 var colideATK1; // collision attaque 1 : sprite
 var colideATK2; // collision attaque 1 : sprite
 var attackintheair; // verifie si peut attaquer en l'air : boolean
 
 var enemySpawn; //spawn enemy
-var enemyMoveDetection;
-var enemyCounterMove;// : number
-var enemyIsAttack; // : boolean
-var enemyIsDie; // : boolean
+var enemyNumber;
+
+var box; // caisse en bois : sprite
 
 var skyBg; //ciel
 var Coin; //pieces
@@ -73,6 +72,7 @@ function preload(){
     this.load.image('ATK1','assets/TRlogo.png');
     this.load.image('spawner','assets/ROELprod.png');
     // this.load.spritesheet('skyAnim', 'assets/Bakcloudanim.png', {frameWidth : 404, frameHeight : 274});
+    this.load.spritesheet('slash','assets/Slash.png', {frameWidth : 65, frameHeight : 65});
     this.load.spritesheet('piecette','assets/Coin.png', {frameWidth : 8, frameHeight : 8});
     this.load.spritesheet('hero', 'assets/Sprites/stancearmed.png',{frameWidth: 170, frameHeight: 170});
     this.load.spritesheet('heroAttack', 'assets/Sprites/sword_attack_move.png',{frameWidth: 170, frameHeight: 170});
@@ -96,7 +96,8 @@ function create(){
     skyBg = this.add.tileSprite(0, 200, 800, 500, 'sky').setScale(3); //image ciel
     var sol1 = this.add.sprite(200, 570, 'ground').setScale(3);//image sol
     var sol2 = this.add.sprite(1412, 500, 'ground').setScale(3);//image sol
-    enemySpawn = this.add.image(1200, 100, 'spawner'); //spawn enemy
+    enemySpawn = this.add.image(1800, -200, 'spawner'); //spawn enemy
+    
 
     Coin = this.physics.add.group({ // piecettes
         //key :'piecette',
@@ -182,14 +183,19 @@ function create(){
         this.physics.add.collider(box, player, function (theplayer, thebox){ //collision entre box et le joueur 
             // theplayer.setVelocityX(0);
             thebox.setVelocityX(0)
+            thebox
             
             if(thebox.body.touching.right || thebox.body.touching.left){
-                // console.log(thebox.body);
+                theplayer.anims.play('runRight', true)
+                counterMove = 0;
+                playerInGround = true
+                //console.log(theplayer.body.angle);
             }
             if(thebox.body.touching.up){
                 playerInGround = true;
                 thebox.setGravityY(-1)
-            }else{playerInGround = false;}
+            }
+            else{playerInGround = false;}
         });
 
         this.physics.add.collider(Coin, platform)
@@ -229,31 +235,13 @@ function create(){
             }
         })
 
-        // var enemyPlayerContact = this.physics.add.collider(enemy,player, function(plyrs ,theEnemy){ //collision entre l'enemy et le joueur 
-            // enemy.setVelocityX(0)
-            // console.log(box.children.entries);
-            //console.log(box.children.entries.length);
-            //console.log(laboite.data.list.pv);
-            //console.log('enculax : '+playerFlip);
-        // });
-        this.physics.add.collider(hittableObject, platform, function(htblobjct, pltfrm){})   //collision Enemy + platform                                     
-        // this.physics.add.collider(hittableObject, player, function(plyr, htblobjct){          // collision groupEnemy + player
-        //     //htblobjct.children.entries[0].destroy()
-        //     console.log(htblobjct);
-        // })                                     
-        // this.physics.add.overlap(player, enemyMoveDetection, function(plyr,enmyMoveDetec){  //collision EnenmyDetector + player
-        //     enemyCounterMove = 2;
-        //     //setTimeout(()=>{enemyCounterMove = O},200)
-        // })
+        this.physics.add.collider(hittableObject, platform, function(htblobjct, pltfrm){})   //collision Enemy + platform
         
     attackintheair = false;
     counterMove = 0;
-    enemyCounterMove = 0;
     playerVelocityX = 350;
     playerInGround = false;
-    enemyIsAttack = false;
-    enemyIsDie = false;
-
+    PlayerTouchEnemy = false;
     
     
     //Touches joueurs / ENTREE CLAVIER
@@ -399,16 +387,21 @@ function create(){
     });
     this.anims.create({
         key: 'fallenemy1',
-        frames: this.anims.generateFrameNumbers('theEnemyfall',{frames : [0, 1, 2, 3, 3, 3]}),
+        frames: this.anims.generateFrameNumbers('theEnemyfall',{frames : [0, 1, 2, 3, 3, 3, 3, 3, 3, 3]}),
         frameRate: 8,
     });
 
     // coin animation
     this.anims.create({
         key: 'turnPiecette',
-        frames: this.anims.generateFrameNumbers('piecette',{frames: [0, 1, 2, 3]}),
+        frames: this.anims.generateFrameNumbers('piecette',{frames: [1, 1, 2, 3]}),
         frameRate: 8,
         repeat: -1
+    });
+    this.anims.create({
+        key: 'slashed',
+        frames: this.anims.generateFrameNumbers('slash',{frames: [0, 1, 2, 2]}),
+        frameRate: 25,
     });
 
 
@@ -418,7 +411,14 @@ function create(){
     //coin.setOrigin(box.x, box.y)   
     //enemy.anims.play('stancenemy1', true);
     //enemy.playAnimation('attackenemy1');
+
+    for(var i = 0;i < 1; i++){
+        setTimeout(()=>{createEnemyOne(enemySpawn, player, this);},12000)
+    }
     createEnemyOne(enemySpawn, player, this);
+    console.log(enemySpawn);
+    //createSlash()
+    //setTimeout(()=>{hittableObject.children.entries[1].destroy()},8000)
     //this.physics.moveToObject(enemy, enemy,200)
 
 
@@ -457,64 +457,83 @@ function update(time, delta){
     scoreText.setText('SCORE : '+ Score) // maj score
 
     //ENEMY UPDATE
-    if(hittableObject.children.entries[0] != undefined){
-
-        // enemyMoveDetection.children.entries[0].setX(hittableObject.children.entries[0].body.position.x + 40) //moveDetection Position
-        // enemyMoveDetection.children.entries[0].setY(hittableObject.children.entries[0].body.position.y + 85)
-        
-        if(Phaser.Math.Distance.BetweenPoints(hittableObject.children.entries[0],player) > 200){enemyCounterMove = 1; enemyIsAttack = true}
-        if(Phaser.Math.Distance.BetweenPoints(hittableObject.children.entries[0],player) < 200 && enemyIsAttack === true){enemyCounterMove = 2; enemyIsAttack = false}
-
-        if(hittableObject.children.entries[0].data.list.health <= 0){enemyCounterMove = 4}
-        if(enemyCounterMove === 0){enemyStand(hittableObject.children.entries[0])}
-        if(enemyCounterMove === 1){enemyWalkFront(hittableObject.children.entries[0],player,this)};
-        if(enemyCounterMove === 2){enemyAttack(hittableObject.children.entries[0])}
-        if(enemyCounterMove === 3){enemyKnockBack(hittableObject.children.entries[0])}
-        if(enemyCounterMove === 4 && enemyIsDie === false){enemyDie(hittableObject.children.entries[0])}
-        
-
-        this.physics.add.collider(hittableObject.children.entries[0], player, function(htblobjct, plyr){  // collision Enemy + player
-            if(htblobjct.body.touching.up){
-                if(plyr.flipX === false){}
-                if(plyr.flipX === true){}
+    for(var i = 0; i < hittableObject.children.entries.length; i++){
+        if(hittableObject.children.entries[i] != undefined && hittableObject.children.entries[i].data.list.name === 'EnemyOne'){
+            
+            if(Phaser.Math.Distance.BetweenPoints(hittableObject.children.entries[i],player) > 200){
+                hittableObject.children.entries[i].data.list.CounterMove = 1; 
+                hittableObject.children.entries[i].data.list.EnemyIsAttack = true; 
             }
-            if(htblobjct.body.touching.left){}
-            //htblobjct.body.enable = false
-        });
-        this.physics.add.overlap(colideATK2, hittableObject.children.entries[0], function(htblObjct, atk){
-            enemyCounterMove = 3;
-            atk.destroy()
-            player.anims.pause();
-            setTimeout(()=>{player.anims.resume()},200)
-            //enemyMoveDetection.children.entries[0].body.enable = false
-            htblObjct.data.list.health = htblObjct.data.list.health - 1;
-            //console.log(htblObjct.data.list.health);
-        })
-        // collidePlayerEnemyDetector = this.physics.add.overlap(player, enemyMoveDetection.children.entries[0], function(plyr,enmyMoveDetec){  //collision EnenmyDetector + player
-        //     if(enemyIsAttack === true){
-        //         enemyCounterMove = 2;
-        //         collidePlayerEnemyDetector.active = false
-        //     }
-        // })
-        
-    }  
-    else{
-        hittableObject.children.entries[0] = [];
-    } 
+            if(Phaser.Math.Distance.BetweenPoints(hittableObject.children.entries[i],player) < 200 && 
+            hittableObject.children.entries[i].data.list.EnemyIsAttack === true){
+                hittableObject.children.entries[i].data.list.CounterMove = 2; 
+                hittableObject.children.entries[i].data.list.EnemyIsAttack = false
+            }
+            if(hittableObject.children.entries[i].data.list.health <= 0){hittableObject.children.entries[i].data.list.CounterMove = 4}
+            if(hittableObject.children.entries[i].data.list.CounterMove === 0){enemyStand(hittableObject.children.entries[i])}
+            if(hittableObject.children.entries[i].data.list.CounterMove === 1){enemyWalkFront(hittableObject.children.entries[i],player,this)};
+            if(hittableObject.children.entries[i].data.list.CounterMove === 2){enemyAttack(hittableObject.children.entries[i])}
+            if(hittableObject.children.entries[i].data.list.CounterMove === 3){enemyKnockBack(hittableObject.children.entries[i])}
+            if(hittableObject.children.entries[i].data.list.CounterMove === 4 && hittableObject.children.entries[i].data.list.EnemyIsDie === false){enemyDie(hittableObject.children.entries[0])}
+            if(hittableObject.children.entries[i].data.list.EnemyIsDie === true){
+                // setTimeout(()=>{
+                    hittableObject.children.entries[i].destroy()
+                    if(hittableObject.children.entries[i] === undefined){console.log('ah ben');}
+
+                    console.log(hittableObject);
+
+                    createEnemyOne(enemySpawn, player, this);
+                // },1000)
+            }
+
+            //this.physics.add.collider(hittableObject, platform, function(htblobjct, pltfrm){})   //collision Enemy + platform
+            this.physics.add.collider(hittableObject.children.entries[i], player, function(htblobjct, plyr){  // collision Enemy + player
+                if(htblobjct.body.touching.up){
+                    if(plyr.flipX === false){}
+                    if(plyr.flipX === true){}
+                }
+                if(htblobjct.body.touching.left){}
+                //htblobjct.body.enable = false
+            });
+            this.physics.add.overlap(colideATK2, hittableObject, function(atk, htblObjct){ //collision Attack + enemy
+                htblObjct.data.list.CounterMove = 3;
+                createSlash()
+                PlayerTouchEnemy = true;
+                atk.destroy()
+                player.anims.pause();
+                setTimeout(()=>{player.anims.resume()},200)
+                htblObjct.data.list.health = htblObjct.data.list.health - 1;
+                //console.log(htblObjct);
+            })
+        }
+        else if(hittableObject.children.entries[i].data.list.name === 'slash'){
+            if(player.flipX === true){
+                hittableObject.children.entries[i].x = player.x - 150
+                hittableObject.children.entries[i].y = player.y
+            }else{
+                hittableObject.children.entries[i].x = player.x + 150
+                hittableObject.children.entries[i].y = player.y
+            }
+        }  
+        else{hittableObject.children.entries[i] = [];} 
+    }
     //console.log(Phaser.Math.Distance.BetweenPoints(hittableObject.children.entries[0],player));
     //console.log(enemyMoveDetection.children.entries[0]);
     //enemyMoveDetection.children.entries[0].body.destroy()
     //console.log(theGamePad);
+    console.log(PlayerTouchEnemy);
     //console.log(enemyCounterMove);
     //console.log(counterMove);
-    //console.log(player.body.velocity.y);
+    //console.log(player.body.angle);
+    //console.log(box.children.entries);
     //console.log(playerInGround);
     //console.log(hittableObject.children.entries[0].body.position);
     //console.log(enemyMoveDetection.children.entries[0].body.position);
-    //console.log(hittableObject.children.entries[0]);
+    //console.log(hittableObject.children.entries[0].anims);
     //console.log(player.anims.currentAnim);
     //console.log(player.anims.currentAnim);
     //console.log(attackintheair);
+    //console.log(EnemyIsDie);
     if (leftkey.isDown && counterMove === 0 || theGamePad.left && counterMove === 0){              //left                                          //left
             player.setVelocityX(-playerVelocityX);
             playerFlip = player.flipX=true;
@@ -553,7 +572,7 @@ function update(time, delta){
         player.setVelocityX(0);
         player.setVelocityY(0);
         player.anims.play('guard', true);
-        enemyCounterMove = 1;
+       
     }
     
     if(Phaser.Input.Keyboard.JustDown(touchesAttack)){                                              //attack
@@ -612,11 +631,7 @@ function attackComboOne(){
                     }
                 }
             })
-    // }
-    // else if(!player.body.touching.down && attackintheair === false){
-    //             attackJump()
-    //             attackintheair = true;
-    // }
+   
 }
 function attackComboTwo(){
 
@@ -762,19 +777,35 @@ function createBox(){ //en chantier
     woodbox.setScale(3)
     woodbox.allowGravity(true)
 }
+function createSlash(){
+    var slash = hittableObject.create(0,0,'slash',0,true);
+    slash.anims.play('slashed', true)
+    slash.rotation = Phaser.Math.Between(-120,120);;
+    slash.setScale(3);
+    slash.setData('name', 'slash');
+    slash.on('animationcomplete', ()=>{
+        slash.destroy();
+        PlayerTouchEnemy = false
+    });
+    
+    //console.log(slash);
+}
 
 function createEnemyOne(enemySpawner, Player, game){
-    var enemyone = hittableObject.create(enemySpawner.x, enemySpawner.y,'enemy', 0, true);
+    var enemyone = hittableObject.get(enemySpawner.x, enemySpawner.y,'enemy', 0, true);
     enemyone.anims.play('stancenemy1',true)
     enemyone.setSize(25, 56)
     enemyone.setScale(3);
+    enemyone.setData('CounterMove', 0);
+    enemyone.setData('EnemyIsAttack', false);
+    enemyone.setData('EnemyIsDie', false);
     enemyone.setData('health', 5);
     enemyone.setData('name', 'EnemyOne');
 }
 function enemyStand(enmy1){
     enmy1.setVelocityX(0);
     enmy1.anims.play('stancenemy1',true)
-    enemyIsAttack = true
+    enmy1.data.list.EnemyIsAttack = true
 }
 
 function enemyWalkFront(enemy1,target,game){
@@ -800,13 +831,14 @@ function enemyAttack(enemyone){
                     if(enemyone.flipX === false){enemyone.setVelocityX(-400)}   
             }
             if(enemyone.anims.currentFrame.index >= 12){ 
-                enemyCounterMove = 0
+                enemyone.data.list.CounterMove = 0
+
             }
         }
     });
 }
 function enemyKnockBack(enmy){
-    enemyIsAttack = false;
+    enmy.data.list.EnemyIsAttack = false;
     enmy.anims.play('knockbackenemy1',true);
     var enemyAction2 = 'knockbackenemy1';
     
@@ -817,7 +849,7 @@ function enemyKnockBack(enmy){
                     if(enmy.flipX === false){enmy.setVelocityX(150)}   
                 }
                 if(enmy.anims.currentFrame.index >= 4){ 
-                    enemyCounterMove = 0
+                    enmy.data.list.CounterMove = 0
                 }
             }
         });
@@ -827,19 +859,30 @@ function enemyDie(enmyOne){
     
     enmyOne.anims.play('fallenemy1', true);
     var enemyAction3 = 'fallenemy1';
+
     enmyOne.on('animationupdate', ()=>{
-        if(enemyAction3 === enmyOne.anims.currentAnim.key ){
-            if(enmyOne.anims.currentFrame.index <= 3){
-                if(enmyOne.flipX === true){enmyOne.setVelocityX(-150)}
-                if(enmyOne.flipX === false){enmyOne.setVelocityX(150)}   
+            if(enmyOne.anims != undefined){
+            if(enemyAction3 === enmyOne.anims.currentAnim.key){
+                if(enmyOne.anims.currentFrame.index <= 3){
+                    if(enmyOne.flipX === true){enmyOne.setVelocityX(-150)}
+                    if(enmyOne.flipX === false){enmyOne.setVelocityX(150)}   
+                }
+                if(enmyOne.anims.currentFrame.index >= 4){
+                    enmyOne.setVelocityX(0)
+                    enmyOne.body.destroy(); 
+                } 
+                if(enmyOne.anims.currentFrame.index >= 10){ 
+
+                    //enmyOne.anims = null
+                    // enmyOne.destroy();  
+                    enmyOne.data.list.EnemyIsDie = true;
+                    // EnemyIsDie = true
+                }
             }
-            if(enmyOne.anims.currentFrame.index >= 4){ 
-                enmyOne.body.destroy();
-               
-                enemyIsDie = true;
-            }
-        }
-    });
+            }else{console.log(hittableObject.children.entries);;}   
+        });
+    // if(enmyOne.anims === undefined){console.log('COUCOU JE SUIS MORT');}
+
 }
 function atkSpeOne(){
     player.anims.play('PowerSlash', true);
