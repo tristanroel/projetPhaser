@@ -96,7 +96,7 @@ function create(){
     skyBg = this.add.tileSprite(0, 200, 800, 500, 'sky').setScale(3); //image ciel
     var sol1 = this.add.sprite(200, 570, 'ground').setScale(3);//image sol
     var sol2 = this.add.sprite(1412, 500, 'ground').setScale(3);//image sol
-    enemySpawn = this.add.image(1800, -200, 'spawner'); //spawn enemy
+    enemySpawn = this.add.image(800, -400, 'spawner'); //spawn enemy
     
 
     Coin = this.physics.add.group({ // piecettes
@@ -411,11 +411,11 @@ function create(){
     //coin.setOrigin(box.x, box.y)   
     //enemy.anims.play('stancenemy1', true);
     //enemy.playAnimation('attackenemy1');
-
-    for(var i = 0;i < 1; i++){
-        setTimeout(()=>{createEnemyOne(enemySpawn, player, this);},12000)
+    
+    for(var i = 0;i < 56; i++){
+        setTimeout(()=>{createEnemyOne(enemySpawn, i);},5000 + (i * 7000))
     }
-    createEnemyOne(enemySpawn, player, this);
+    //createEnemyOne(enemySpawn, player, this);
     console.log(enemySpawn);
     //createSlash()
     //setTimeout(()=>{hittableObject.children.entries[1].destroy()},8000)
@@ -460,34 +460,10 @@ function update(time, delta){
     for(var i = 0; i < hittableObject.children.entries.length; i++){
         if(hittableObject.children.entries[i] != undefined && hittableObject.children.entries[i].data.list.name === 'EnemyOne'){
             
-            if(Phaser.Math.Distance.BetweenPoints(hittableObject.children.entries[i],player) > 200){
-                hittableObject.children.entries[i].data.list.CounterMove = 1; 
-                hittableObject.children.entries[i].data.list.EnemyIsAttack = true; 
-            }
-            if(Phaser.Math.Distance.BetweenPoints(hittableObject.children.entries[i],player) < 200 && 
-            hittableObject.children.entries[i].data.list.EnemyIsAttack === true){
-                hittableObject.children.entries[i].data.list.CounterMove = 2; 
-                hittableObject.children.entries[i].data.list.EnemyIsAttack = false
-            }
-            if(hittableObject.children.entries[i].data.list.health <= 0){hittableObject.children.entries[i].data.list.CounterMove = 4}
-            if(hittableObject.children.entries[i].data.list.CounterMove === 0){enemyStand(hittableObject.children.entries[i])}
-            if(hittableObject.children.entries[i].data.list.CounterMove === 1){enemyWalkFront(hittableObject.children.entries[i],player,this)};
-            if(hittableObject.children.entries[i].data.list.CounterMove === 2){enemyAttack(hittableObject.children.entries[i])}
-            if(hittableObject.children.entries[i].data.list.CounterMove === 3){enemyKnockBack(hittableObject.children.entries[i])}
-            if(hittableObject.children.entries[i].data.list.CounterMove === 4 && hittableObject.children.entries[i].data.list.EnemyIsDie === false){enemyDie(hittableObject.children.entries[0])}
-            if(hittableObject.children.entries[i].data.list.EnemyIsDie === true){
-                // setTimeout(()=>{
-                    hittableObject.children.entries[i].destroy()
-                    if(hittableObject.children.entries[i] === undefined){console.log('ah ben');}
-
-                    console.log(hittableObject);
-
-                    createEnemyOne(enemySpawn, player, this);
-                // },1000)
-            }
+            var currentEnemy = hittableObject.children.entries[i];
 
             //this.physics.add.collider(hittableObject, platform, function(htblobjct, pltfrm){})   //collision Enemy + platform
-            this.physics.add.collider(hittableObject.children.entries[i], player, function(htblobjct, plyr){  // collision Enemy + player
+            this.physics.add.collider(currentEnemy, player, function(htblobjct, plyr){  // collision Enemy + player
                 if(htblobjct.body.touching.up){
                     if(plyr.flipX === false){}
                     if(plyr.flipX === true){}
@@ -505,6 +481,26 @@ function update(time, delta){
                 htblObjct.data.list.health = htblObjct.data.list.health - 1;
                 //console.log(htblObjct);
             })
+
+            if(Phaser.Math.Distance.BetweenPoints(currentEnemy,player) > 200){
+                currentEnemy.data.list.CounterMove = 1; 
+                currentEnemy.data.list.EnemyIsAttack = true; 
+            }
+            if(Phaser.Math.Distance.BetweenPoints(currentEnemy,player) < 200 && 
+            currentEnemy.data.list.EnemyIsAttack === true){
+                currentEnemy.data.list.CounterMove = 2; 
+                currentEnemy.data.list.EnemyIsAttack = false
+            }
+            if(currentEnemy.data.list.health <= 0){currentEnemy.data.list.CounterMove = 4}
+            if(currentEnemy.data.list.CounterMove === 0){enemyStand(currentEnemy)}
+            if(currentEnemy.data.list.CounterMove === 1){enemyWalkFront(currentEnemy,player,this)};
+            if(currentEnemy.data.list.CounterMove === 2){enemyAttack(currentEnemy)}
+            if(currentEnemy.data.list.CounterMove === 3){enemyKnockBack(currentEnemy)}
+            if(currentEnemy.data.list.CounterMove === 4 && currentEnemy.data.list.EnemyIsDie === false) {enemyDie(currentEnemy)}
+            if(currentEnemy.data.list.EnemyIsDie === true){
+                    Phaser.Utils.Array.RemoveAt(hittableObject.children.entries, i);
+                    currentEnemy.destroy()
+            }
         }
         else if(hittableObject.children.entries[i].data.list.name === 'slash'){
             if(player.flipX === true){
@@ -521,7 +517,7 @@ function update(time, delta){
     //console.log(enemyMoveDetection.children.entries[0]);
     //enemyMoveDetection.children.entries[0].body.destroy()
     //console.log(theGamePad);
-    console.log(PlayerTouchEnemy);
+    //console.log(PlayerTouchEnemy);
     //console.log(enemyCounterMove);
     //console.log(counterMove);
     //console.log(player.body.angle);
@@ -791,8 +787,8 @@ function createSlash(){
     //console.log(slash);
 }
 
-function createEnemyOne(enemySpawner, Player, game){
-    var enemyone = hittableObject.get(enemySpawner.x, enemySpawner.y,'enemy', 0, true);
+function createEnemyOne(enemySpawner, i){
+    var enemyone = hittableObject.create(Phaser.Math.Between(-500,500), enemySpawner.y,'enemy', 0, true);
     enemyone.anims.play('stancenemy1',true)
     enemyone.setSize(25, 56)
     enemyone.setScale(3);
@@ -879,7 +875,7 @@ function enemyDie(enmyOne){
                     // EnemyIsDie = true
                 }
             }
-            }else{console.log(hittableObject.children.entries);;}   
+            }else{console.log(hittableObject.children.entries);}   
         });
     // if(enmyOne.anims === undefined){console.log('COUCOU JE SUIS MORT');}
 
