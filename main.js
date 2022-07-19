@@ -95,8 +95,8 @@ function create(){
 
     skyBg = this.add.tileSprite(0, 200, 800, 500, 'sky').setScale(3); //image ciel
     var sol1 = this.add.sprite(200, 570, 'ground').setScale(3);//image sol
-    var sol2 = this.add.sprite(1412, 500, 'ground').setScale(3);//image sol
-    enemySpawn = this.add.image(800, -400, 'spawner'); //spawn enemy
+    var sol2 = this.add.sprite(1422, 500, 'ground').setScale(3);//image sol
+    enemySpawn = this.add.image(1800, -400, 'spawner'); //spawn enemy
     
 
     Coin = this.physics.add.group({ // piecettes
@@ -160,7 +160,7 @@ function create(){
         platform.add(sol2)//asigne
 
         this.physics.add.collider(platform,player, function( pl4yer,theplatform){ //collision entre la plateforrme et le joueur 
-            if(theplatform.body.touching.up){
+            if(theplatform.body.touching.up && pl4yer.body.touching.down){
                 attackintheair = false;
                 playerInGround = true;
             }
@@ -183,7 +183,7 @@ function create(){
         this.physics.add.collider(box, player, function (theplayer, thebox){ //collision entre box et le joueur 
             // theplayer.setVelocityX(0);
             thebox.setVelocityX(0)
-            thebox
+            
             
             if(thebox.body.touching.right || thebox.body.touching.left){
                 theplayer.anims.play('runRight', true)
@@ -522,7 +522,7 @@ function update(time, delta){
     //console.log(counterMove);
     //console.log(player.body.angle);
     //console.log(box.children.entries);
-    //console.log(playerInGround);
+    console.log(playerInGround);
     //console.log(hittableObject.children.entries[0].body.position);
     //console.log(enemyMoveDetection.children.entries[0].body.position);
     //console.log(hittableObject.children.entries[0].anims);
