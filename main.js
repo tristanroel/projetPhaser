@@ -185,17 +185,17 @@ function create(){
             thebox.setVelocityX(0)
             
             
-            if(thebox.body.touching.right || thebox.body.touching.left){
-                theplayer.anims.play('runRight', true)
-                counterMove = 0;
-                playerInGround = true
-                //console.log(theplayer.body.angle);
-            }
-            if(thebox.body.touching.up){
+            // if(thebox.body.touching.right || thebox.body.touching.left){
+            //     theplayer.anims.play('runRight', true)
+            //     counterMove = 0;
+            //     playerInGround = true
+            //     //console.log(theplayer.body.angle);
+            // }
+            if(thebox.body.touching.up && theplayer.body.touching.down){
                 playerInGround = true;
                 thebox.setGravityY(-1)
             }
-            else{playerInGround = false;}
+            // else{playerInGround = false;}
         });
 
         this.physics.add.collider(Coin, platform)
@@ -530,7 +530,7 @@ function update(time, delta){
     //console.log(player.anims.currentAnim);
     //console.log(attackintheair);
     //console.log(EnemyIsDie);
-    if (leftkey.isDown && counterMove === 0 || theGamePad.left && counterMove === 0){              //left                                          //left
+    if (leftkey.isDown && counterMove === 0 || theGamePad.left && counterMove === 0){              //left
             player.setVelocityX(-playerVelocityX);
             playerFlip = player.flipX=true;
 
@@ -538,7 +538,7 @@ function update(time, delta){
                 player.anims.play('runLeft', true);
             }
         }
-    else if (rightkey.isDown && counterMove === 0 || theGamePad.right && counterMove === 0){       //right                                            //right
+    else if (rightkey.isDown && counterMove === 0 || theGamePad.right && counterMove === 0){       //right
             player.setVelocityX(playerVelocityX);
             playerFlip = player.flipX=false;
            
