@@ -95,7 +95,7 @@ function create(){
 
     skyBg = this.add.tileSprite(0, 200, 800, 500, 'sky').setScale(3); //image ciel
     var sol1 = this.add.sprite(200, 570, 'ground').setScale(3);//image sol
-    var sol2 = this.add.sprite(1422, 500, 'ground').setScale(3);//image sol
+    var sol2 = this.add.sprite(1412, 500, 'ground').setScale(3);//image sol
     enemySpawn = this.add.image(1800, -400, 'spawner'); //spawn enemy
     
 
