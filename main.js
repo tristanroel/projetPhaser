@@ -500,11 +500,13 @@ function update(time, delta){
                             console.log(plyr.body.velocity);
                         }
                         else{
+                            
                             counterMove = 28
                             KnockBack(htblobjct);
                             console.log('coup dans l\'dos');
                         }
                     }else{
+                        
                         counterMove = 28
                         KnockBack(htblobjct)
                         console.log('aille !');
@@ -768,6 +770,7 @@ function attackJump(){
     });
 }
 function KnockBack(enemy){
+    touchesAttack.enabled = false;
     player.anims.play('knockBack', true);
     var nameAction = 'knockBack';
     player.on('animationupdate', ()=>{
@@ -784,6 +787,7 @@ function KnockBack(enemy){
             }
             if(player.anims.currentFrame.index >=5){
                 counterMove = 0;
+                touchesAttack.enabled = true;
             }
         }
     });
