@@ -49,7 +49,8 @@ var playerFlip; // direction du joueur : boulean
 var PlayerTouchEnemy; // : boolean
 var colideATK1; // collision attaque 1 : sprite
 var colideATK2; // collision attaque 1 : sprite
-var attackintheair; // verifie si peut attaquer en l'air : boolean
+var attackintheair; // verifie si attaque en l'air : boolean
+var attackinground;
 
 var enemySpawn; //spawn enemy
 //var enemyNumber;
@@ -62,6 +63,7 @@ var Coin; //pieces
 var text; // info command list
 var Score = 0; // Score
 var scoreText;
+var healthBar; 
 
 
 var countTest = 0;
@@ -96,12 +98,12 @@ function create(){
     
    //OBJECT
 
-    skyBg = this.add.tileSprite(0, 200, 800, 500, 'sky').setScale(3); //image ciel
+    skyBg = this.add.tileSprite(0, 400, 404, 542, 'sky').setScale(3); //image ciel
     var sol1 = this.add.sprite(200, 570, 'ground').setScale(3);//image sol
     var sol2 = this.add.sprite(1412, 500, 'ground').setScale(3);//image sol
-    enemySpawn = this.add.image(1800, 100, 'spawner'); //spawn enemy
+    enemySpawn = this.add.image(1900, 100, 'spawner'); //spawn enemy
     
-
+    healthBar = this.add.rectangle(0,0,200,10,0xB14F37).setStrokeStyle(2, 0xFFFFFF);
     Coin = this.physics.add.group({ // piecettes
         //key :'piecette',
         setXY:{x: -800, y :60},
@@ -133,9 +135,9 @@ function create(){
 
     player = this.physics.add.sprite(200, 310,'hero').setScale(3); // player
     player.body.setSize(25, 58) // hitbox player
-    player.setData('health', 100)
+    player.setData('health', 10)
     player.setData('Guard', false)
-    console.log(player);
+    //console.log(player);
     
 
     colideATK2 = this.physics.add.group({ // collision attaque
@@ -247,6 +249,7 @@ function create(){
     playerVelocityX = 350;
     playerInGround = false;
     PlayerTouchEnemy = false;
+    attackinground = false;
     
     
     //Touches joueurs / ENTREE CLAVIER
@@ -390,6 +393,12 @@ function create(){
         repeat : -1,
     });
     this.anims.create({
+        key: 'walkbackenemy1',
+        frames: this.anims.generateFrameNumbers('theEnemy',{frames : [4, 3, 2, 1]}),
+        frameRate: 4,
+        repeat : -1,
+    });
+    this.anims.create({
         key: 'attackenemy1',
         frames: this.anims.generateFrameNumbers('theEnemy',{frames : [4, 5, 5, 6, 7, 7, 7, 7, 6, 0, 0, 0, 0, 0, 0, 0, 0]}),
         frameRate: 5,
@@ -398,13 +407,12 @@ function create(){
         key: 'knockbackenemy1',
         frames: this.anims.generateFrameNumbers('theEnemy',{frames : [8 ,9 ,9, 0]}),
         frameRate: 9,
-        
     });
     this.anims.create({
         key: 'fallenemy1',
         frames: this.anims.generateFrameNumbers('theEnemyfall',{frames : [0, 1, 2, 3, 3, 3, 3, 3, 3, 3]}),
         frameRate: 8,
-    });
+    })
 
     // coin animation
     this.anims.create({
@@ -427,10 +435,10 @@ function create(){
     //enemy.anims.play('stancenemy1', true);
     //enemy.playAnimation('attackenemy1');
     
-    for(var i = 0;i < 12; i++){
-        setTimeout(()=>{createEnemyOne(enemySpawn, i);},5000 + (i * 7000))
+    for(var i = 0;i < 5; i++){
+        setTimeout(()=>{createEnemyOne(enemySpawn, i);},9000 + (i * 7000))
     }
-    //createEnemyOne(enemySpawn, player, this);
+    createEnemyOne(enemySpawn, player, this);
     //console.log(enemySpawn);
     //createSlash()
     //setTimeout(()=>{hittableObject.children.entries[1].destroy()},8000)
@@ -467,6 +475,9 @@ function update(time, delta){
     skyBg.tilePositionX += 0.5;
     text.x = player.body.position.x - 350; //position text
     text.y = player.body.position.y + 250;
+    healthBar.x = player.body.position.x - 230; //position healthbar
+    healthBar.y = player.body.position.y - 180;
+    healthBar.width = player.data.list.health * 20;
     scoreText.x = player.body.position.x + 250; //position Score
     scoreText.y = player.body.position.y -180;
     scoreText.setText('SCORE : '+ Score) // maj score
@@ -482,7 +493,12 @@ function update(time, delta){
                 //     if(plyr.flipX === false){}
                 //     if(plyr.flipX === true){}
                 // }
-                // if(htblobjct.body.touching.left){}
+                if(htblobjct.body.touching.left && htblobjct.data.list.AtkCollide === false ){
+                    console.log('touché lenemi');
+                    counterMove = 14;
+                    GuardKnockBack()
+                }
+                
                 if(htblobjct.data.list.AtkCollide === true){
                     htblobjct.data.list.AtkCollide = false;
                     if(plyr.data.list.Guard === true){
@@ -500,13 +516,13 @@ function update(time, delta){
                             console.log(plyr.body.velocity);
                         }
                         else{
-                            
+                            plyr.data.list.health = plyr.data.list.health - 1
                             counterMove = 28
                             KnockBack(htblobjct);
                             console.log('coup dans l\'dos');
                         }
                     }else{
-                        
+                        plyr.data.list.health = plyr.data.list.health - 1
                         counterMove = 28
                         KnockBack(htblobjct)
                         console.log('aille !');
@@ -525,7 +541,7 @@ function update(time, delta){
                 //console.log(htblObjct);
             })
 
-            if(Phaser.Math.Distance.BetweenPoints(currentEnemy,player) > 200 &&
+            if(Phaser.Math.Distance.BetweenPoints(currentEnemy,player) > 200 && 
             currentEnemy.data.list.AttackIsFinish === true){
                 currentEnemy.data.list.CounterMove = 1; 
                 currentEnemy.data.list.EnemyIsAttack = true; 
@@ -533,6 +549,9 @@ function update(time, delta){
             if(Phaser.Math.Distance.BetweenPoints(currentEnemy,player) < 200 && 
             currentEnemy.data.list.EnemyIsAttack === true && 
             currentEnemy.data.list.AttackIsFinish === true){
+                // var randomNbr = Phaser.Math.Between(0,10);
+                // if(randomNbr <= 5){currentEnemy.data.list.CounterMove = 2;}
+                // if(randomNbr > 5){currentEnemy.data.list.CounterMove = 5;}
                 currentEnemy.data.list.AttackIsFinish = false
                 currentEnemy.data.list.CounterMove = 2; 
                 currentEnemy.data.list.EnemyIsAttack = false
@@ -540,6 +559,7 @@ function update(time, delta){
             if(currentEnemy.data.list.health <= 0){currentEnemy.data.list.CounterMove = 4}
             if(currentEnemy.data.list.CounterMove === 0){enemyStand(currentEnemy)}
             if(currentEnemy.data.list.CounterMove === 1){enemyWalkFront(currentEnemy,player,this)};
+            if(currentEnemy.data.list.CounterMove === 5){enemyWalkBack(currentEnemy,player,this)};
             if(currentEnemy.data.list.CounterMove === 2){enemyAttack(currentEnemy)}
             if(currentEnemy.data.list.CounterMove === 3){enemyKnockBack(currentEnemy)}
             if(currentEnemy.data.list.CounterMove === 4 && currentEnemy.data.list.EnemyIsDie === false) {enemyDie(currentEnemy)}
@@ -573,9 +593,9 @@ function update(time, delta){
     //enemyMoveDetection.children.entries[0].body.destroy()
     //console.log(theGamePad);
     //console.log(PlayerTouchEnemy);
-    console.log(counterMove);
+    //console.log(counterMove);
     //console.log('AtkCollide : '+ hittableObject.children.entries[0].data.list.AtkCollide);
-    //console.log(player.data.list.Guard);
+    //console.log(player.data.list.health);
     //console.log(box.children.entries);
     //console.log(playerInGround);
     //console.log(hittableObject.children.entries[0].body.position);
@@ -583,87 +603,86 @@ function update(time, delta){
     //console.log(currentEnemy);
     //console.log(player.anims.currentAnim);
     //console.log(player.anims.currentAnim);
-    //console.log(attackintheair);
+    //console.log('countTest : '+countTest);
+    // console.log(attackintheair);
+    //console.log(attackinground);
     //console.log(EnemyIsDie);
-    if (leftkey.isDown && counterMove === 0 || theGamePad.left && counterMove === 0){              //left
-            player.setVelocityX(-playerVelocityX);
-            playerFlip = player.flipX=true;
-
-            if(playerInGround === true){
-                player.anims.play('runLeft', true);
+        if(player.data.list.health <= 0){counterMove = 999; player.data.list.health = 0}
+        if (leftkey.isDown && counterMove === 0 || theGamePad.left && counterMove === 0){              //left
+                player.setVelocityX(-playerVelocityX);
+                playerFlip = player.flipX=true;
+                if(playerInGround === true){
+                    player.anims.play('runLeft', true);
+                }
             }
-        }
-    else if (rightkey.isDown && counterMove === 0 || theGamePad.right && counterMove === 0){       //right
-            player.setVelocityX(playerVelocityX);
-            playerFlip = player.flipX=false;
-           
-            if(playerInGround === true){
-                player.anims.play('runRight', true);
+        else if (rightkey.isDown && counterMove === 0 || theGamePad.right && counterMove === 0){       //right
+                player.setVelocityX(playerVelocityX);
+                playerFlip = player.flipX=false;
+            
+                if(playerInGround === true){
+                    player.anims.play('runRight', true);
+                }
             }
-        }
-    else if (player.setVelocityX(0)){                                                               //idle
-            if(playerInGround === true && counterMove === 0){
-                player.anims.play('idle', true);
+        else if (player.setVelocityX(0)){                                                               //idle
+                if(playerInGround === true && counterMove === 0){
+                    player.anims.play('idle', true);
+                }
             }
+        
+        if (Phaser.Input.Keyboard.JustDown(upkey) && playerInGround === true && counterMove === 0       //jump
+        || theGamePad.A && playerInGround === true && counterMove === 0){ //gamepad
+            player.setVelocityY(-500);
+            playerInGround = false;
+            jumpAction();
         }
-    
-    if (Phaser.Input.Keyboard.JustDown(upkey) && playerInGround === true && counterMove === 0       //jump
-    || theGamePad.A && playerInGround === true && counterMove === 0){ //gamepad
-        player.setVelocityY(-500);
-        playerInGround = false;
-        jumpAction();
-    }
-    if(player.body.velocity.y > 0 && attackintheair === false && counterMove != 28){
-        player.anims.play('fall', true)
-        playerInGround = false
-    }     
-    
-
-    if (touchesGuard.isDown && playerInGround === true && counterMove === 0){                       //guard
-        player.setVelocityX(0);
-        player.setVelocityY(0);
-        player.anims.play('guard', true);
-        player.data.list.Guard = true
-    }else{ player.data.list.Guard = false}
-    
-    if(Phaser.Input.Keyboard.JustDown(touchesAttack)){                                              //attack
-        counterMove++;
-        if(counterMove === 1 && playerInGround === true){attackComboOne();}
-        else if (counterMove >= 2 && playerInGround === true){attackComboTwo();}
-        else if(counterMove === 1 && playerInGround === false){attackJump();}
-        // else{counterMove = 0}
-        //if(counterMove === 3){attackComboThree();}  
-    }
+        if(player.body.velocity.y > 0 && attackintheair === false &&                                    //fall
+            counterMove != 28 && 
+            counterMove != 14 && 
+            attackinground === false){               
+            fallAction()
+            //player.anims.play('fall', true)
+            playerInGround = false
+        }     
+        
+        if (touchesGuard.isDown && playerInGround === true && counterMove === 0){                       //guard
+            player.setVelocityX(0);
+            player.setVelocityY(0);
+            player.anims.play('guard', true);
+            player.data.list.Guard = true
+        }else{ player.data.list.Guard = false}
+        
+        if(Phaser.Input.Keyboard.JustDown(touchesAttack)){                                              //attack
+            counterMove++;
+            if(counterMove === 1 && playerInGround === true){attackComboOne();}
+            else if (counterMove >= 2 && playerInGround === true){attackComboTwo();}
+            else if(counterMove === 1 && playerInGround === false){attackJump();}
+            //else{counterMove = 0}
+            //if(counterMove === 3){attackComboThree();}  
+        }    
 }
 
 function attackComboOne(){
+        attackinground = true;
         var nameAttack = 'attackOne'
         player.anims.play(nameAttack, true);
         var colAtk2 = colideATK2.get();
         colAtk2.setSize(120,120)
         colAtk2.visible = false;
-    
             player.on('animationupdate', ()=>{
                 if(nameAttack === player.anims.currentAnim.key){
                     if(4 === player.anims.currentFrame.index){
-                        //APPARITION DU COLLIDER ATTACK
-                            //collideBox(player.x,player.y)
                             if(playerFlip === true){colAtk2.setX(player.x -90);colAtk2.setY(player.y);}
                             if(playerFlip === false){colAtk2.setX(player.x +90);colAtk2.setY(player.y)}      
                     };
-                    if(player.anims.currentFrame.index >= 2 && player.anims.currentFrame.index <= 3){
-                        // if(playerFlip === true){player.setVelocityX(-1000)}
-                        // if(playerFlip === false){player.setVelocityX(1000)}
-                        //touchesAttack.enabled = false;
-                    }
                     if(player.anims.currentFrame.index >= 6){
-                        touchesAttack.enabled = true;
-                        //gamepad.enabled = true; 
                         colAtk2.destroy()
                     }
-                    if(player.anims.currentFrame.index >= 7){countTest = 1};
-                    if(13 === player.anims.currentFrame.index){//reset counterMove : 0
+                    if(player.anims.currentFrame.index >= 7){
+                        countTest = 1
+                    };
+                    if(13 === player.anims.currentFrame.index){
                         counterMove = 0;
+                        attackinground = false;
                     }
                 }
             })
@@ -683,26 +702,22 @@ if(player.anims.currentAnim.key === 'attackOne'){
     player.on('animationupdate', ()=>{
         if(nameAttack2 === player.anims.currentAnim.key){
             if(player.anims.currentFrame.index <= 3){
-                // if(playerFlip === true){player.setVelocityX(-1200)}
-                // if(playerFlip === false){player.setVelocityX(1200)}
-                //touchesAttack.enabled = false;
             }
             if(player.anims.currentFrame.index === 4){
                 if(playerFlip === true){colAtk2.setX(player.x -90);colAtk2.setY(player.y)}
                 if(playerFlip === false){colAtk2.setX(player.x +90);colAtk2.setY(player.y)}
             }
             if(player.anims.currentFrame.index >= 5){
-                //touchesAttack.enabled = false;
                 colAtk2.destroy()
             }
-            if(player.anims.currentFrame.index >= 7){touchesAttack.enabled = true;}
-
             if(12 === player.anims.currentFrame.index){//reset counterMove : 0
                 counterMove = 0;
-                countTest = 0
+                countTest = 0;
+                attackinground = false;
             }
         }
     });
+    
     }
 }else{}
 }
@@ -737,18 +752,12 @@ function attackComboThree(){
     });
 }
 function jumpAction(){
-   
         player.anims.play('jump', true);
-        var nameAction = 'jump'
-        player.on('animationupdate', ()=>{
-            if(nameAction === player.anims.currentAnim.key){
-                // if(player.body.touching.down ){
-                //     //counterMove = 0;
-                // }
-            }
-        });
-    
 }
+function fallAction(){
+        player.anims.play('fall', true)   
+}
+
 function attackJump(){
     player.anims.play('jumpAtk', true);
     var nameAttack4 = 'jumpAtk';
@@ -791,7 +800,6 @@ function KnockBack(enemy){
             }
         }
     });
-
 }
 
 function GuardKnockBack(){
@@ -808,18 +816,6 @@ function GuardKnockBack(){
             }
         }
     });
-}
-
-function dieEnemyOne(enemyOne){
-    enemyOne.anims.play('fallenemy1', true)
-    enemyOne.on('animationupdate', ()=>{
-        if(enemyOne.anims.currentFrame.index <= 2){
-            enemyOne.setVelocityX(400)
-        }
-        if(enemyOne.anims.currentFrame.index === 4){
-            enemyOne.setVelocityX(0)
-        }
-    })
 }
 
 function createCoin(thebox){
@@ -872,12 +868,26 @@ function enemyStand(enmy1){
 
 function enemyWalkFront(enemy1,target,game){
     enemy1.anims.play('walkenemy1', true)
-    game.physics.moveToObject(enemy1, target, 100);
+    game.physics.moveToObject(enemy1, target, Phaser.Math.Between(4,200));
     enemy1.setVelocityY(600);
     if(enemy1.body.velocity.x != 0){    //flip enemy
         if(enemy1.body.velocity.x < 0){
             enemy1.flipX = false;
         }else{enemy1.flipX = true;}
+    }
+}
+function enemyWalkBack(enemy1,target,game){
+    enemy1.anims.play('walkbackenemy1', true)
+    game.physics.moveToObject(enemy1, target, -100);
+    enemy1.setVelocityY(600);
+    setTimeout(()=>{
+        enemy1.data.list.CounterMove = 0
+        enemy1.data.list.AttackIsFinish = true
+    }, 2000)
+    if(enemy1.body.velocity.x != 0){    //flip enemy
+        if(enemy1.body.velocity.x < 0){
+            enemy1.flipX = true;
+        }else{enemy1.flipX = false;}
     }
 }
 function enemyAttack(enemyone){
