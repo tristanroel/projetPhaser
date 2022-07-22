@@ -23,7 +23,7 @@ var configuration = {
     physics :{
         default : 'arcade',
         arcade :{
-                    debug : true,
+                    debug : false,
                     gravity : {y : 1000},
                 }
     }
@@ -396,7 +396,7 @@ function create(){
     });
     this.anims.create({
         key: 'walkbackenemy1',
-        frames: this.anims.generateFrameNumbers('theEnemy',{frames : [4, 3, 2, 1]}),
+        frames: this.anims.generateFrameNumbers('theEnemy',{frames : [4, 3, 2, 1, 4, 3, 2, 1, 4, 3, 2, 1]}),
         frameRate: 4,
         repeat : -1,
     });
@@ -552,12 +552,15 @@ function update(time, delta){
             if(Phaser.Math.Distance.BetweenPoints(currentEnemy,player) <= 198 && 
             currentEnemy.data.list.EnemyIsAttack === true && 
             currentEnemy.data.list.AttackIsFinish === true){
-                // var randomNbr = Phaser.Math.Between(0,10);
-                // if(randomNbr <= 5){currentEnemy.data.list.CounterMove = 2;}
-                // if(randomNbr > 5){currentEnemy.data.list.CounterMove = 5;}
                 currentEnemy.data.list.AttackIsFinish = false
-                currentEnemy.data.list.CounterMove = 2; 
                 currentEnemy.data.list.EnemyIsAttack = false
+                if(currentEnemy.data.list.randomValue % 2 === 1){
+                    currentEnemy.data.list.CounterMove = 5;
+                    currentEnemy.data.list.randomValue = currentEnemy.data.list.randomValue + 1;
+                }else{
+                    currentEnemy.data.list.CounterMove = 2;
+                    currentEnemy.data.list.randomValue = currentEnemy.data.list.randomValue + 1;
+                }
             }
             if(currentEnemy.data.list.health <= 0){currentEnemy.data.list.CounterMove = 4}
             if(currentEnemy.data.list.CounterMove === 0){enemyStand(currentEnemy)}
@@ -603,7 +606,7 @@ function update(time, delta){
     //console.log(box.children.entries);
     //console.log(playerInGround);
     //console.log(hittableObject.children.entries);
-    //console.log(enemyMoveDetection.children.entries[0].body.position);
+    //console.log(hittableObject.children.entries[0].body.position.x);
     //console.log(currentEnemy);
     //console.log(player.anims.currentAnim);
     //console.log(player.anims.currentAnim);
@@ -612,7 +615,7 @@ function update(time, delta){
     //console.log(attackinground);
     //console.log(EnemyIsDie);
     // console.log(player.body.velocity.y);
-    console.log(playerCanFall);
+    //console.log(playerCanFall);
         if(player.data.list.health <= 0){
             counterMove = 999; 
             player.data.list.health = 0;
@@ -901,25 +904,27 @@ function enemyWalkFront(enemy1,target,game){
     }
 }
 function enemyWalkBack(enemy1,target,game){
+    
     enemy1.anims.play('walkbackenemy1', true)
-    game.physics.moveToObject(enemy1, target, -100);
+    game.physics.moveToObject(enemy1, target, -(enemy1.data.list.randomValue));
     enemy1.data.list.AttackIsFinish = false
     enemy1.setVelocityY(600);
-    if(enemy1.data.list != undefined){
-    setTimeout(()=>{
-            enemy1.data.list.CounterMove = 0
-            enemy1.data.list.AttackIsFinish = true
-        }, 0)
-    }else{
-        enemy1.data.list.CounterMove = 0
-        enemy1.data.list.AttackIsFinish = true
-    }
+    var enemyAction = 'walkbackenemy1';
+    enemy1.on('animationupdate', ()=>{
+        if(enemyAction === enemy1.anims.currentAnim.key){
+            if(enemy1.anims.currentFrame.index >= 4){
+                enemy1.data.list.CounterMove = 1
+                enemy1.data.list.AttackIsFinish = true
+            }
+        }
+    });
     if(enemy1.body.velocity.x != 0){    //flip enemy
         if(enemy1.body.velocity.x < 0){
             enemy1.flipX = true;
         }else{enemy1.flipX = false;}
     }
 }
+
 function enemyAttack(enemyone){
     enemyone.setVelocityX(0);
     enemyone.anims.play('attackenemy1',true)
