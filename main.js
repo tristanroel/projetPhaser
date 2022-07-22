@@ -913,7 +913,7 @@ function enemyWalkBack(enemy1,target,game){
     enemy1.on('animationupdate', ()=>{
         if(enemyAction === enemy1.anims.currentAnim.key){
             if(enemy1.anims.currentFrame.index >= 4){
-                enemy1.data.list.CounterMove = 1
+                enemy1.data.list.CounterMove = 2
                 enemy1.data.list.AttackIsFinish = true
             }
         }
