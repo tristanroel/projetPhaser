@@ -23,7 +23,7 @@ var configuration = {
     physics :{
         default : 'arcade',
         arcade :{
-                    debug : false,
+                    debug : true,
                     gravity : {y : 1000},
                 }
     }
@@ -51,6 +51,7 @@ var colideATK1; // collision attaque 1 : sprite
 var colideATK2; // collision attaque 1 : sprite
 var attackintheair; // verifie si attaque en l'air : boolean
 var attackinground;
+var playerCanFall; // : boolean
 
 var enemySpawn; //spawn enemy
 //var enemyNumber;
@@ -250,6 +251,7 @@ function create(){
     playerInGround = false;
     PlayerTouchEnemy = false;
     attackinground = false;
+    playerCanFall = true;
     
     
     //Touches joueurs / ENTREE CLAVIER
@@ -343,13 +345,13 @@ function create(){
     });
     this.anims.create({
         key: 'protectGuard',
-        frames: this.anims.generateFrameNumbers('heroProtectGuard',{frames: [0, 1, 2, 3, 4]}),
+        frames: this.anims.generateFrameNumbers('heroProtectGuard',{frames: [0, 1, 2, 3, 4, 4, 4, 4, 4, 4]}),
         frameRate: 8,
         //repeat: -1
     });
     this.anims.create({
         key: 'knockBack',
-        frames: this.anims.generateFrameNumbers('heroKnockBack',{frames: [0, 1, 2, 2, 1]}),
+        frames: this.anims.generateFrameNumbers('heroKnockBack',{frames: [0, 1, 2, 2, 1, 1, 1, 1, 1, 1]}),
         frameRate: 8,
     });
     this.anims.create({
@@ -383,7 +385,7 @@ function create(){
 
     this.anims.create({
         key: 'stancenemy1',
-        frames: this.anims.generateFrameNumbers('theEnemy',{frames : [0]}),
+        frames: this.anims.generateFrameNumbers('theEnemy',{frames : [1]}),
         frameRate: 6,
     });
     this.anims.create({
@@ -401,7 +403,7 @@ function create(){
     this.anims.create({
         key: 'attackenemy1',
         frames: this.anims.generateFrameNumbers('theEnemy',{frames : [4, 5, 5, 6, 7, 7, 7, 7, 6, 0, 0, 0, 0, 0, 0, 0, 0]}),
-        frameRate: 5,
+        frameRate: 8,
     });
     this.anims.create({
         key: 'knockbackenemy1',
@@ -493,7 +495,9 @@ function update(time, delta){
                 //     if(plyr.flipX === false){}
                 //     if(plyr.flipX === true){}
                 // }
-                if(htblobjct.body.touching.left && htblobjct.data.list.AtkCollide === false ){
+                if((htblobjct.body.touching.left || 
+                    htblobjct.body.touching.right) && 
+                    htblobjct.data.list.AtkCollide === false){
                     console.log('touché lenemi');
                     counterMove = 14;
                     GuardKnockBack()
@@ -527,7 +531,6 @@ function update(time, delta){
                         KnockBack(htblobjct)
                         console.log('aille !');
                     }
-
                 }
             });
             this.physics.add.overlap(colideATK2, hittableObject, function(atk, htblObjct){ //collision Attack + enemy
@@ -540,13 +543,13 @@ function update(time, delta){
                 htblObjct.data.list.health = htblObjct.data.list.health - 1;
                 //console.log(htblObjct);
             })
-
-            if(Phaser.Math.Distance.BetweenPoints(currentEnemy,player) > 200 && 
+            
+            if(Phaser.Math.Distance.BetweenPoints(currentEnemy,player) >= 202 && 
             currentEnemy.data.list.AttackIsFinish === true){
                 currentEnemy.data.list.CounterMove = 1; 
                 currentEnemy.data.list.EnemyIsAttack = true; 
             }
-            if(Phaser.Math.Distance.BetweenPoints(currentEnemy,player) < 200 && 
+            if(Phaser.Math.Distance.BetweenPoints(currentEnemy,player) <= 198 && 
             currentEnemy.data.list.EnemyIsAttack === true && 
             currentEnemy.data.list.AttackIsFinish === true){
                 // var randomNbr = Phaser.Math.Between(0,10);
@@ -594,20 +597,27 @@ function update(time, delta){
     //console.log(theGamePad);
     //console.log(PlayerTouchEnemy);
     //console.log(counterMove);
+    //console.log(returnRandomNumber(10, 20));
     //console.log('AtkCollide : '+ hittableObject.children.entries[0].data.list.AtkCollide);
     //console.log(player.data.list.health);
     //console.log(box.children.entries);
     //console.log(playerInGround);
-    //console.log(hittableObject.children.entries[0].body.position);
+    //console.log(hittableObject.children.entries);
     //console.log(enemyMoveDetection.children.entries[0].body.position);
     //console.log(currentEnemy);
     //console.log(player.anims.currentAnim);
     //console.log(player.anims.currentAnim);
     //console.log('countTest : '+countTest);
-    // console.log(attackintheair);
+    //console.log(attackintheair);
     //console.log(attackinground);
     //console.log(EnemyIsDie);
-        if(player.data.list.health <= 0){counterMove = 999; player.data.list.health = 0}
+    // console.log(player.body.velocity.y);
+    console.log(playerCanFall);
+        if(player.data.list.health <= 0){
+            counterMove = 999; 
+            player.data.list.health = 0;
+            // player.body.destroy()
+        }
         if (leftkey.isDown && counterMove === 0 || theGamePad.left && counterMove === 0){              //left
                 player.setVelocityX(-playerVelocityX);
                 playerFlip = player.flipX=true;
@@ -635,12 +645,13 @@ function update(time, delta){
             playerInGround = false;
             jumpAction();
         }
-        if(player.body.velocity.y > 0 && attackintheair === false &&                                    //fall
+        if(player.body.velocity.y > 0 &&                                                                //fall
+            attackintheair === false &&                                    
             counterMove != 28 && 
             counterMove != 14 && 
+            playerCanFall === true &&
             attackinground === false){               
             fallAction()
-            //player.anims.play('fall', true)
             playerInGround = false
         }     
         
@@ -779,7 +790,7 @@ function attackJump(){
     });
 }
 function KnockBack(enemy){
-    touchesAttack.enabled = false;
+    playerCanFall = false
     player.anims.play('knockBack', true);
     var nameAction = 'knockBack';
     player.on('animationupdate', ()=>{
@@ -795,14 +806,19 @@ function KnockBack(enemy){
                 } 
             }
             if(player.anims.currentFrame.index >=5){
-                counterMove = 0;
-                touchesAttack.enabled = true;
+                if(player.body.velocity.y != 0){
+                    playerCanFall = false
+                }else{
+                    playerCanFall = true;
+                    counterMove = 0;
+                }
             }
         }
     });
 }
 
 function GuardKnockBack(){
+    playerCanFall = false
     player.anims.play('protectGuard', true);
     var nameAction = 'protectGuard';
     player.on('animationupdate', ()=>{
@@ -812,8 +828,14 @@ function GuardKnockBack(){
                 if(playerFlip === false){player.setVelocityX(-800)} 
             }
             if(player.anims.currentFrame.index >=5){
-                counterMove = 0;
+                if(player.body.velocity.y != 0){
+                    playerCanFall = false
+                }else{
+                    playerCanFall = true;
+                    counterMove = 0;
+                }
             }
+            
         }
     });
 }
@@ -859,16 +881,18 @@ function createEnemyOne(enemySpawner, i){
     enemyone.setData('EnemyIsDie', false);
     enemyone.setData('health', 5);
     enemyone.setData('name', 'EnemyOne');
+    enemyone.setData('randomValue',Phaser.Math.Between(50,200));
+    enemyone.setDepth(0)
 }
 function enemyStand(enmy1){
     enmy1.setVelocityX(0);
-    enmy1.anims.play('stancenemy1',true)
+    //enmy1.anims.play('stancenemy1',true)
     enmy1.data.list.EnemyIsAttack = true
 }
 
 function enemyWalkFront(enemy1,target,game){
     enemy1.anims.play('walkenemy1', true)
-    game.physics.moveToObject(enemy1, target, Phaser.Math.Between(4,200));
+    game.physics.moveToObject(enemy1, target, enemy1.data.list.randomValue);
     enemy1.setVelocityY(600);
     if(enemy1.body.velocity.x != 0){    //flip enemy
         if(enemy1.body.velocity.x < 0){
@@ -879,11 +903,17 @@ function enemyWalkFront(enemy1,target,game){
 function enemyWalkBack(enemy1,target,game){
     enemy1.anims.play('walkbackenemy1', true)
     game.physics.moveToObject(enemy1, target, -100);
+    enemy1.data.list.AttackIsFinish = false
     enemy1.setVelocityY(600);
+    if(enemy1.data.list != undefined){
     setTimeout(()=>{
+            enemy1.data.list.CounterMove = 0
+            enemy1.data.list.AttackIsFinish = true
+        }, 0)
+    }else{
         enemy1.data.list.CounterMove = 0
         enemy1.data.list.AttackIsFinish = true
-    }, 2000)
+    }
     if(enemy1.body.velocity.x != 0){    //flip enemy
         if(enemy1.body.velocity.x < 0){
             enemy1.flipX = true;
@@ -958,21 +988,24 @@ function enemyDie(enmyOne){
                     enmyOne.body.destroy(); 
                 } 
                 if(enmyOne.anims.currentFrame.index >= 10){ 
-
-                    //enmyOne.anims = null
-                    // enmyOne.destroy();  
                     enmyOne.data.list.EnemyIsDie = true;
-                    // EnemyIsDie = true
                 }
             }
             }else{console.log(hittableObject.children.entries);}   
         });
-    // if(enmyOne.anims === undefined){console.log('COUCOU JE SUIS MORT');}
-
 }
+
 function atkSpeOne(){
     player.anims.play('PowerSlash', true);
     
+}
+function returnRandomNumber(number1,number2){
+    // setTimeout(()=>{
+        var randomNbr = 0;
+        randomNbr = Phaser.Math.Between(number1,number2);
+    // }, 1000)
+
+    return randomNbr
 }
 
 
