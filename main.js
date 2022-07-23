@@ -389,7 +389,7 @@ function create(){
     });
     this.anims.create({
         key: 'knockbackenemy1',
-        frames: this.anims.generateFrameNumbers('theEnemy',{frames : [ 8, 9, 9, 9, 9, 9, 9, 9, 0]}),
+        frames: this.anims.generateFrameNumbers('theEnemy',{frames : [ 8, 9, 9, 9, 9, 9, 9, 0, 0]}),
         frameRate: 9,
     });
     this.anims.create({
@@ -801,7 +801,7 @@ function tornadoSlash(){
                 player.body.checkCollision.left = true;
                 colAtk.destroy();
                 player.data.list.Eject = true;
-                player.anims.stop()
+                // player.anims.stop()
                 if(playerFlip === true){colAtkTwo.setX(player.x -50);colAtkTwo.setY(player.y -65)}
                 if(playerFlip === false){colAtkTwo.setX(player.x +50);colAtkTwo.setY(player.y -65)} 
             }
@@ -1007,8 +1007,8 @@ function enemyKnockBack(enmy){
             enmy.on('animationupdate', ()=>{
                 if(enemyAction2 === enmy.anims.currentAnim.key){
                     if(enmy.anims.currentFrame.index <= 3){
-                        if(enmy.flipX === true){enmy.setVelocityX(-50)}
-                        if(enmy.flipX === false){enmy.setVelocityX(50)}   
+                        if(enmy.flipX === true){enmy.setVelocityX(-100)}
+                        if(enmy.flipX === false){enmy.setVelocityX(100)}   
                     }
                     if(enmy.anims.currentFrame.index >= 8 &&
                         player.data.list.Eject === false){ 
