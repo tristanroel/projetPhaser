@@ -1,7 +1,7 @@
 var configuration = {
     type: Phaser.AUTO,
     pixelArt : true,
-    width : 800,
+    width : 900,
     height : 600,
     backgroundColor : '#353535',
     fps: {
@@ -37,9 +37,12 @@ var rightkey;
 var upkey;
 var touchesAttack; // touche d'attaque
 
+///Provisoire
 var theGamePad;
 var gamepadJump; // : boolean
 var gamepadAttack; // : boolean
+/////////////////////////////////
+var GameControllers;
 
 var player;
 var playerVelocityX;
@@ -143,10 +146,12 @@ function create(){
         // size : {x : 200, y : 200}
         //setXY : {x : -999, y : -999}
     })
-    //colideATK2.children.iterateLocal('setData', 'eject', false)
+    
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     // TEXT
-    text = this.add.text(-150,510, ' << CONTROL >> \n LEFT = press "Q"\n RIGHT = press "D"\n JUMP  = press "Z"\n\n ATTACK = press "J"\n GUARD = press "I"' , {font : '16px Courier'}); 
+
+    text = this.add.text(-150,510, ' << CONTROL >> \n LEFT = press "Q"\n RIGHT = press "D"\n JUMP  = press "Z"\n\n ATTACK = press "J"\n GUARD = press "I" \n GAMEPAD = ' , {font : '16px Courier'}); 
     scoreText = this.add.text(10,10, 'SCORE : 0',{ font : '22px Courier', color : '#353535'})
     //console.log(colideATK2);
     //////////////////////
@@ -154,7 +159,10 @@ function create(){
     //CAMERA
     this.cameras.main.startFollow(player);
 
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
     //COLISIONS
+
     var platform = this.physics.add.staticGroup();// groupe plateforme
         platform.add(sol1)//asigne
         platform.add(sol2)//asigne
@@ -218,8 +226,10 @@ function create(){
     attackinground = false;
     playerCanFall = true;
     
-    
-    //Touches joueurs / ENTREE CLAVIER
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////// 
+
+    ///  ENTREES CLAVIER
+
     leftkey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Q);
     rightkey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
     upkey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Z);
@@ -237,13 +247,19 @@ function create(){
             tornadoSlash();
         }
     }) 
-  
+    //////////////////////////////////////////////////////////////////////////////////////////////////
+
+    // GAMEPAD
+
     gamepadAttack = false;
     gamepadJump = false;
     theGamePad = this.input.gamepad.on('down', function(pad, button, index){
         theGamePad = pad
+        text.setText('Playing with : ' + pad.id);
+        console.log(pad.id);
     }, this);
-    
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
 
     //ANIMATIONS
 
@@ -401,43 +417,11 @@ function create(){
     });
 
 
-    // coin.getChildren().forEach(function() {
-    //skyBgAnim.anims.play('lescloud', true)
-    //coin.anims.play('turnPiecette', true);
-    //coin.setOrigin(box.x, box.y)   
-    //enemy.anims.play('stancenemy1', true);
-    //enemy.playAnimation('attackenemy1');
-    
     for(var i = 0;i < 10; i++){
         setTimeout(()=>{createEnemyOne(enemySpawn, i);},9000 + (i * 7000))
     }
     createEnemyOne(enemySpawn, player, this);
-    //console.log(enemySpawn);
-    //createSlash()
-    //setTimeout(()=>{hittableObject.children.entries[1].destroy()},8000)
-    //this.physics.moveToObject(enemy, enemy,200)
-
-
-
-    // })
-    // coin.callAll('animation.add','turnPiecette', 'piecette',[0, 1, 2, 3], true);
-    // coin.callAll('animation.play', 'turnPiecette', 'piecette');
-    
 }
-
-//apparition collision attaque 1
-// function collideBox(playerx, playery){ 
-//     var ctk = colideATK1.get();
-//         if(!ctk) return;
-//         if(playerFlip === true){ctk.enableBody(true, playerx -122,playery,true, true)}
-//         if(playerFlip === false){ctk.enableBody(true, playerx +122,playery,true, true)}
-//         // ctk.enableBody(true, playerx,playery,true, true)
-// }
-
-// function destroyCollideBox(player,cAtk){
-//     cAtk.disableBody(true,true);
-// }
-
 
 //////////////////////////////////////////////////////////////////////////////////////////////// UPDATE 
 
@@ -462,11 +446,12 @@ function update(time, delta){
             var currentEnemy = hittableObject.children.entries[i];
 
             this.physics.add.collider(currentEnemy, player, function(htblobjct, plyr){  // collision Enemy + player
-                // if(htblobjct.body.touching.up){
-                //     if(plyr.flipX === false){}
-                //     if(plyr.flipX === true){}
-                // }
-                console.log(htblobjct.body.checkCollision.up = false)
+                if(htblobjct.body.touching.up){
+                    console.log(htblobjct.body.checkCollision.up = false)
+                }
+                if(plyr.body.touching.up){
+                    console.log(plyr.body.checkCollision.up = false)
+                }
                 if((htblobjct.body.touching.left || 
                     htblobjct.body.touching.right) && 
                     htblobjct.data.list.AtkCollide === false){
@@ -588,12 +573,33 @@ function update(time, delta){
     //console.log(EnemyIsDie);
     //console.log(player.body.velocity.y);
     //console.log(playerCanFall);
+    //theGamePad.left = true
+    //console.log(theGamePad);
+    //console.log(theGamePad.gamepads);
+    //console.log(this.input.gamepad.total);
+    //console.log(this.input.gamepad.gamepads.length);
+    if(theGamePad.left === true){
+        theGamePad.enabled = false
+        //console.log(theGamePad);
+        //console.log(theGamePad._HAxisLeft);
+        console.log(theGamePad.buttons[0].pressed = true); //jump
+        console.log('encule');
+    }
+    // GameControllers = this.input.gamepad.gamepads;
+    // var bubu;
+    // for(var i = 0; i < GameControllers; i++){
+    //     var GamePad = GameControllers[i];
+    //     bubu = GamePad;
+    //     console.log(GamePad);
+    // }
+    // console.log(bubu);
+
         if(player.data.list.health <= 0){
             counterMove = 999; 
             player.data.list.health = 0;
             // player.body.destroy()
         }
-        if (leftkey.isDown && counterMove === 0 || theGamePad.left && counterMove === 0){              //left
+        if (leftkey.isDown && counterMove === 0 || theGamePad.left  && counterMove === 0){              //left
                 player.setVelocityX(-playerVelocityX);
                 playerFlip = player.flipX=true;
                 if(playerInGround === true){
@@ -1058,23 +1064,25 @@ function enemyDie(enmyOne){
     enmyOne.anims.play('fallenemy1', true);
     var enemyAction3 = 'fallenemy1';
     enmyOne.on('animationupdate', ()=>{
-            if(enmyOne.anims != undefined){
+        if(enmyOne.anims != undefined){
             if(enemyAction3 === enmyOne.anims.currentAnim.key){
                 if(enmyOne.anims.currentFrame.index <= 3){
-                        if(enmyOne.flipX === true){enmyOne.setVelocityX(-150)}
-                        if(enmyOne.flipX === false){enmyOne.setVelocityX(150)}   
+                    if(enmyOne.flipX === true){enmyOne.setVelocityX(-150)}
+                    if(enmyOne.flipX === false){enmyOne.setVelocityX(150)}
                 }
                 if(enmyOne.anims.currentFrame.index >= 6){
-                    enmyOne.setVelocityX(0)
-                    enmyOne.setVelocityY(600)
+                    if(enmyOne.body.velocity.y !=0){
+                        enmyOne.setVelocityX(0)
+                        enmyOne.setVelocityY(600)
+                    }else{enmyOne.body.destroy(); }
                 } 
                 if(enmyOne.anims.currentFrame.index >= 14){ 
                     enmyOne.data.list.EnemyIsDie = true;
-                    enmyOne.body.destroy(); 
+                    // enmyOne.body.destroy(); 
                 }
             }
-            }else{console.log(hittableObject.children.entries);}   
-        });
+        }else{console.log(hittableObject.children.entries);}   
+    });
 }
 
 function returnRandomNumber(number1,number2){
