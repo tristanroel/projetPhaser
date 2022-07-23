@@ -86,6 +86,7 @@ function preload(){
     this.load.spritesheet('heroGuard', 'assets/Sprites/guard.png',{frameWidth: 170, frameHeight: 170});
     this.load.spritesheet('heroProtectGuard', 'assets/Sprites/Playerkbtest.png',{frameWidth: 170, frameHeight: 170});
     this.load.spritesheet('heroKnockBack', 'assets/Sprites/KnockBacktest.png',{frameWidth: 170, frameHeight: 170});
+    this.load.spritesheet('shoryu', 'assets/Sprites/shoryu.png',{frameWidth: 170, frameHeight: 170});
     this.load.spritesheet('powerSlash', 'assets/PowerSlash.png',{frameWidth: 100, frameHeight: 100});
     this.load.spritesheet('box', 'assets/box.png',{frameWidth: 62, frameHeight: 62});
     this.load.spritesheet('theEnemy', 'assets/Enemy/enemiaxe1.png',{frameWidth: 170, frameHeight: 170});
@@ -125,19 +126,11 @@ function create(){
     box.children.iterateLocal('setSize', 35,35)
     box.setVelocityY(600)
     
-    // var enemy = this.physics.add.group({   //enemy
-    //     key :'theEnemy',
-    //     setXY:{x: -200, y :366},
-    //     setScale : {x : 3}
-    // });
-    // enemy.children.iterateLocal('setData', 'pv', 5)
-    // enemy.children.iterateLocal('setSize', 26,56)
-
-
     player = this.physics.add.sprite(200, 310,'hero').setScale(3); // player
     player.body.setSize(25, 58) // hitbox player
     player.setData('health', 10)
     player.setData('Guard', false)
+    player.setData('Eject', false)
     //console.log(player);
     
 
@@ -146,9 +139,11 @@ function create(){
         allowGravity : false,
         disableBody : true,
         visible : false,
+        data : {'Eject': false}
         // size : {x : 200, y : 200}
         //setXY : {x : -999, y : -999}
     })
+    //colideATK2.children.iterateLocal('setData', 'eject', false)
 
     // TEXT
     text = this.add.text(-150,510, ' << CONTROL >> \n ← = press "Q"\n → = press "D"\n ↑  = press "Z"\n\n 🗡 = press "J"\n 🛡 = press "I"' , {font : '16px Courier'}); 
@@ -262,13 +257,14 @@ function create(){
     touchesAttack = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.J); //attack
     touchesGuard = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.I); //Guard
 
-    var specialAtkOne = this.input.keyboard.createCombo([40, 39, 32], {resetOnMatch:true, maxKeyDelay:700}); //300ms pour taper le combo, sinon se reinitialise
+    var tornadoSlashLeft = this.input.keyboard.createCombo([83, 68, 74], {resetOnMatch:true, maxKeyDelay:700}); //300ms pour taper le combo, sinon se reinitialise
+    var tornadoSlashRight = this.input.keyboard.createCombo([83, 81, 74], {resetOnMatch:true, maxKeyDelay:700}); 
 
     this.input.keyboard.on('keycombomatch', function(combo){ //verification du secialAtk entré
-        if(combo === specialAtkOne && player.body.touching.down && counterMove === 0){
+        if((combo === tornadoSlashLeft || tornadoSlashRight )&& player.body.touching.down && counterMove === 0){
             console.log('connaldemelde');
             counterMove = 32;
-            atkSpeOne();
+            tornadoSlash();
         }
     }) 
   
@@ -355,6 +351,11 @@ function create(){
         frameRate: 8,
     });
     this.anims.create({
+        key: 'shoryuSlash',
+        frames: this.anims.generateFrameNumbers('shoryu',{frames: [0, 2, 3, 4, 5, 6, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7]}),
+        frameRate: 12,
+    });
+    this.anims.create({
         key: 'PowerSlash',
         frames: this.anims.generateFrameNumbers('powerSlash',{frames: [0 ,1, 2, 3, 4, 5, 6, 7, 8, 9, 10]}),
         frameRate: 16,
@@ -407,12 +408,17 @@ function create(){
     });
     this.anims.create({
         key: 'knockbackenemy1',
-        frames: this.anims.generateFrameNumbers('theEnemy',{frames : [8 ,9 ,9, 0]}),
+        frames: this.anims.generateFrameNumbers('theEnemy',{frames : [ 8, 9, 9, 9, 9, 9, 0]}),
         frameRate: 9,
     });
     this.anims.create({
         key: 'fallenemy1',
         frames: this.anims.generateFrameNumbers('theEnemyfall',{frames : [0, 1, 2, 3, 3, 3, 3, 3, 3, 3]}),
+        frameRate: 8,
+    })
+    this.anims.create({
+        key: 'ejectenemy1',
+        frames: this.anims.generateFrameNumbers('theEnemyfall',{frames : [1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3]}),
         frameRate: 8,
     })
 
@@ -495,10 +501,11 @@ function update(time, delta){
                 //     if(plyr.flipX === false){}
                 //     if(plyr.flipX === true){}
                 // }
+                console.log(htblobjct.body)
                 if((htblobjct.body.touching.left || 
                     htblobjct.body.touching.right) && 
                     htblobjct.data.list.AtkCollide === false){
-                    console.log('touché lenemi');
+                    //console.log('touché lenemi');
                     counterMove = 14;
                     GuardKnockBack()
                 }
@@ -599,10 +606,11 @@ function update(time, delta){
     //enemyMoveDetection.children.entries[0].body.destroy()
     //console.log(theGamePad);
     //console.log(PlayerTouchEnemy);
+    //console.log(colideATK2);
     //console.log(counterMove);
     //console.log(returnRandomNumber(10, 20));
     //console.log('AtkCollide : '+ hittableObject.children.entries[0].data.list.AtkCollide);
-    //console.log(player.data.list.health);
+    //console.log(player.data.list.Eject);
     //console.log(box.children.entries);
     //console.log(playerInGround);
     //console.log(hittableObject.children.entries);
@@ -614,7 +622,7 @@ function update(time, delta){
     //console.log(attackintheair);
     //console.log(attackinground);
     //console.log(EnemyIsDie);
-    // console.log(player.body.velocity.y);
+    //console.log(player.body.velocity.y);
     //console.log(playerCanFall);
         if(player.data.list.health <= 0){
             counterMove = 999; 
@@ -792,7 +800,66 @@ function attackJump(){
         }
     });
 }
+function tornadoSlash(){
+    playerCanFall = false;
+    console.log(player.body.checkCollision);
+    player.anims.play('shoryuSlash', true);
+    var nameAttack = 'shoryuSlash';
+    var colAtk = colideATK2.get().setSize(120,120);
+    var colAtkTwo = colideATK2.get().setSize(120,120);
+    var colAtkThree = colideATK2.get().setSize(120,120);
+    colAtk.visible = false;
+    colAtkTwo.visible = false;
+    colAtkThree.visible = false;
+    player.on('animationupdate', ()=>{
+        if(nameAttack === player.anims.currentAnim.key){
+            if(player.anims.currentFrame.index < 3 ){
+                player.body.checkCollision.right = false;
+                player.body.checkCollision.left = false;
+            }
+            if(player.anims.currentFrame.index <= 3 ){
+                if(playerFlip === true){player.setVelocityX(-2000)}
+                if(playerFlip === false){player.setVelocityX(2000)} 
+            }
+            if(player.anims.currentFrame.index === 2 ){
+                // player.anims.stop()
+                if(playerFlip === true){colAtk.setX(player.x -130);colAtk.setY(player.y +20)}
+                if(playerFlip === false){colAtk.setX(player.x +130);colAtk.setY(player.y +20)} 
+            }
+            if(player.anims.currentFrame.index === 4 ){
+                player.body.checkCollision.right = true;
+                player.body.checkCollision.left = true;
+                colAtk.destroy();
+                player.data.list.Eject = true;
+                if(playerFlip === true){colAtkTwo.setX(player.x -90);colAtkTwo.setY(player.y -65)}
+                if(playerFlip === false){colAtkTwo.setX(player.x +90);colAtkTwo.setY(player.y -65)} 
+            }
+            if(player.anims.currentFrame.index === 6 ){
+                colAtkTwo.destroy();
+                if(playerFlip === true){colAtkThree.setX(player.x -50);colAtkThree.setY(player.y -150)}
+                if(playerFlip === false){colAtkThree.setX(player.x +50);colAtkThree.setY(player.y -150)} 
+            }
+            if(player.anims.currentFrame.index === 7 ){colAtkThree.destroy();}
+            if(player.anims.currentFrame.index >= 4 &&
+                player.anims.currentFrame.index <= 6){
+                    player.setVelocityY(-350)
+            }
+            if(player.anims.currentFrame.index >= 16){
+                player.data.list.Eject = false;
+                if(player.body.velocity.y != 0){
+                    playerCanFall = false
+                }else{
+                    playerCanFall = true;
+                    counterMove = 0;
+                }
+                
+            }
+        }
+    });
+
+}
 function KnockBack(enemy){
+    player.data.list.Eject = false;
     playerCanFall = false
     player.anims.play('knockBack', true);
     var nameAction = 'knockBack';
@@ -821,6 +888,7 @@ function KnockBack(enemy){
 }
 
 function GuardKnockBack(){
+    player.data.list.Eject = false;
     playerCanFall = false
     player.anims.play('protectGuard', true);
     var nameAction = 'protectGuard';
@@ -885,6 +953,8 @@ function createEnemyOne(enemySpawner, i){
     enemyone.setData('health', 5);
     enemyone.setData('name', 'EnemyOne');
     enemyone.setData('randomValue',Phaser.Math.Between(50,200));
+    // enemyone.body.touching.up = false;
+    // console.log(enemyone);
     enemyone.setDepth(0)
 }
 function enemyStand(enmy1){
@@ -903,6 +973,7 @@ function enemyWalkFront(enemy1,target,game){
         }else{enemy1.flipX = true;}
     }
 }
+
 function enemyWalkBack(enemy1,target,game){
     
     enemy1.anims.play('walkbackenemy1', true)
@@ -957,39 +1028,83 @@ function enemyAttack(enemyone){
     });
 }
 function enemyKnockBack(enmy){
-   //console.log(enemyCollideATK);
-    enmy.data.list.EnemyIsAttack = false;
-    enmy.anims.play('knockbackenemy1',true);
-    var enemyAction2 = 'knockbackenemy1';
-    
-        enmy.on('animationupdate', ()=>{
-            if(enemyAction2 === enmy.anims.currentAnim.key){
-                if(enmy.anims.currentFrame.index <= 3){
-                    if(enmy.flipX === true){enmy.setVelocityX(-150)}
-                    if(enmy.flipX === false){enmy.setVelocityX(150)}   
+    if(player.data.list.Eject === false){
+        enmy.data.list.EnemyIsAttack = false;
+        enmy.anims.play('knockbackenemy1',true);
+        var enemyAction2 = 'knockbackenemy1';
+        
+            enmy.on('animationupdate', ()=>{
+                if(enemyAction2 === enmy.anims.currentAnim.key){
+                    if(enmy.anims.currentFrame.index <= 3){
+                        if(enmy.flipX === true){enmy.setVelocityX(-50)}
+                        if(enmy.flipX === false){enmy.setVelocityX(50)}   
+                    }
+                    if(enmy.anims.currentFrame.index >= 6 &&
+                        player.data.list.Eject === false){ 
+                        enmy.data.list.CounterMove = 0
+                        enmy.data.list.AttackIsFinish = true
+                        console.log('et tac');
+                    }
                 }
-                if(enmy.anims.currentFrame.index >= 4){ 
-                    enmy.data.list.CounterMove = 0
-                    enmy.data.list.AttackIsFinish = true
+            });
+    }else{
+        enmy.data.list.EnemyIsAttack = false;
+        enmy.anims.play('ejectenemy1',true);
+        var enemyAction3 = 'ejectenemy1';
+        enmy.data.list.CounterMove = 77
+            enmy.on('animationupdate', ()=>{
+                if(enemyAction3 === enmy.anims.currentAnim.key){
+                    if(enmy.anims.currentFrame.index <= 5){
+                        if(enmy.flipX === true){
+                            enmy.setVelocityX(-100)
+                            enmy.setVelocityY(-400)
+                        }
+                        if(enmy.flipX === false){
+                            enmy.setVelocityX(100)
+                            enmy.setVelocityY(-400)
+                        }   
+                    }
+                    if(enmy.anims.currentFrame.index >= 6 &&
+                        enmy.anims.currentFrame.index <= 7){
+                            enmy.setVelocityX(200)
+                            enmy.setVelocityY(0)
+                        }
+                        if(enmy.anims.currentFrame.index >= 8 &&
+                            enmy.anims.currentFrame.index <10){
+                            enmy.setVelocityX(100)
+                            enmy.setVelocityY(500)
+                            enmy.setBounce(0.5,0.5)
+                        }
+                    if(enmy.anims.currentFrame.index > 10){
+                        enmy.setVelocityX(0)
+                        enmy.setBounce(0,0)                       
+                    }
+                    if(enmy.anims.currentFrame.index >= 20 &&
+                        enmy.body.velocity.y === 0){ 
+                            enmy.setVelocityX(0)
+                            
+                            console.log('fdp');
+                        enmy.data.list.CounterMove = 0
+                        enmy.data.list.AttackIsFinish = true
+                    }
                 }
-            }
-        });
-    
+            });
+    }
 }
+
 function enemyDie(enmyOne){
-    
     enmyOne.anims.play('fallenemy1', true);
     var enemyAction3 = 'fallenemy1';
-
     enmyOne.on('animationupdate', ()=>{
             if(enmyOne.anims != undefined){
             if(enemyAction3 === enmyOne.anims.currentAnim.key){
                 if(enmyOne.anims.currentFrame.index <= 3){
-                    if(enmyOne.flipX === true){enmyOne.setVelocityX(-150)}
-                    if(enmyOne.flipX === false){enmyOne.setVelocityX(150)}   
+                        if(enmyOne.flipX === true){enmyOne.setVelocityX(-150)}
+                        if(enmyOne.flipX === false){enmyOne.setVelocityX(150)}   
                 }
                 if(enmyOne.anims.currentFrame.index >= 4){
                     enmyOne.setVelocityX(0)
+                    enmyOne.setVelocityY(600)
                     enmyOne.body.destroy(); 
                 } 
                 if(enmyOne.anims.currentFrame.index >= 10){ 
