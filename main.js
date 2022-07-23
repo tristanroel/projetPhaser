@@ -87,7 +87,7 @@ function preload(){
     this.load.spritesheet('heroProtectGuard', 'assets/Sprites/Playerkbtest.png',{frameWidth: 170, frameHeight: 170});
     this.load.spritesheet('heroKnockBack', 'assets/Sprites/KnockBacktest.png',{frameWidth: 170, frameHeight: 170});
     this.load.spritesheet('shoryu', 'assets/Sprites/shoryu.png',{frameWidth: 170, frameHeight: 170});
-    this.load.spritesheet('powerSlash', 'assets/PowerSlash.png',{frameWidth: 100, frameHeight: 100});
+    // this.load.spritesheet('powerSlash', 'assets/PowerSlash.png',{frameWidth: 100, frameHeight: 100});
     this.load.spritesheet('box', 'assets/box.png',{frameWidth: 62, frameHeight: 62});
     this.load.spritesheet('theEnemy', 'assets/Enemy/enemiaxe1.png',{frameWidth: 170, frameHeight: 170});
     this.load.spritesheet('theEnemyfall', 'assets/Enemy/enemi1falling.png',{frameWidth: 170, frameHeight: 170});
@@ -103,38 +103,38 @@ function create(){
     skyBg = this.add.tileSprite(0, 400, 404, 542, 'sky').setScale(3); //image ciel
     var sol1 = this.add.sprite(200, 570, 'ground').setScale(3);//image sol
     var sol2 = this.add.sprite(1412, 500, 'ground').setScale(3);//image sol
-    enemySpawn = this.add.image(1900, 100, 'spawner'); //spawn enemy
+    enemySpawn = this.add.image(1600, 100, 'spawner'); //spawn enemy
     
-    healthBar = this.add.rectangle(0,0,200,10,0xB14F37).setStrokeStyle(2, 0xFFFFFF);
-    Coin = this.physics.add.group({ // piecettes
+    healthBar = this.add.rectangle(0,0,200,20,0xB14F37).setStrokeStyle(2, 0xFFFFFF); //healthbar
+    Coin = this.physics.add.group({                              // Coin
         //key :'piecette',
         setXY:{x: -800, y :60},
         visible : false,
     });
 
-    hittableObject = this.physics.add.group()
+    hittableObject = this.physics.add.group()                                       // enemy and other...
 
-    box = this.physics.add.group({ //caisse en bois
+    box = this.physics.add.group({                                                  // woodBox
         key : 'box',
         name : 'woodBox',
         //allowGravity : false,
         repeat : 2,
-        setXY:{x: -100, y :90, stepX: 1000},
+        setXY:{x: -100, y :90, stepX: 800},
         setScale : {x : 3},
     });
     box.children.iterateLocal('setData', 'pv', 4)
     box.children.iterateLocal('setSize', 35,35)
     box.setVelocityY(600)
     
-    player = this.physics.add.sprite(200, 310,'hero').setScale(3); // player
-    player.body.setSize(25, 58) // hitbox player
+    player = this.physics.add.sprite(200, 310,'hero').setScale(3);                  // player
+    player.body.setSize(25, 58)                                         
     player.setData('health', 10)
     player.setData('Guard', false)
     player.setData('Eject', false)
     //console.log(player);
     
 
-    colideATK2 = this.physics.add.group({ // collision attaque
+    colideATK2 = this.physics.add.group({ // collision attack
         key : 'ATK1',
         allowGravity : false,
         disableBody : true,
@@ -146,16 +146,13 @@ function create(){
     //colideATK2.children.iterateLocal('setData', 'eject', false)
 
     // TEXT
-    text = this.add.text(-150,510, ' << CONTROL >> \n ← = press "Q"\n → = press "D"\n ↑  = press "Z"\n\n 🗡 = press "J"\n 🛡 = press "I"' , {font : '16px Courier'}); 
-    scoreText = this.add.text(10,10, 'SCORE : 0',{ font : '16px Arial Black', color : '#353535'})
+    text = this.add.text(-150,510, ' << CONTROL >> \n LEFT = press "Q"\n RIGHT = press "D"\n JUMP  = press "Z"\n\n ATTACK = press "J"\n GUARD = press "I"' , {font : '16px Courier'}); 
+    scoreText = this.add.text(10,10, 'SCORE : 0',{ font : '22px Courier', color : '#353535'})
     //console.log(colideATK2);
     //////////////////////
     
     //CAMERA
     this.cameras.main.startFollow(player);
-
-
-
 
     //COLISIONS
     var platform = this.physics.add.staticGroup();// groupe plateforme
@@ -181,46 +178,19 @@ function create(){
             piepiece.destroy();
             //console.log('Score : '+Score);
             })
-        //this.physics.add.collider(platform,enemy) //collision enemy platform
 
         this.physics.add.collider(box, player, function (theplayer, thebox){ //collision entre box et le joueur 
-            // theplayer.setVelocityX(0);
             thebox.setVelocityX(0)
-            
-            
-            // if(thebox.body.touching.right || thebox.body.touching.left){
-            //     theplayer.anims.play('runRight', true)
-            //     counterMove = 0;
-            //     playerInGround = true
-            //     //console.log(theplayer.body.angle);
-            // }
             if(thebox.body.touching.up && theplayer.body.touching.down){
                 playerInGround = true;
                 thebox.setGravityY(-1)
             }
-            // else{playerInGround = false;}
         });
 
         this.physics.add.collider(Coin, platform)
 
-        // this.physics.add.overlap(colideATK2, enemy, function(colAtk2, theEnemy){ // collision attaque sur l'enemy
-        //     colAtk2.destroy();
-        //     theEnemy.data.list.pv = theEnemy.data.list.pv - 1;
-        //     theEnemy.anims.play('knockbackenemy1', true);
-
-        //     player.anims.pause();
-        //     setTimeout(()=>{player.anims.resume()},200)
-        //     //console.log('ouille !!!');
-        //     if(theEnemy.data.list.pv <= 0){
-        //         // theEnemy.anims.play('fallenemy1', true);
-        //         dieEnemyOne(theEnemy);
-        //         enemyPlayerContact.active = false;
-        //         setTimeout(()=>{theEnemy.destroy()},2000)            }
-        // });
-
         this.physics.add.overlap(colideATK2, box, function(colAtk2, boite){ // collision entre attaque et boites 
             boite.data.list.pv = boite.data.list.pv - 1;
-            // colAtk2.disableBody(false);
             colAtk2.destroy()
             
             player.anims.pause();
@@ -355,11 +325,6 @@ function create(){
         frames: this.anims.generateFrameNumbers('shoryu',{frames: [0, 2, 3, 4, 5, 6, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7]}),
         frameRate: 12,
     });
-    this.anims.create({
-        key: 'PowerSlash',
-        frames: this.anims.generateFrameNumbers('powerSlash',{frames: [0 ,1, 2, 3, 4, 5, 6, 7, 8, 9, 10]}),
-        frameRate: 16,
-    });
 
     ///// animation box
 
@@ -413,7 +378,7 @@ function create(){
     });
     this.anims.create({
         key: 'fallenemy1',
-        frames: this.anims.generateFrameNumbers('theEnemyfall',{frames : [0, 1, 2, 3, 3, 3, 3, 3, 3, 3]}),
+        frames: this.anims.generateFrameNumbers('theEnemyfall',{frames : [0, 1, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3]}),
         frameRate: 8,
     })
     this.anims.create({
@@ -443,7 +408,7 @@ function create(){
     //enemy.anims.play('stancenemy1', true);
     //enemy.playAnimation('attackenemy1');
     
-    for(var i = 0;i < 5; i++){
+    for(var i = 0;i < 10; i++){
         setTimeout(()=>{createEnemyOne(enemySpawn, i);},9000 + (i * 7000))
     }
     createEnemyOne(enemySpawn, player, this);
@@ -501,11 +466,10 @@ function update(time, delta){
                 //     if(plyr.flipX === false){}
                 //     if(plyr.flipX === true){}
                 // }
-                console.log(htblobjct.body)
+                console.log(htblobjct.body.checkCollision.up = false)
                 if((htblobjct.body.touching.left || 
                     htblobjct.body.touching.right) && 
                     htblobjct.data.list.AtkCollide === false){
-                    //console.log('touché lenemi');
                     counterMove = 14;
                     GuardKnockBack()
                 }
@@ -1051,29 +1015,27 @@ function enemyKnockBack(enmy){
         enmy.data.list.EnemyIsAttack = false;
         enmy.anims.play('ejectenemy1',true);
         var enemyAction3 = 'ejectenemy1';
-        enmy.data.list.CounterMove = 77
+        enmy.data.list.CounterMove = 77;
+        enmy.body.setSize(15,56)
             enmy.on('animationupdate', ()=>{
                 if(enemyAction3 === enmy.anims.currentAnim.key){
                     if(enmy.anims.currentFrame.index <= 5){
-                        if(enmy.flipX === true){
-                            enmy.setVelocityX(-100)
-                            enmy.setVelocityY(-400)
-                        }
-                        if(enmy.flipX === false){
-                            enmy.setVelocityX(100)
-                            enmy.setVelocityY(-400)
-                        }   
+                        if(enmy.flipX === true){enmy.setVelocityX(-100)}
+                        if(enmy.flipX === false){enmy.setVelocityX(100)}   
+                        enmy.setVelocityY(-400)
                     }
                     if(enmy.anims.currentFrame.index >= 6 &&
                         enmy.anims.currentFrame.index <= 7){
-                            enmy.setVelocityX(200)
+                            if(enmy.flipX === true){enmy.setVelocityX(-200)}
+                            if(enmy.flipX === false){enmy.setVelocityX(200)}
                             enmy.setVelocityY(0)
                         }
                         if(enmy.anims.currentFrame.index >= 8 &&
                             enmy.anims.currentFrame.index <10){
-                            enmy.setVelocityX(100)
-                            enmy.setVelocityY(500)
-                            enmy.setBounce(0.5,0.5)
+                                if(enmy.flipX === true){enmy.setVelocityX(-100)}
+                                if(enmy.flipX === false){enmy.setVelocityX(100)}   
+                                enmy.setVelocityY(500)
+                                enmy.setBounce(0.5,0.5)
                         }
                     if(enmy.anims.currentFrame.index > 10){
                         enmy.setVelocityX(0)
@@ -1102,23 +1064,19 @@ function enemyDie(enmyOne){
                         if(enmyOne.flipX === true){enmyOne.setVelocityX(-150)}
                         if(enmyOne.flipX === false){enmyOne.setVelocityX(150)}   
                 }
-                if(enmyOne.anims.currentFrame.index >= 4){
+                if(enmyOne.anims.currentFrame.index >= 6){
                     enmyOne.setVelocityX(0)
                     enmyOne.setVelocityY(600)
-                    enmyOne.body.destroy(); 
                 } 
-                if(enmyOne.anims.currentFrame.index >= 10){ 
+                if(enmyOne.anims.currentFrame.index >= 14){ 
                     enmyOne.data.list.EnemyIsDie = true;
+                    enmyOne.body.destroy(); 
                 }
             }
             }else{console.log(hittableObject.children.entries);}   
         });
 }
 
-function atkSpeOne(){
-    player.anims.play('PowerSlash', true);
-    
-}
 function returnRandomNumber(number1,number2){
     // setTimeout(()=>{
         var randomNbr = 0;
