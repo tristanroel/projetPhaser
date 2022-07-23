@@ -151,7 +151,7 @@ function create(){
 
     // TEXT
 
-    text = this.add.text(-150,510, ' << CONTROL >> \n LEFT = press "Q"\n RIGHT = press "D"\n JUMP  = press "Z"\n\n ATTACK = press "J"\n GUARD = press "I"' , {font : '16px Courier'}); 
+    text = this.add.text(-150,510, ' << CONTROL >> \n LEFT = press "Q"\n RIGHT = press "D"\n JUMP  = press "Z"\n\n ATTACK = press "J"\n GUARD = press "I".' , {font : '16px Courier'}); 
     scoreText = this.add.text(10,10, 'SCORE : 0',{ font : '22px Courier', color : '#353535'})
     //console.log(colideATK2);
     //////////////////////
@@ -1010,7 +1010,7 @@ function enemyKnockBack(enmy){
                         if(enmy.flipX === true){enmy.setVelocityX(-100)}
                         if(enmy.flipX === false){enmy.setVelocityX(100)}   
                     }
-                    if(enmy.anims.currentFrame.index >= 8 &&
+                    if(enmy.anims.currentFrame.index >= 5 &&
                         player.data.list.Eject === false){ 
                         enmy.data.list.CounterMove = 0
                         enmy.data.list.AttackIsFinish = true
