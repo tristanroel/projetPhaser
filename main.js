@@ -1,7 +1,7 @@
 var configuration = {
     type: Phaser.AUTO,
     pixelArt : true,
-    width : 900,
+    width : 1000,
     height : 600,
     backgroundColor : '#353535',
     fps: {
@@ -151,7 +151,7 @@ function create(){
 
     // TEXT
 
-    text = this.add.text(-150,510, ' << CONTROL >> \n LEFT = press "Q"\n RIGHT = press "D"\n JUMP  = press "Z"\n\n ATTACK = press "J"\n GUARD = press "I" \n GAMEPAD = ' , {font : '16px Courier'}); 
+    text = this.add.text(-150,510, ' << CONTROL >> \n LEFT = press "Q"\n RIGHT = press "D"\n JUMP  = press "Z"\n\n ATTACK = press "J"\n GUARD = press "I"' , {font : '16px Courier'}); 
     scoreText = this.add.text(10,10, 'SCORE : 0',{ font : '22px Courier', color : '#353535'})
     //console.log(colideATK2);
     //////////////////////
@@ -389,7 +389,7 @@ function create(){
     });
     this.anims.create({
         key: 'knockbackenemy1',
-        frames: this.anims.generateFrameNumbers('theEnemy',{frames : [ 8, 9, 9, 9, 9, 9, 0]}),
+        frames: this.anims.generateFrameNumbers('theEnemy',{frames : [ 8, 9, 9, 9, 9, 9, 9, 9, 0]}),
         frameRate: 9,
     });
     this.anims.create({
@@ -776,7 +776,7 @@ function tornadoSlash(){
     player.anims.play('shoryuSlash', true);
     var nameAttack = 'shoryuSlash';
     var colAtk = colideATK2.get().setSize(120,120);
-    var colAtkTwo = colideATK2.get().setSize(120,120);
+    var colAtkTwo = colideATK2.get().setSize(200,120);
     var colAtkThree = colideATK2.get().setSize(120,120);
     colAtk.visible = false;
     colAtkTwo.visible = false;
@@ -801,8 +801,9 @@ function tornadoSlash(){
                 player.body.checkCollision.left = true;
                 colAtk.destroy();
                 player.data.list.Eject = true;
-                if(playerFlip === true){colAtkTwo.setX(player.x -90);colAtkTwo.setY(player.y -65)}
-                if(playerFlip === false){colAtkTwo.setX(player.x +90);colAtkTwo.setY(player.y -65)} 
+                player.anims.stop()
+                if(playerFlip === true){colAtkTwo.setX(player.x -50);colAtkTwo.setY(player.y -65)}
+                if(playerFlip === false){colAtkTwo.setX(player.x +50);colAtkTwo.setY(player.y -65)} 
             }
             if(player.anims.currentFrame.index === 6 ){
                 colAtkTwo.destroy();
@@ -1009,7 +1010,7 @@ function enemyKnockBack(enmy){
                         if(enmy.flipX === true){enmy.setVelocityX(-50)}
                         if(enmy.flipX === false){enmy.setVelocityX(50)}   
                     }
-                    if(enmy.anims.currentFrame.index >= 6 &&
+                    if(enmy.anims.currentFrame.index >= 8 &&
                         player.data.list.Eject === false){ 
                         enmy.data.list.CounterMove = 0
                         enmy.data.list.AttackIsFinish = true
