@@ -270,10 +270,10 @@ function create(){
             gamePadCombo = gamePadCombo + 'B';
         }
         if(pad._LCRight.pressed){ //Right
-            gamePadCombo = gamePadCombo + 'C';
+            gamePadCombo = gamePadCombo + 'D';
         }
         if(pad._LCLeft.pressed){  //Left
-            gamePadCombo = gamePadCombo + 'D';
+            gamePadCombo = gamePadCombo + 'G';
         }
         
         
@@ -604,7 +604,7 @@ function update(time, delta){
     //console.log(this.input.gamepad.gamepads.length);
     if((gamePadCombo.length >= 3 && theGamePad.X)|| gamePadCombo.length >= 3){
         console.log(gamePadCombo);
-            if(gamePadCombo.includes("BCA") || gamePadCombo.includes("BDA") && player.body.touching.down && counterMove === 0){
+            if(gamePadCombo.includes("BDA") || gamePadCombo.includes("BGA") && player.body.touching.down && counterMove === 0){
                 counterMove = 32;
                 tornadoSlash();
                 console.log('tornadoSash');
