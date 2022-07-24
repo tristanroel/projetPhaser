@@ -608,9 +608,10 @@ function update(time, delta){
                 counterMove = 32;
                 tornadoSlash();
                 console.log('tornadoSash');
+                gamePadCombo = [];
+            }else{
+                gamePadCombo = [];
             }
-            gamePadCombo = [];
-
             //theGamePad.enabled = false
             //console.log(theGamePad);
             // if(theGamePad._RCBottom.pressed === true){
