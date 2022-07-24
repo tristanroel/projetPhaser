@@ -602,7 +602,7 @@ function update(time, delta){
     //console.log(theGamePad.gamepads);
     //console.log(this.input.gamepad.total);
     //console.log(this.input.gamepad.gamepads.length);
-    if((gamePadCombo.length >= 4 && theGamePad.X)|| gamePadCombo.length >= 4){
+    if((gamePadCombo.length >= 3 && theGamePad.X)|| gamePadCombo.length >= 3){
         console.log(gamePadCombo);
             if(gamePadCombo.includes("BCA") || gamePadCombo.includes("BDA") && player.body.touching.down && counterMove === 0){
                 counterMove = 32;
