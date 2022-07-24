@@ -263,19 +263,17 @@ function create(){
             gamepadJump = true;
         }
         if(pad._RCLeft.pressed){ //Attack
-            gamePadCombo = gamePadCombo + 'atk';
+            gamePadCombo = gamePadCombo + 'A';
             gamepadAttack = true;
         }
         if(pad._LCBottom.pressed){//down
-            gamePadCombo = gamePadCombo + 'down';
+            gamePadCombo = gamePadCombo + 'B';
         }
         if(pad._LCRight.pressed){ //Right
-            gamePadCombo = gamePadCombo + 'right';
-            
+            gamePadCombo = gamePadCombo + 'C';
         }
         if(pad._LCLeft.pressed){  //Left
-            gamePadCombo = gamePadCombo + 'left';
-            
+            gamePadCombo = gamePadCombo + 'D';
         }
         
         
@@ -604,18 +602,26 @@ function update(time, delta){
     //console.log(theGamePad.gamepads);
     //console.log(this.input.gamepad.total);
     //console.log(this.input.gamepad.gamepads.length);
-    console.log(gamePadCombo);
-    if(theGamePad.X){
-        //theGamePad.enabled = false
-        //console.log(theGamePad);
-        // if(theGamePad._RCBottom.pressed === true){
-            //setTimeout(()=>{theGamePad._RCBottom.pressed = false},1)
-            //theGamePad._RCBottom.pressed = false
-            console.log(theGamePad._RCBottom.pressed); // A
-        // }
-        //console.log(theGamePad._LCLeft.pressed);
-        //console.log(theGamePad.buttons[1].pressed); //jump
-        //console.log('encule');
+    if((gamePadCombo.length >= 4 && theGamePad.X)|| gamePadCombo.length >= 4){
+        console.log(gamePadCombo);
+            if(gamePadCombo.includes("BCA") || gamePadCombo.includes("BDA") && player.body.touching.down && counterMove === 0){
+                counterMove = 32;
+                tornadoSlash();
+                console.log('tornadoSash');
+            }
+            gamePadCombo = [];
+
+            //theGamePad.enabled = false
+            //console.log(theGamePad);
+            // if(theGamePad._RCBottom.pressed === true){
+                //setTimeout(()=>{theGamePad._RCBottom.pressed = false},1)
+                //theGamePad._RCBottom.pressed = false
+                //console.log(theGamePad._RCBottom.pressed); // A
+            // }
+            //console.log(theGamePad._LCLeft.pressed);
+            //console.log(theGamePad.buttons[1].pressed); //jump
+            //console.log('encule');
+        
     }
     // GameControllers = this.input.gamepad.gamepads;
     // var bubu;
@@ -670,7 +676,7 @@ function update(time, delta){
         }     
         
         if (touchesGuard.isDown && playerInGround === true && counterMove === 0 ||
-            theGamePad.Y && playerInGround === true && counterMove === 0 ){                       //guard
+            theGamePad.Y && playerInGround === true && counterMove === 0 ){                             //guard
             player.setVelocityX(0);
             player.setVelocityY(0);
             player.anims.play('guard', true);
