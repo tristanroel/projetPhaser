@@ -107,7 +107,7 @@ function create(){
     skyBg = this.add.tileSprite(0, 400, 404, 542, 'sky').setScale(3); //image ciel
     var sol1 = this.add.sprite(200, 570, 'ground').setScale(3);//image sol
     var sol2 = this.add.sprite(1412, 500, 'ground').setScale(3);//image sol
-    enemySpawn = this.add.image(600, 100, 'spawner'); //spawn enemy
+    enemySpawn = this.add.image(1800, 100, 'spawner'); //spawn enemy
     
     healthBar = this.add.rectangle(0,0,200,20,0xB14F37).setStrokeStyle(2, 0xFFFFFF); //healthbar
     Coin = this.physics.add.group({                              // Coin
@@ -152,7 +152,7 @@ function create(){
 
     // TEXT
 
-    text = this.add.text(-150,510, ' << CONTROL >> \n LEFT = press "Q"\n RIGHT = press "D"\n JUMP  = press "Z"\n\n ATTACK = press "J"\n GUARD = press "I" \n version : O.2' , {font : '16px Courier'}); 
+    text = this.add.text(-150,510, ' << CONTROL >> \n LEFT = press "Q"\n RIGHT = press "D"\n JUMP  = press "Z"\n\n ATTACK = press "J"\n GUARD = press "I" \n version : O.3 | 24.07.22' , {font : '16px Courier'}); 
     scoreText = this.add.text(10,10, 'SCORE : 0',{ font : '22px Courier', color : '#353535'})
     //console.log(colideATK2);
     //////////////////////
@@ -259,7 +259,6 @@ function create(){
         text.setText('Playing with : ' + pad.id);
         //console.log(pad.id);
         if(pad._RCBottom.pressed && playerInGround === true && counterMove === 0){ //jump
-            console.log('kikou');
             gamepadJump = true;
         }
         if(pad._RCLeft.pressed){ //Attack
@@ -305,14 +304,14 @@ function create(){
     firstAtk = this.anims.create({
         key: 'attackOne',
         frames: this.anims.generateFrameNumbers('heroAttack',{frames: [ 0, 1, 2, 3, 4, 5, 6, 6, 6, 6, 6, 6, 6]}),
-        frameRate: 25,
+        frameRate: 27,
         //repeat: -1
     })
 
     this.anims.create({
         key: 'attackTwo',
         frames: this.anims.generateFrameNumbers('heroAttack',{frames: [7, 8, 9, 10, 11, 12, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13]}),
-        frameRate: 22,
+        frameRate: 24,
         //repeat: -1
     })
     this.anims.create({
@@ -580,7 +579,7 @@ function update(time, delta){
     //console.log(theGamePad);
     //console.log(PlayerTouchEnemy);
     //console.log(colideATK2);
-    //console.log(counterMove);
+    console.log(playerInGround);
     //console.log(returnRandomNumber(10, 20));
     //console.log('AtkCollide : '+ hittableObject.children.entries[0].data.list.AtkCollide);
     //console.log(player.data.list.Eject);
@@ -602,28 +601,19 @@ function update(time, delta){
     //console.log(theGamePad.gamepads);
     //console.log(this.input.gamepad.total);
     //console.log(this.input.gamepad.gamepads.length);
-    if(player.flipX === true && player.body.velocity.x === 0){console.log('flip');}
+    //if(player.flipX === true && player.body.velocity.x === 0){console.log('flip');}
     if((theGamePad.X)){
-        console.log(gamePadCombo);
-            if(gamePadCombo.includes("BDA") || gamePadCombo.includes("BGA") && player.body.touching.down && counterMove === 0){
-                counterMove = 32;
-                tornadoSlash();
-                console.log('tornadoSash');
-                gamePadCombo = [];
+        //console.log(gamePadCombo);
+            if(counterMove === 0 && gamePadCombo.includes("BDA") || gamePadCombo.includes("BGA")){
+                if(playerInGround === true){
+                    counterMove = 32;
+                    tornadoSlash();
+                    console.log('tornadoSash');
+                    gamePadCombo = [];
+                }
             }else{
                 gamePadCombo = [];
             }
-            //theGamePad.enabled = false
-            //console.log(theGamePad);
-            // if(theGamePad._RCBottom.pressed === true){
-                //setTimeout(()=>{theGamePad._RCBottom.pressed = false},1)
-                //theGamePad._RCBottom.pressed = false
-                //console.log(theGamePad._RCBottom.pressed); // A
-            // }
-            //console.log(theGamePad._LCLeft.pressed);
-            //console.log(theGamePad.buttons[1].pressed); //jump
-            //console.log('encule');
-        
     }
     // GameControllers = this.input.gamepad.gamepads;
     // var bubu;
@@ -642,6 +632,7 @@ function update(time, delta){
         if (leftkey.isDown && counterMove === 0 || theGamePad.left  && counterMove === 0){              //left
                 player.setVelocityX(-playerVelocityX);
                 playerFlip = player.flipX=true;
+
                 if(playerInGround === true){
                     player.anims.play('runLeft', true);
                 }
@@ -1057,7 +1048,6 @@ function enemyKnockBack(enmy){
                         player.data.list.Eject === false){ 
                         enmy.data.list.CounterMove = 0
                         enmy.data.list.AttackIsFinish = true
-                        console.log('et tac');
                     }
                 }
             });
