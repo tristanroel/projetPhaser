@@ -88,7 +88,7 @@ function preload(){
     this.load.spritesheet('herojumpAtk', 'assets/Sprites/jump_sword_attack.png',{frameWidth: 170, frameHeight: 170});
     this.load.spritesheet('heroGuard', 'assets/Sprites/guard.png',{frameWidth: 170, frameHeight: 170});
     this.load.spritesheet('heroProtectGuard', 'assets/Sprites/Playerkbtest.png',{frameWidth: 170, frameHeight: 170});
-    this.load.spritesheet('heroKnockBack', 'assets/Sprites/KnockBacktest.png',{frameWidth: 170, frameHeight: 170});
+    this.load.spritesheet('heroKnockBack', 'assets/Sprites/KnockBack.png',{frameWidth: 170, frameHeight: 170});
     this.load.spritesheet('shoryu', 'assets/Sprites/shoryu.png',{frameWidth: 170, frameHeight: 170});
     // this.load.spritesheet('powerSlash', 'assets/PowerSlash.png',{frameWidth: 100, frameHeight: 100});
     this.load.spritesheet('box', 'assets/box.png',{frameWidth: 62, frameHeight: 62});
@@ -149,11 +149,10 @@ function create(){
     })
     
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
     // TEXT
 
-    text = this.add.text(-150,510, ' << CONTROL >> \n LEFT = press "Q"\n RIGHT = press "D"\n JUMP  = press "Z"\n\n ATTACK = press "J"\n GUARD = press "I" \n version : O.3 | 24.07.22' , {font : '16px Courier'}); 
-    scoreText = this.add.text(10,10, 'SCORE : 0',{ font : '22px Courier', color : '#353535'})
+    text = this.add.text(0,0, ' << CONTROL >> \n LEFT = press "Q"\n RIGHT = press "D"\n JUMP  = press "Z"\n ATTACK = press "J"\n GUARD = press "I" \n GAMEPAD : disconected\n version : O.4 | 24.07.22' , {fontFamily : 'PixelFont'}); 
+    scoreText = this.add.text(0,0, 'SCORE : 0',{ fontFamily : 'PixelFont',fontWeight :'20px', color : '#353535'})
     //console.log(colideATK2);
     //////////////////////
     
@@ -454,13 +453,13 @@ function update(time, delta){
     //BACKGROUND AND TEXT
     skyBg.x = player.body.position.x // position du ciel
     skyBg.tilePositionX += 0.5;
-    text.x = player.body.position.x - 350; //position text
-    text.y = player.body.position.y + 250;
-    healthBar.x = player.body.position.x - 230; //position healthbar
-    healthBar.y = player.body.position.y - 180;
+    text.x = player.body.position.x - 450; //position text
+    text.y = player.body.position.y + 210;
+    healthBar.x = player.body.position.x - 340; //position healthbar
+    healthBar.y = player.body.position.y - 185;
     healthBar.width = player.data.list.health * 20;
-    scoreText.x = player.body.position.x + 250; //position Score
-    scoreText.y = player.body.position.y -180;
+    scoreText.x = player.body.position.x + 400; //position Score
+    scoreText.y = player.body.position.y -200;
     scoreText.setText('SCORE : '+ Score) // maj score
 
     //ENEMY UPDATE
@@ -493,7 +492,6 @@ function update(time, delta){
                         else if(plyr.flipX === true && htblobjct.flipX === true){
                             counterMove = 14;
                             GuardKnockBack()
-                            plyr.anims.play('protectGuard', true)
                             console.log(plyr.body.velocity);
                         }
                         else{
@@ -539,18 +537,19 @@ function update(time, delta){
                     currentEnemy.data.list.randomValue = currentEnemy.data.list.randomValue + 1;
                 }
             }
-
-            if(currentEnemy.data.list.health <= 0){currentEnemy.data.list.CounterMove = 4}
-            if(currentEnemy.data.list.CounterMove === 0){enemyStand(currentEnemy)}
-            if(currentEnemy.data.list.CounterMove === 1){enemyWalkFront(currentEnemy,player,this)};
-            if(currentEnemy.data.list.CounterMove === 5){enemyWalkBack(currentEnemy,player,this)};
-            if(currentEnemy.data.list.CounterMove === 2){enemyAttack(currentEnemy)}
-            if(currentEnemy.data.list.CounterMove === 3){enemyKnockBack(currentEnemy)}
-            if(currentEnemy.data.list.CounterMove === 7){enemyCrossBow(currentEnemy)}
-            if(currentEnemy.data.list.CounterMove === 4 && currentEnemy.data.list.EnemyIsDie === false) {enemyDie(currentEnemy)}
-            if(currentEnemy.data.list.EnemyIsDie === true){
-                    Phaser.Utils.Array.RemoveAt(hittableObject.children.entries, i);
-                    currentEnemy.destroy()
+            if(currentEnemy.data.list.CounterMove != 28){
+                if(currentEnemy.data.list.health <= 0){currentEnemy.data.list.CounterMove = 4}
+                if(currentEnemy.data.list.CounterMove === 0){enemyStand(currentEnemy)}
+                if(currentEnemy.data.list.CounterMove === 1){enemyWalkFront(currentEnemy,player,this)};
+                if(currentEnemy.data.list.CounterMove === 5){enemyWalkBack(currentEnemy,player,this)};
+                if(currentEnemy.data.list.CounterMove === 2){enemyAttack(currentEnemy)}
+                if(currentEnemy.data.list.CounterMove === 3){enemyKnockBack(currentEnemy)}
+                if(currentEnemy.data.list.CounterMove === 7){enemyCrossBow(currentEnemy)}
+                if(currentEnemy.data.list.CounterMove === 4 && currentEnemy.data.list.EnemyIsDie === false) {enemyDie(currentEnemy)}
+                if(currentEnemy.data.list.EnemyIsDie === true){
+                        Phaser.Utils.Array.RemoveAt(hittableObject.children.entries, i);
+                        currentEnemy.destroy()
+                }
             }
         }
         else if(hittableObject.children.entries[i].data.list.name === 'slash'){
@@ -573,13 +572,14 @@ function update(time, delta){
         //  }
         else{hittableObject.children.entries[i] = [];} 
     }
+
     //console.log(Phaser.Math.Distance.BetweenPoints(hittableObject.children.entries[0],player));
     //console.log(enemyMoveDetection.children.entries[0]);
     //enemyMoveDetection.children.entries[0].body.destroy()
-    //console.log(theGamePad);
+    //console.log(counterMove);
     //console.log(PlayerTouchEnemy);
     //console.log(colideATK2);
-    console.log(playerInGround);
+    //console.log(playerInGround);
     //console.log(returnRandomNumber(10, 20));
     //console.log('AtkCollide : '+ hittableObject.children.entries[0].data.list.AtkCollide);
     //console.log(player.data.list.Eject);
@@ -908,7 +908,8 @@ function GuardKnockBack(){
                     playerCanFall = false
                 }else{
                     playerCanFall = true;
-                    counterMove = 0;
+                        counterMove = 0;
+                    
                 }
             }
             
@@ -1129,17 +1130,6 @@ function enemyCrossBow(enemy1){
     });
 
 }
-function gamePadEvent(){
 
-}
-
-function returnRandomNumber(number1,number2){
-    // setTimeout(()=>{
-        var randomNbr = 0;
-        randomNbr = Phaser.Math.Between(number1,number2);
-    // }, 1000)
-
-    return randomNbr
-}
 
 
