@@ -497,9 +497,9 @@ function create(){
 
 
     // Object call
-    // for(var i = 0;i < 3; i++){
-    //     setTimeout(()=>{createEnemyOne(enemySpawn, 'Enemy1',0)},9000 + (i * 7000))
-    // }
+    for(var i = 0;i < 5; i++){
+        setTimeout(()=>{createEnemyOne(enemySpawn, 'Enemy1',0)},9000 + (i * 7000))
+    }
     createEnemyOne(enemySpawn,'CrossBow', 7);
 
     
