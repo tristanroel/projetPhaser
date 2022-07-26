@@ -160,7 +160,7 @@ function create(){
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // TEXT
 
-    text = this.add.text(0,0, ' << CONTROL >> \n LEFT = press "Q"\n RIGHT = press "D"\n JUMP  = press "Z"\n ATTACK = press "J"\n GUARD = press "I" \n GAMEPAD : disconected\n version : O.5 | 25.07.22' , {fontFamily : 'PixelFont'}); 
+    text = this.add.text(0,0, ' << CONTROL >> \n LEFT = press "Q"\n RIGHT = press "D"\n JUMP  = press "Z"\n ATTACK = press "J"\n GUARD = press "I" \n GAMEPAD : disconected\n version : O.6 | 26.07.22' , {fontFamily : 'PixelFont'}); 
     scoreText = this.add.text(0,0, 'SCORE : 0',{ fontFamily : 'PixelFont',fontWeight :'20px', color : '#353535'})
     //console.log(colideATK2);
     //////////////////////
