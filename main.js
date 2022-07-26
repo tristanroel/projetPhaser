@@ -121,7 +121,7 @@ function create(){
         setXY:{x: -800, y :60},
         visible : false,
     });
-    Arrow = this.physics.add.image(0,0,'carreau').setScale(3).setGravityY(-1000)                                               // Arrow
+    Arrow = this.physics.add.image(0,0,'carreau').setScale(3).setGravityY(-1000).setY(-999)                                               // Arrow
     //     key : 'carreau',
     //     allowGravity : false,
     // })                                              
@@ -196,11 +196,11 @@ function create(){
             //console.log('Score : '+Score);
             })
         
-        this.physics.add.overlap(Arrow, colideATK2, function(atk, arrow){ // collision Fleches + joueur
-            console.log('ouille');
-            arrow.setY(-999)
-            atk.destroy()
-        })
+        // this.physics.add.overlap(Arrow, colideATK2, function(atk, arrow){ // collision Fleches + joueur
+        //     console.log('ouille');
+        //     arrow.setY(-999)
+        //     atk.destroy()
+        // })
 
         this.physics.add.collider(box, player, function (theplayer, thebox){ //collision entre box et le joueur 
             thebox.setVelocityX(0)
