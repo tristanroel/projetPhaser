@@ -97,9 +97,10 @@ function preload(){
 
     // this.load.spritesheet('powerSlash', 'assets/PowerSlash.png',{frameWidth: 100, frameHeight: 100});
     this.load.spritesheet('box', 'assets/box.png',{frameWidth: 62, frameHeight: 62});
-    this.load.spritesheet('theEnemy', 'assets/Enemy/enemiaxe1.png',{frameWidth: 170, frameHeight: 170});
+    this.load.spritesheet('theEnemy', 'assets/Enemy/enemiaxe.png',{frameWidth: 170, frameHeight: 170});
     this.load.spritesheet('theEnemyfall', 'assets/Enemy/enemi1falling.png',{frameWidth: 170, frameHeight: 170});
     this.load.spritesheet('theEnemyCrossBow', 'assets/Enemy/arbaletrier.png',{frameWidth: 170, frameHeight: 170});
+    this.load.spritesheet('theEnemyPoleAxe', 'assets/Enemy/poleaxegiant.png',{frameWidth: 180, frameHeight: 170});
 
 }
 
@@ -171,7 +172,7 @@ function create(){
 
     // TEXT
 
-    text = this.add.text(0,0, ' << CONTROL >> \n LEFT = press "Q"\n RIGHT = press "D"\n JUMP  = press "Z"\n ATTACK = press "J"\n GUARD = press "I" \n GAMEPAD : disconected\n version : O.7 | 27.07.22' , {fontFamily : 'PixelFont'}); 
+    text = this.add.text(0,0, ' << CONTROL >> \n LEFT = press "Q"\n RIGHT = press "D"\n JUMP  = press "Z"\n ATTACK = press "J"\n GUARD = press "I" \n GAMEPAD : disconected\n version : O.8 | 27.07.22' , {fontFamily : 'PixelFont'}); 
     scoreText = this.add.text(0,0, 'SCORE : 0',{ fontFamily : 'PixelFont',fontWeight :'20px', color : '#353535'})
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -207,20 +208,18 @@ function create(){
             piepiece.destroy();
             //console.log('Score : '+Score);
             })
-        
-        // this.physics.add.overlap(Arrow, colideATK2, function(atk, arrow){ // collision Fleches + joueur
-        //     console.log('ouille');
-        //     arrow.setY(-999)
-        //     atk.destroy()
-        // })
 
-        this.physics.add.collider(player, Arrow, function(plyr,arrw){
+        this.physics.add.collider(player, Arrow, function(plyr,arrw){           // collision Fleches + joueur
             arrw.setY(-999)
             arrw.setX(0)
             arrw.setVelocityY(0)
+            if(plyr.body.touching.right){plyr.flipX = false};
+            if(plyr.body.touching.left){plyr.flipX = true};
+            counterMove = 28;
+            plyr.data.list.health--;
         })
 
-        this.physics.add.collider(box, player, function (theplayer, thebox){ //collision entre box et le joueur 
+        this.physics.add.collider(box, player, function (theplayer, thebox){    //collision entre box et le joueur 
             thebox.setVelocityX(0)
             if(thebox.body.touching.up && theplayer.body.touching.down){
                 playerInGround = true;
@@ -423,6 +422,11 @@ function create(){
         frameRate: 6,
     });
     this.anims.create({
+        key: 'stancePoleAxe',
+        frames: this.anims.generateFrameNumbers('theEnemyPoleAxe',{frames : [0]}),
+        frameRate: 6,
+    });
+    this.anims.create({
         key: 'walkEnemy1',
         frames: this.anims.generateFrameNumbers('theEnemy',{frames : [1, 2, 3, 4]}),
         frameRate: 4,
@@ -431,6 +435,12 @@ function create(){
     this.anims.create({
         key: 'walkCrossBow',
         frames: this.anims.generateFrameNumbers('theEnemyCrossBow',{frames : [16, 17, 18, 19]}),
+        frameRate: 4,
+        repeat : -1,
+    });
+    this.anims.create({
+        key: 'walkPoleAxe',
+        frames: this.anims.generateFrameNumbers('theEnemyPoleAxe',{frames : [1, 2, 3, 4]}),
         frameRate: 4,
         repeat : -1,
     });
@@ -447,8 +457,14 @@ function create(){
         repeat : -1,
     });
     this.anims.create({
+        key: 'walkbackPoleAxe',
+        frames: this.anims.generateFrameNumbers('theEnemyPoleAxe',{frames : [1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4]}),
+        frameRate: 2,
+        repeat : -1,
+    });
+    this.anims.create({
         key: 'attackEnemy1',
-        frames: this.anims.generateFrameNumbers('theEnemy',{frames : [4, 5, 5, 6, 7, 7, 7, 7, 6, 0, 0, 0, 0, 0, 0, 0, 0]}),
+        frames: this.anims.generateFrameNumbers('theEnemy',{frames : [4, 5, 5, 6, 7, 8, 9, 9, 9, 0, 0, 0, 0, 0, 0, 0, 0]}),
         frameRate: 8,
     });
     this.anims.create({
@@ -457,13 +473,23 @@ function create(){
         frameRate: 6,
     })
     this.anims.create({
+        key: 'attackPoleAxe',
+        frames: this.anims.generateFrameNumbers('theEnemyPoleAxe',{frames : [ 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 7, 8, 9, 10, 11, 11, 11, 11, 12, 13, 14, 15, 16, 17, 17, 0, 0, 0]}),
+        frameRate: 10,
+    })
+    this.anims.create({
         key: 'knockbackEnemy1',
-        frames: this.anims.generateFrameNumbers('theEnemy',{frames : [ 8, 9, 9, 9, 9, 9, 9, 0, 0]}),
+        frames: this.anims.generateFrameNumbers('theEnemy',{frames : [ 10, 11, 11, 11, 11, 11, 11, 11, 0]}),
         frameRate: 9,
     });
     this.anims.create({
         key: 'knockbackCrossBow',
         frames: this.anims.generateFrameNumbers('theEnemyCrossBow',{frames : [ 11, 12, 12, 12, 12, 12, 12, 8, 8]}),
+        frameRate: 9,
+    });
+    this.anims.create({
+        key: 'knockbackPoleAxe',
+        frames: this.anims.generateFrameNumbers('theEnemyPoleAxe',{frames : [ 18, 19, 19, 19, 19, 19, 19, 0, 0]}),
         frameRate: 9,
     });
     this.anims.create({
@@ -477,6 +503,11 @@ function create(){
         frameRate: 8,
     })
     this.anims.create({
+        key: 'fallPoleAxe',
+        frames: this.anims.generateFrameNumbers('theEnemyPoleAxe',{frames : [19, 20, 21, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22]}),
+        frameRate: 8,
+    })
+    this.anims.create({
         key: 'ejectEnemy1',
         frames: this.anims.generateFrameNumbers('theEnemyfall',{frames : [1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3]}),
         frameRate: 8,
@@ -484,6 +515,11 @@ function create(){
     this.anims.create({
         key: 'ejectCrossBow',
         frames: this.anims.generateFrameNumbers('theEnemyCrossBow',{frames : [13, 13, 13, 13, 13, 13, 14, 14, 14, 14, 14, 14, 15, 15, 15, 15, 15, 15, 15, 15]}),
+        frameRate: 8,
+    })
+    this.anims.create({
+        key: 'ejectPoleAxe',
+        frames: this.anims.generateFrameNumbers('theEnemyPoleAxe',{frames : [20, 20, 20, 20, 20, 20, 21, 21, 21, 21, 21, 21, 22, 22, 22, 22, 22, 22, 22, 22]}),
         frameRate: 8,
     })
 
@@ -504,13 +540,13 @@ function create(){
 
 // CREATE ENEMIES
 
-    createEnemies(enemySpawn,'CrossBow', 0);
+    createEnemies(enemySpawn,'PoleAxe', 0);
     
-    for(var i = 0;i < 4; i++){
+    for(var i = 0;i < 2; i++){
         setTimeout(()=>{createEnemies(enemySpawn, 'Enemy1',0)},9000 + (i * 7000))
     }
    
-    for(var i = 0;i < 4; i++){
+    for(var i = 0;i < 2; i++){
         setTimeout(()=>{createEnemies(enemySpawn,'CrossBow', 7);},9000 + (i * 7000))
     }
     
@@ -573,12 +609,12 @@ function update(time, delta){
                         else{                                                                       // collision Player KnockBack
                             plyr.data.list.health = plyr.data.list.health - 1
                             counterMove = 28
-                            KnockBack(htblobjct);
+                            // KnockBack();
                         }
                     }else{
                         plyr.data.list.health = plyr.data.list.health - 1
                         counterMove = 28
-                        KnockBack(htblobjct)
+                        // KnockBack()
                         
                     }
                 }
@@ -593,7 +629,7 @@ function update(time, delta){
                 atk.destroy();
                 PlayerTouchEnemy = true;
                 player.anims.pause();
-                setTimeout(()=>{player.anims.resume()},200)
+                setTimeout(()=>{player.anims.resume()},150)
                 htblObjct.data.list.health = htblObjct.data.list.health - 1;
                 //console.log(htblObjct)
             })
@@ -655,7 +691,7 @@ function update(time, delta){
 
         else{hittableObject.children.entries[i] = [];} 
     }
-    console.log(Arrow);
+    //console.log(Arrow);
     //console.log(Phaser.Math.Distance.BetweenPoints(hittableObject.children.entries[0],player));
     //console.log(enemyMoveDetection.children.entries[0]);
     //enemyMoveDetection.children.entries[0].body.destroy()
@@ -686,7 +722,9 @@ function update(time, delta){
     //console.log(this.input.gamepad.total);
     //console.log(this.input.gamepad.gamepads.length);
     //if(player.flipX === true && player.body.velocity.x === 0){console.log('flip');}
-    if(counterMove === 28){console.log('ouille');}
+    if(counterMove === 28){
+        KnockBack()
+    }
     if(player.data.list.health <= 0){                                                              //Player Die
         //counterMove = 999;
         player.data.list.health = 0;
@@ -938,7 +976,7 @@ function tornadoSlash(){                                                        
     });
 
 }
-function KnockBack(enemy){                                                                                  // Knock Back
+function KnockBack(){                                                                                  // Knock Back
     player.data.list.Eject = false;
     playerCanFall = false
     player.anims.play('knockBack', true);
@@ -946,12 +984,10 @@ function KnockBack(enemy){                                                      
     player.on('animationupdate', ()=>{
         if(nameAction === player.anims.currentAnim.key){
             if(player.anims.currentFrame.index <=4){
-                if(enemy.flipX === true){
-                    player.flipX = true
+                if(player.flipX === true){
                     player.setVelocityX(800)
                 }
-                if(enemy.flipX === false){
-                    player.flipX = false
+                if(player.flipX === false){
                     player.setVelocityX(-800)
                 } 
             }
@@ -965,12 +1001,10 @@ function KnockBack(enemy){                                                      
                     }
                 }else{
                     player.setVelocityY(-200)
-                    if(enemy.flipX === true){
-                        player.flipX = true
+                    if(player.flipX === true){
                         player.setVelocityX(2000)
                     }
-                    if(enemy.flipX === false){
-                        player.flipX = false
+                    if(player.flipX === false){
                         player.setVelocityX(-2000)
                         player.body.checkCollision.right = false;
                         player.body.checkCollision.left = false;
@@ -1073,8 +1107,8 @@ function createEnemies(enemySpawner, typeOfEnemy, counterMoveNumber){           
         arrow.setSize(20, 4);
         arrow.setData('id', id);
     }
-    console.log(enemyone);
-    console.log(arrow);
+    //console.log(enemyone);
+    //console.log(arrow);
 }
 
 function enemyStand(enmy1){
@@ -1168,13 +1202,14 @@ function enemyAttack(enemyone, currentArrow){
 
                     }
                 }
-
                 currentArrow.setY(enemyone.y - 35)  
                 if(enemyone.flipX === true){
+                    currentArrow.flipX = true;
                     currentArrow.setX(enemyone.x + 100)
                     currentArrow.setVelocityX(400)
                 }
                 if(enemyone.flipX === false){
+                    currentArrow.flipX = false;
                     currentArrow.setX(enemyone.x - 100) 
                     currentArrow.setVelocityX(-400)
                 }
