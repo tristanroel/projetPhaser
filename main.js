@@ -579,7 +579,6 @@ function update(time, delta){
             var currentEnemy = hittableObject.children.entries[i]; 
 
             // COLLISION Enemy + player
-
             this.physics.add.collider(currentEnemy, player, function(htblobjct, plyr){              
                 if(htblobjct.body.touching.up){
                     console.log(htblobjct.body.checkCollision.up = false)
