@@ -23,7 +23,7 @@ var configuration = {
     physics :{
         default : 'arcade',
         arcade :{
-                    debug : false,
+                    debug : true,
                     gravity : {y : 1000},
                 }
     }
@@ -213,10 +213,13 @@ function create(){
             arrw.setY(-999)
             arrw.setX(0)
             arrw.setVelocityY(0)
-            if(plyr.body.touching.right){plyr.flipX = false};
-            if(plyr.body.touching.left){plyr.flipX = true};
-            counterMove = 28;
-            plyr.data.list.health--;
+            console.log(plyr.data.list.Guard);
+            if(plyr.data.list.Guard != true){
+                if(plyr.body.touching.right){plyr.flipX = false};
+                if(plyr.body.touching.left){plyr.flipX = true};
+                counterMove = 28;
+                plyr.data.list.health =  plyr.data.list.health - 20;
+            }else{counterMove = 14}
         })
 
         this.physics.add.collider(box, player, function (theplayer, thebox){    //collision entre box et le joueur 
@@ -374,7 +377,7 @@ function create(){
     });
     this.anims.create({
         key: 'knockBack',
-        frames: this.anims.generateFrameNumbers('heroKnockBack',{frames: [0, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 5, 5]}),
+        frames: this.anims.generateFrameNumbers('heroKnockBack',{frames: [0, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5]}),
         frameRate: 8,
     });
     this.anims.create({
@@ -599,21 +602,23 @@ function update(time, delta){
                     if(plyr.data.list.Guard === true || counterMove === 14){
                         if(plyr.flipX === false && htblobjct.flipX === false){
                             counterMove = 14;
-                            GuardKnockBack()
+                            
                         }
                         else if(plyr.flipX === true && htblobjct.flipX === true){
                             counterMove = 14;
-                            GuardKnockBack()
+                            
                             console.log(plyr.body.velocity);
                         }
                         else{                                                                       // collision Player KnockBack
-                            plyr.data.list.health = plyr.data.list.health - 1
+                            //plyr.data.list.health = plyr.data.list.health - 1
                             counterMove = 28
+                            player.data.list.health--;
                             // KnockBack();
                         }
                     }else{
-                        plyr.data.list.health = plyr.data.list.health - 1
+                        //plyr.data.list.health = plyr.data.list.health - 1
                         counterMove = 28
+                        player.data.list.health--;
                         // KnockBack()
                         
                     }
@@ -722,12 +727,18 @@ function update(time, delta){
     //console.log(this.input.gamepad.total);
     //console.log(this.input.gamepad.gamepads.length);
     //if(player.flipX === true && player.body.velocity.x === 0){console.log('flip');}
+    console.log(player.body.velocity.y);
     if(counterMove === 28){
         KnockBack()
     }
+    if(counterMove === 14){
+        GuardKnockBack()
+    }
     if(player.data.list.health <= 0){                                                              //Player Die
-        //counterMove = 999;
+        counterMove = 999;
         player.data.list.health = 0;
+        player.body.checkCollision.right = false;
+        player.body.checkCollision.left = false;
     }
     // CONTROL PLAYER
 
@@ -1002,7 +1013,7 @@ function KnockBack(){                                                           
                 }else{
                     player.setVelocityY(-200)
                     if(player.flipX === true){
-                        player.setVelocityX(2000)
+                        player.setGravityX(2000)
                     }
                     if(player.flipX === false){
                         player.setVelocityX(-2000)
@@ -1012,17 +1023,15 @@ function KnockBack(){                                                           
                 }
             }
             if(player.anims.currentFrame.index >=10){
-                player.setVelocityY(200)
+                player.setGravityY(-1200)
             }
             if(player.anims.currentFrame.index >=12){
-                player.setVelocityY(800)
+                player.setGravityY(8000)
             }
-            if(player.anims.currentFrame.index >=14){
+            if(player.anims.currentFrame.index >=18){
                 player.setVelocityX(0)
-                // if(playerInGround === true){
-
-                    player.body.destroy()
-                // }
+                // player.body.destroy();
+                
             }
             
         }
