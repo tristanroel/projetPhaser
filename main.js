@@ -582,7 +582,6 @@ function update(time, delta){
             var currentEnemy = hittableObject.children.entries[i]; 
 
             // COLLISION Enemy + player
-
             this.physics.add.collider(currentEnemy, player, function(htblobjct, plyr){              
                 if(htblobjct.body.touching.up){
                     console.log(htblobjct.body.checkCollision.up = false)
@@ -668,21 +667,37 @@ function update(time, delta){
                     currentEnemy.data.list.randomValue = currentEnemy.data.list.randomValue + 1;
                 }
             }
-            if(currentEnemy.data.list.CounterMove != 28){                                               // action enemies
-                if(currentEnemy.data.list.health <= 0){currentEnemy.data.list.CounterMove = 4}
-                if(currentEnemy.data.list.CounterMove === 0){enemyStand(currentEnemy)}
-                if(currentEnemy.data.list.CounterMove === 1){enemyWalkFront(currentEnemy,player,this)};
-                if(currentEnemy.data.list.CounterMove === 5){enemyWalkBack(currentEnemy,player,this)};
-                if(currentEnemy.data.list.CounterMove === 2){enemyAttack(currentEnemy)}
-                if(currentEnemy.data.list.CounterMove === 3){enemyKnockBack(currentEnemy)}
-                if(currentEnemy.data.list.CounterMove === 4 && currentEnemy.data.list.EnemyIsDie === false) {enemyDie(currentEnemy)}
+
+            if(currentEnemy.data.list.CounterMove != 28){                                           // action enemies
+                if(currentEnemy.data.list.health <= 0){
+                    currentEnemy.data.list.CounterMove = 4
+                }
+
+                switch(currentEnemy.data.list.CounterMove){
+                    case 0: enemyStand(currentEnemy); break;
+                    case 1: enemyWalkFront(currentEnemy,player,this); break;
+                    case 2: enemyAttack(currentEnemy); break;
+                    case 3: enemyKnockBack(currentEnemy); break;
+                    case 4:
+                        if(currentEnemy.data.list.EnemyIsDie === false)
+                        {
+                            enemyDie(currentEnemy);
+                        }
+                        break;
+                    case 5: enemyWalkBack(currentEnemy,player,this); break;
+                    case 6:
+                    case 7:
+                    default:
+                        //do nothing
+                        break;
+                }
 
                 if(currentEnemy.data.list.EnemyIsDie === true){
                         Phaser.Utils.Array.RemoveAt(hittableObject.children.entries, i);
-                        //Phaser.Utils.Array.RemoveAt(Arrow.children.entries, i);
                         currentEnemy.destroy()
                 }
             }
+            
         }
         else if(hittableObject.children.entries[i].data.list.name === 'slash'){                         //img attack slash
             if(player.flipX === true){
