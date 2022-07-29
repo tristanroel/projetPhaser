@@ -864,6 +864,9 @@ function update(time, delta){
         else if (player.setVelocityX(0)){                                                               //idle
                 if(playerInGround === true && counterMove === 0){
                     player.anims.play('idle', true);
+                    player.setGravityY(0);
+                    player.body.checkCollision.right = true;
+                    player.body.checkCollision.left = true;
                 }
             }
         
@@ -1064,7 +1067,7 @@ function tornadoSlash(){                                                        
             if(player.anims.currentFrame.index === 7 ){colAtkThree.destroy();}
             if(player.anims.currentFrame.index >= 4 &&
                 player.anims.currentFrame.index <= 6){
-                    player.setVelocityY(-playerVelocityX)
+                    player.setVelocityY(-350)
             }
             if(player.anims.currentFrame.index >= 16){
                 player.data.list.Eject = false;
