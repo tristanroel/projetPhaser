@@ -23,7 +23,7 @@ var configuration = {
     physics :{
         default : 'arcade',
         arcade :{
-                    debug : true,
+                    debug : false,
                     gravity : {y : 1000},
                 }
     }
@@ -172,7 +172,7 @@ function create(){
 
     // TEXT
 
-    text = this.add.text(0,0, ' << CONTROL >> \n LEFT = press "Q"\n RIGHT = press "D"\n JUMP  = press "Z"\n ATTACK = press "J"\n GUARD = press "I" \n GAMEPAD : disconected\n version : O.8 | 27.07.22' , {fontFamily : 'PixelFont'}); 
+    text = this.add.text(0,0, ' << CONTROL >> \n LEFT = press "Q"\n RIGHT = press "D"\n JUMP  = press "Z"\n ATTACK = press "J"\n GUARD = press "I" \n GAMEPAD : disconected\n version : O.9 | 29.07.22' , {fontFamily : 'PixelFont'}); 
     scoreText = this.add.text(0,0, 'SCORE : 0',{ fontFamily : 'PixelFont',fontWeight :'20px', color : '#353535'})
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -571,19 +571,19 @@ function create(){
 
 // CREATE ENEMIES
 
-    //createEnemies(enemySpawn,'PoleAxe');
+    createEnemies(enemySpawn,'PoleAxe');
     
     for(var i = 0;i < 2; i++){
         setTimeout(()=>{createEnemies(enemySpawn, 'Enemy1')},9000 + (i * 7000))
     }
    
-    // for(var i = 0;i < 2; i++){
-    //     setTimeout(()=>{createEnemies(enemySpawn,'CrossBow');},9000 + (i * 7000))
-    // }
+    for(var i = 0;i < 2; i++){
+        setTimeout(()=>{createEnemies(enemySpawn,'CrossBow');},9000 + (i * 7000))
+    }
 
-    // for(var i = 0;i < 2; i++){
-    //     setTimeout(()=>{createEnemies(enemySpawn,'box');},9000 + (i * 7000))
-    // }
+    for(var i = 0;i < 2; i++){
+        setTimeout(()=>{createEnemies(enemySpawn,'box');},9000 + (i * 7000))
+    }
 
 
     
