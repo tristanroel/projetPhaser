@@ -84,7 +84,7 @@ function preload(){
     this.load.spritesheet('piecette','assets/Coin.png', {frameWidth : 8, frameHeight : 8});
     this.load.spritesheet('hero', 'assets/Sprites/stancearmed.png',{frameWidth: 170, frameHeight: 170});
     this.load.spritesheet('heroAttack', 'assets/Sprites/sword_attack_move.png',{frameWidth: 170, frameHeight: 170});
-    this.load.spritesheet('herorun', 'assets/Sprites/walkarmed_Old.png',{frameWidth: 170, frameHeight: 170});
+    this.load.spritesheet('herorun', 'assets/Sprites/walkarmed_old.png',{frameWidth: 170, frameHeight: 170});
     this.load.spritesheet('herojump', 'assets/Sprites/jumparmed.png',{frameWidth: 170, frameHeight: 170});
     this.load.spritesheet('herojumpAtk', 'assets/Sprites/jump_sword_attack.png',{frameWidth: 170, frameHeight: 170});
     this.load.spritesheet('heroGuard', 'assets/Sprites/guard.png',{frameWidth: 170, frameHeight: 170});
