@@ -73,6 +73,8 @@ var healthBar;
 
 var countTest = 0;
 
+var currentEnemy
+
 function preload(){
     this.load.image('sky','assets/Thesky.png');
     this.load.image('ground','assets/solPave.png');
@@ -584,8 +586,6 @@ function create(){
     for(var i = 0;i < 2; i++){
         setTimeout(()=>{createEnemies(enemySpawn,'box');},9000 + (i * 7000))
     }
-
-
     
 }
 
@@ -613,7 +613,7 @@ function update(time, delta){
     for(var i = 0; i < hittableObject.children.entries.length; i++){
         if(hittableObject.children.entries[i] != undefined && hittableObject.children.entries[i].data.list.name === 'EnemyOne'){
             
-            var currentEnemy = hittableObject.children.entries[i]; 
+            currentEnemy = hittableObject.children.entries[i]; 
 
             //COLLISION Enemy + player
             this.physics.add.collider(currentEnemy, player, function(htblobjct, plyr){              // COLLISIONS
@@ -634,11 +634,9 @@ function update(time, delta){
 
                 //playerVelocityX = 0;
 
-                if(htblobjct.data.list.AtkCollide === true){                                        // collision Player Guard 
-                    console.log('yeyo');                      
+                if(htblobjct.data.list.AtkCollide === true){                                        // collision Player Guard                     
                     if(plyr.data.list.Guard === true){
                         // htblobjct.data.list.AtkCollide = false;
-                        
                         if(plyr.flipX === false && htblobjct.flipX === false){
                             counterMove = 14;
                             htblobjct.data.list.AtkCollide = false;
@@ -783,7 +781,7 @@ function update(time, delta){
 
         else{hittableObject.children.entries[i] = [];} 
     }
-   // console.log(player.data.list.Guard);
+    //console.log(player.data.list.Guard);
     //console.log(currentEnemy);
     //console.log(Arrow);
     //console.log(Phaser.Math.Distance.BetweenPoints(hittableObject.children.entries[0],player));
@@ -799,7 +797,8 @@ function update(time, delta){
     //console.log(player.data.list.Eject);
     //console.log(box.children.entries);
     //console.log(playerInGround);
-    //console.log(hittableObject.children.entries);
+    //console.log(-26 * 6);
+    console.log(hittableObject.children.entries);
     //console.log(hittableObject.children.entries[0].body.position.x);
     //console.log(currentEnemy);
     //console.log(player.anims.currentAnim);
@@ -1038,8 +1037,9 @@ function tornadoSlash(){                                                        
                 player.body.checkCollision.left = false;
             }
             if(player.anims.currentFrame.index <= 3 ){
-                if(playerFlip === true){player.setVelocityX(-2000)}
-                if(playerFlip === false){player.setVelocityX(2000)} 
+                player.setGravityY(-1000);
+                if(playerFlip === true){player.setVelocityX(-playerVelocityX * 6)}
+                if(playerFlip === false){player.setVelocityX(playerVelocityX * 6)} 
             }
             if(player.anims.currentFrame.index === 2 ){
                 // player.anims.stop()
@@ -1047,6 +1047,7 @@ function tornadoSlash(){                                                        
                 if(playerFlip === false){colAtk.setX(player.x +130);colAtk.setY(player.y +20)} 
             }
             if(player.anims.currentFrame.index === 4 ){
+                player.setGravityY(0);
                 player.body.checkCollision.right = true;
                 player.body.checkCollision.left = true;
                 colAtk.destroy();
@@ -1063,7 +1064,7 @@ function tornadoSlash(){                                                        
             if(player.anims.currentFrame.index === 7 ){colAtkThree.destroy();}
             if(player.anims.currentFrame.index >= 4 &&
                 player.anims.currentFrame.index <= 6){
-                    player.setVelocityY(-350)
+                    player.setVelocityY(-playerVelocityX)
             }
             if(player.anims.currentFrame.index >= 16){
                 player.data.list.Eject = false;
@@ -1207,6 +1208,9 @@ function createEnemies(enemySpawner, typeOfEnemy){                              
     }
     if(typeOfEnemy === 'box'){  
         enemyone.setSize(35, 35);
+        enemyone.body.checkCollision.up = true;
+        enemyone.body.checkCollision.left = false;
+        enemyone.body.checkCollision.right = false;
         enemyone.setData('health', 3);
     }       
     //console.log(enemyone);
@@ -1220,6 +1224,8 @@ function enemyStand(enmy1){
 }
 
 function enemyWalkFront(enemy1,target,game){                                                    //enemy Walk
+
+if(enemy1.data.list.type != 'box'){
     var animsName = 'walk'+enemy1.data.list.type;
 
     enemy1.anims.play(animsName, true)
@@ -1235,18 +1241,20 @@ function enemyWalkFront(enemy1,target,game){                                    
             }
         }
     })
+}else{}    
     
 
 }
 
 function enemyWalkBack(enemy1,target,game){                                                     // enemy walkBack
+    enemy1.setBounce(0,0)
     var animsName = 'walkback'+enemy1.data.list.type;
     enemy1.anims.play(animsName, true)
 
     game.physics.moveToObject(enemy1, target, - (enemy1.data.list.randomValue));
     enemy1.data.list.AttackIsFinish = false
-    enemy1.setVelocityY(600);
-    //var enemyAction = 'walkbackenemy1';
+    enemy1.setGravityY(1000);
+    
     enemy1.on('animationupdate', ()=>{
         if(animsName === enemy1.anims.currentAnim.key){
             if(enemy1.anims.currentFrame.index >= 4){
@@ -1405,7 +1413,8 @@ function enemyKnockBack(enmy){
                         }
                     if(enmy.anims.currentFrame.index >= 11){
                         enmy.setVelocityX(0)
-                        enmy.setBounce(0,0)                       
+                        enmy.setBounce(0,0)  
+                                          
                     }
                     if(enmy.anims.currentFrame.index >= 20 &&
                         enmy.body.velocity.y === 0){ 
