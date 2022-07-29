@@ -5,7 +5,7 @@ var configuration = {
     height : 600,
     backgroundColor : '#353535',
     fps: {
-        target: 60,
+        target: 40,
         forceSetTimeOut: true
       },
     input : {
@@ -23,7 +23,7 @@ var configuration = {
     physics :{
         default : 'arcade',
         arcade :{
-                    debug : false,
+                    debug : true,
                     gravity : {y : 1000},
                 }
     }
@@ -72,8 +72,6 @@ var scoreText;
 var healthBar; 
 
 var countTest = 0;
-
-var currentEnemy;
 
 function preload(){
     this.load.image('sky','assets/Thesky.png');
@@ -136,7 +134,6 @@ function create(){
         setXY:{x: -800, y :60},
         visible : false,
     });
-    
     Arrow = this.physics.add.group({allowGravity : false})                          // Arrow 
 
     hittableObject = this.physics.add.group()                                       // enemy and other...
@@ -150,11 +147,8 @@ function create(){
         setScale : {x : 3},
     });
     box.children.iterateLocal('setData', 'pv', 4)
-    box.children.iterateLocal('setData', 'type', 'enemyOne')
     box.children.iterateLocal('setSize', 35,35)
     box.setVelocityY(600)
-    //hittableObject.add()
-    //console.log(box.children);
     
     player = this.physics.add.sprite(200, 310,'hero').setScale(3);                  // player
     player.body.setSize(25, 58)                                         
@@ -202,7 +196,6 @@ function create(){
             }
         })
         this.physics.add.collider(platform,box)                     //collision plateforme et boites
-
         this.physics.add.collider(box,box, function(box2, box1){    // collisions entre boites
             box1.body.blocked.left = true
             box1.body.blocked.right = true
@@ -210,7 +203,7 @@ function create(){
             box2.body.blocked.right = true
             //console.log(box1.body.blocked.left);
         })
-        this.physics.add.overlap(Coin, player, function(theplayer, piepiece){ // collision pieces et joueur 
+        this.physics.add.overlap(Coin, player, function(theplayer, piepiece){   // collision pieces et joueur 
             Score++;
             piepiece.destroy();
             //console.log('Score : '+Score);
@@ -220,13 +213,15 @@ function create(){
             arrw.setY(-999)
             arrw.setX(0)
             arrw.setVelocityY(0)
-            console.log(plyr.data.list.Guard);
-            if(plyr.data.list.Guard != true){
+            // console.log(plyr.data.list.Guard);
+            if(plyr.data.list.Guard === true){
+                counterMove = 14
+            }else{
                 if(plyr.body.touching.right){plyr.flipX = false};
                 if(plyr.body.touching.left){plyr.flipX = true};
                 counterMove = 28;
                 plyr.data.list.health--;
-            }else{counterMove = 14}
+            }
         })
 
         this.physics.add.collider(box, player, function (theplayer, thebox){    //collision entre box et le joueur 
@@ -318,7 +313,7 @@ function create(){
     this.anims.create({
         key: 'idle',
         frames: this.anims.generateFrameNumbers('hero',{frames: [0, 1, 2, 3]}),
-        frameRate: 4,
+        frameRate: 6,
         repeat: -1
     })
     this.anims.create({
@@ -576,19 +571,19 @@ function create(){
 
 // CREATE ENEMIES
 
-    createEnemies(enemySpawn,'PoleAxe');
+    //createEnemies(enemySpawn,'PoleAxe');
     
     for(var i = 0;i < 2; i++){
         setTimeout(()=>{createEnemies(enemySpawn, 'Enemy1')},9000 + (i * 7000))
     }
    
-    for(var i = 0;i < 2; i++){
-        setTimeout(()=>{createEnemies(enemySpawn,'CrossBow');},9000 + (i * 7000))
-    }
+    // for(var i = 0;i < 2; i++){
+    //     setTimeout(()=>{createEnemies(enemySpawn,'CrossBow');},9000 + (i * 7000))
+    // }
 
-    for(var i = 0;i < 2; i++){
-        setTimeout(()=>{createEnemies(enemySpawn,'box');},9000 + (i * 7000))
-    }
+    // for(var i = 0;i < 2; i++){
+    //     setTimeout(()=>{createEnemies(enemySpawn,'box');},9000 + (i * 7000))
+    // }
 
 
     
@@ -618,44 +613,48 @@ function update(time, delta){
     for(var i = 0; i < hittableObject.children.entries.length; i++){
         if(hittableObject.children.entries[i] != undefined && hittableObject.children.entries[i].data.list.name === 'EnemyOne'){
             
-            currentEnemy = hittableObject.children.entries[i]; 
+            var currentEnemy = hittableObject.children.entries[i]; 
 
-            // COLLISION Enemy + player
+            //COLLISION Enemy + player
             this.physics.add.collider(currentEnemy, player, function(htblobjct, plyr){              // COLLISIONS
             
             if(htblobjct.data.list.type != 'box'){
-                if(htblobjct.body.touching.up){
-                    console.log(htblobjct.body.checkCollision.up = false)
-                }
-                if(plyr.body.touching.up){                                                          // collision up player
-                    console.log(plyr.body.checkCollision.up = false)
-                }
-                if((htblobjct.body.touching.left ||                                                 // collision left/right enemy + player
-                    htblobjct.body.touching.right) && 
-                    htblobjct.data.list.AtkCollide === false){
-                    counterMove = 14;
-                    GuardKnockBack()
-                }
-                
-                if(htblobjct.data.list.AtkCollide === true){                                        // collision Player Guard                       
-                    htblobjct.data.list.AtkCollide = false;
-                    if(plyr.data.list.Guard === true || counterMove === 14){
+                // if(htblobjct.body.touching.up){
+                //     console.log(htblobjct.body.checkCollision.up = false)
+                // }
+                // if(plyr.body.touching.up){                                                          // collision up player
+                //     console.log(plyr.body.checkCollision.up = false)
+                // }
+                // if((htblobjct.body.touching.left ||                                                 // collision left/right enemy + player
+                //     htblobjct.body.touching.right) && 
+                //     htblobjct.data.list.AtkCollide === false){
+                //     counterMove = 14;
+                //     GuardKnockBack()
+                // }
+
+                //playerVelocityX = 0;
+
+                if(htblobjct.data.list.AtkCollide === true){                                        // collision Player Guard 
+                    console.log('yeyo');                      
+                    if(plyr.data.list.Guard === true){
+                        // htblobjct.data.list.AtkCollide = false;
+                        
                         if(plyr.flipX === false && htblobjct.flipX === false){
                             counterMove = 14;
+                            htblobjct.data.list.AtkCollide = false;
                         }
                         else if(plyr.flipX === true && htblobjct.flipX === true){
                             counterMove = 14;
                             console.log(plyr.body.velocity);
+                            htblobjct.data.list.AtkCollide = false;
                         }
-                        else{                                                                           // collision Player KnockBack
-                            counterMove = 28
-                            plyr.data.list.health--;
-                        }
-                    }else{
+                    }else{                                                                          // collision Player KnockBack
                         counterMove = 28
                         plyr.data.list.health--;
+                        htblobjct.data.list.AtkCollide = false;
+
                     }
-                }
+                }else{counterMove = 28}
             }else{
                 htblobjct.setVelocityX(0);                                                              //collision player + box
                 if(plyr.body.touching.down && htblobjct.body.touching.up){
@@ -697,6 +696,8 @@ function update(time, delta){
                 currentEnemy.data.list.CounterMove = 2; 
             }
 
+
+
             if(Phaser.Math.Distance.BetweenPoints(currentEnemy,player) <= 198 &&                        // action enemies
             currentEnemy.data.list.type != 'box' &&
             currentEnemy.data.list.EnemyIsAttack === true && 
@@ -736,10 +737,35 @@ function update(time, delta){
                         break;
                 }
 
-                if(currentEnemy.data.list.EnemyIsDie === true){
-                        Phaser.Utils.Array.RemoveAt(hittableObject.children.entries, i);
-                        currentEnemy.destroy()
+
+                if(currentEnemy.data.list.EnemyIsDie === true)
+                {
+                    // Delete arrow for the crossbow enemy
+                    if(currentEnemy.data.list.type == "CrossBow")
+                    {
+                        var currentArrow = null;
+
+                        for(var i = 0; i < Arrow.children.entries.length; i++)
+                        {
+                            if(currentEnemy.data.list.id_arrow == Arrow.children.entries[i].data.list.id)
+                            {
+                                currentArrow = Arrow.children.entries[i]; // Arrow found
+                                break;
+                            }
+                        }
+
+                        if(currentArrow != null)
+                        {
+                            Phaser.Utils.Array.RemoveAt(Arrow.children.entries, i);
+                            currentArrow.destroy()
+                        }
+                    }
+
+                    // Delete enemy
+                    Phaser.Utils.Array.RemoveAt(hittableObject.children.entries, i);
+                    currentEnemy.destroy()
                 }
+            
             }
             
         }
@@ -755,6 +781,8 @@ function update(time, delta){
 
         else{hittableObject.children.entries[i] = [];} 
     }
+   // console.log(player.data.list.Guard);
+    //console.log(currentEnemy);
     //console.log(Arrow);
     //console.log(Phaser.Math.Distance.BetweenPoints(hittableObject.children.entries[0],player));
     //console.log(enemyMoveDetection.children.entries[0]);
@@ -808,7 +836,7 @@ function update(time, delta){
                 if(playerInGround === true){
                     counterMove = 32;
                     tornadoSlash();
-                    console.log('tornadoSash');
+                    //console.log('tornadoSash');
                     gamePadCombo = [];
                 }
             }else{
@@ -861,7 +889,8 @@ function update(time, delta){
             player.setVelocityY(0);
             player.anims.play('guard', true);
             player.data.list.Guard = true
-        }else{ player.data.list.Guard = false}
+        }else if(touchesGuard.isUp && playerInGround === true && counterMove != 14){
+             player.data.list.Guard = false}
         
         if(Phaser.Input.Keyboard.JustDown(touchesAttack) || gamepadAttack === true){                    //attack                                            //attack
             gamepadAttack = false;
@@ -1100,7 +1129,8 @@ function KnockBack(){                                                           
     });
 }
 
-function GuardKnockBack(){                                                                              // Guard
+function GuardKnockBack(){  
+    player.data.list.Guard = true                                                                            // Guard
     player.data.list.Eject = false;
     playerCanFall = false
     player.anims.play('protectGuard', true);
@@ -1108,8 +1138,8 @@ function GuardKnockBack(){                                                      
     player.on('animationupdate', ()=>{
         if(nameAction === player.anims.currentAnim.key){
             if(player.anims.currentFrame.index <=4){
-                if(playerFlip === true){player.setVelocityX(800)}
-                if(playerFlip === false){player.setVelocityX(-800)} 
+                if(playerFlip === true){player.setVelocityX(600)}
+                if(playerFlip === false){player.setVelocityX(-600)} 
             }
             if(player.anims.currentFrame.index >=5){
                 if(player.body.velocity.y != 0){
@@ -1162,7 +1192,9 @@ function createEnemies(enemySpawner, typeOfEnemy){                              
     enemyone.setData('name', 'EnemyOne');
     enemyone.setData('type', typeOfEnemy);
     enemyone.setData('id', id);
+    enemyone.setData('id_arrow', id);
     enemyone.setData('randomValue',Phaser.Math.Between(50,200));
+    enemyone.body.checkCollision.up = false
     enemyone.setDepth(0);
     
     if(typeOfEnemy === 'CrossBow'){                                                         //create Arrow
@@ -1263,28 +1295,37 @@ function enemyAttack(enemyone, currentArrow){
         }
         if(animsName === enemyone.anims.currentAnim.key &&                                  //attack CrossBow
             enemyone.data.list.type === 'CrossBow'){
-            if(enemyone.anims.currentFrame.index === 9){
+            if(enemyone.anims.currentFrame.index === 9)
+                {
+                    var currentArrow = null;
 
-                for(var i = 0; i < Arrow.children.entries.length; i++){
-                    if(Arrow.children.entries[i].data.list.id === enemyone.data.list.id){
-                        var currentArrow = Arrow.children.entries[i]
-                    }else{
+                    for(var i = 0; i < Arrow.children.entries.length; i++)
+                    {
+                        if(Arrow.children.entries[i].data.list.id === enemyone.data.list.id_arrow)
+                        {
+                            currentArrow = Arrow.children.entries[i];
+                            break;
+                        }
+                    }
 
+                    if(currentArrow != null)
+                    {
+                        currentArrow.setY(enemyone.y - 35)  
+
+                        if(enemyone.flipX === true)
+                        {
+                            currentArrow.flipX = true;
+                            currentArrow.setX(enemyone.x + 100)
+                            currentArrow.setVelocityX(400)
+                        }
+                        else
+                        {
+                            currentArrow.flipX = false;
+                            currentArrow.setX(enemyone.x - 100) 
+                            currentArrow.setVelocityX(-400)
+                        }
                     }
                 }
-                currentArrow.setY(enemyone.y - 35)  
-                if(enemyone.flipX === true){
-                    currentArrow.flipX = true;
-                    currentArrow.setX(enemyone.x + 100)
-                    currentArrow.setVelocityX(400)
-                }
-                if(enemyone.flipX === false){
-                    currentArrow.flipX = false;
-                    currentArrow.setX(enemyone.x - 100) 
-                    currentArrow.setVelocityX(-400)
-                }
-                //console.log(currentArrow);
-            }
         }
     });
 }
@@ -1354,13 +1395,13 @@ function enemyKnockBack(enmy){
                             enmy.setVelocityY(0)
                         }
                         if(enmy.anims.currentFrame.index >= 8 &&
-                            enmy.anims.currentFrame.index <10){
+                            enmy.anims.currentFrame.index <= 10){
                                 if(enmy.flipX === true){enmy.setVelocityX(-100)}
                                 if(enmy.flipX === false){enmy.setVelocityX(100)}   
                                 enmy.setVelocityY(500)
                                 enmy.setBounce(0.5,0.5)
                         }
-                    if(enmy.anims.currentFrame.index > 10){
+                    if(enmy.anims.currentFrame.index >= 11){
                         enmy.setVelocityX(0)
                         enmy.setBounce(0,0)                       
                     }
