@@ -234,7 +234,7 @@ function create(){
 
         this.physics.add.collider(Coin, platform)
 
-        this.physics.add.overlap(colideATK2, box, function(colAtk2, boite){ // collision entre attaque et boites 
+        this.physics.add.overlap(colideATK2, box, function(colAtk2, boite){     // collision entre attaque et boites 
             boite.data.list.pv = boite.data.list.pv - 1;
             colAtk2.destroy()
             
@@ -654,7 +654,9 @@ function update(time, delta){
                         htblobjct.data.list.AtkCollide = false;
 
                     }
-                }else{counterMove = 28}
+                }else{
+                    // counterMove = 28
+                }
             }else{
                 htblobjct.setVelocityX(0);                                                              //collision player + box
                 if(plyr.body.touching.down && htblobjct.body.touching.up){
