@@ -59,6 +59,9 @@ var playerCanFall; // : boolean
 
 
 var enemy1Spawn; //spawn enemy
+var enemyCrossBowSpawn;
+var boxSpawn;
+
 var enemyNumberId;
 var colideATKEnemy;
 
@@ -130,9 +133,12 @@ function create(){
     var sol1 = this.add.sprite(200, 570, 'ground').setScale(3);//image sol
     var sol2 = this.add.sprite(1422, 500, 'ground').setScale(3);//image sol
     var sol3 = this.add.sprite(2512, 700, 'ground').setScale(3);//image sol
-    enemy1Spawn = this.add.image(1700, 300, 'spawner'); //spawn enemy
-    enemyCrossBowSpawn = this.add.image(2000, 300, 'spawner'); //spawn enemy
-    boxSpawn = this.add.image(1200, 300, 'spawner'); //spawn enemy
+
+
+    enemy1Spawn = this.add.image(1700, 300, 'spawner').setVisible(false);         //spawn enemy
+    enemyCrossBowSpawn = this.add.image(2000, 300, 'spawner').setVisible(false);  //spawn enemy
+    boxSpawn = this.add.image(1200, 300, 'spawner').setVisible(false);            //spawn enemy
+
     
     healthBar = this.add.rectangle(0,0,200,20,0xB14F37).setStrokeStyle(2, 0xFFFFFF); //healthbar
     
