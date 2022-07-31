@@ -137,7 +137,10 @@ function create(){
 
     enemy1Spawn = this.add.image(1700, 300, 'spawner').setVisible(false);         //spawn enemy
     enemyCrossBowSpawn = this.add.image(2000, 300, 'spawner').setVisible(false);  //spawn enemy
-    boxSpawn = this.add.image(1200, 300, 'spawner').setVisible(false);            //spawn enemy
+    boxSpawn = this.add.group({
+        key : 'box',
+        visible : false,
+    });            //spawn enemy
 
     
     healthBar = this.add.rectangle(0,0,200,20,0xB14F37).setStrokeStyle(2, 0xFFFFFF); //healthbar
@@ -276,8 +279,9 @@ function create(){
         // })
         
         this.physics.add.collider(hittableObject, platform, function(htblobjct, pltfrm){})   //collision Enemy + platform
+
         this.physics.add.overlap(hittableObject, platform, function(htblobjct, pltfrm){      //overlap Enemy + platform
-            htblobjct.body.velocity.y = -200
+            htblobjct.body.velocity.y = -150
         })
     
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////// 
@@ -603,6 +607,8 @@ function create(){
 
     createEnemies(enemy1Spawn,'PoleAxe');
     createEnemies(enemyCrossBowSpawn,'Enemy1');
+    createEnemies(enemyCrossBowSpawn,'Enemy1');
+    //createEnemies(enemyCrossBowSpawn,'CrossBow');
     createEnemies(boxSpawn,'box');
     
     // for(var i = 0;i < 1; i++){
@@ -677,10 +683,20 @@ function update(time, delta){
                             counterMove = 14;
                             htblobjct.data.list.AtkCollide = false;
                         }
+
                         else if(plyr.flipX === true && htblobjct.flipX === true){
                             counterMove = 14;
-                            console.log(plyr.body.velocity);
+                            //console.log(plyr.body.velocity);
                             htblobjct.data.list.AtkCollide = false;
+
+                        }else if(plyr.flipX === true && htblobjct.flipX === false){
+                            
+                            counterMove = 28
+                        }
+
+                        else if(plyr.flipX === false && htblobjct.flipX === true){
+                            
+                            counterMove = 28
                         }
                     }else{                                                                          // collision Player KnockBack
                         counterMove = 28
@@ -1273,7 +1289,7 @@ function createEnemies(enemySpawner, typeOfEnemy){                              
         enemyone.body.checkCollision.up = true;
         enemyone.body.checkCollision.left = false;
         enemyone.body.checkCollision.right = false;
-        enemyone.setData('health', 3);
+        enemyone.setData('health', 4);
     }       
 }
 
