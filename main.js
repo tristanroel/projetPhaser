@@ -1,8 +1,8 @@
 var configuration = {
     type: Phaser.AUTO,
     pixelArt : true,
-    width : 1000,
-    height : 600,
+    // width : 1000,
+    // height : 600,
     backgroundColor : '#353535',
     fps: {
         target: 50,
@@ -12,8 +12,9 @@ var configuration = {
         gamepad : true
     },
     scale:{
-        mode : Phaser.Scale.FIT,
-        autoCenter: 1,
+       mode : Phaser.Scale.FIT,
+       width : 360,
+       height : 210,
     },
     scene:{
         preload : preload,
@@ -24,9 +25,9 @@ var configuration = {
         default : 'arcade',
         arcade :{
                     debug : false,
-                    gravity : {y : 1000},
+                    gravity : {y : 600},
                 }
-    }
+    },
 }
 
 var game = new Phaser.Game(configuration);
@@ -85,7 +86,7 @@ function preload(){
     this.load.image('ATK1','assets/TRlogo.png');
     this.load.image('spawner','assets/ROELprod.png');
     this.load.image('carreau', 'assets/carreau.png');
-    // this.load.spritesheet('skyAnim', 'assets/Bakcloudanim.png', {frameWidth : 404, frameHeight : 274});
+    this.load.image('TilesLevel', 'assets/levelOne/Decor1.png');
     this.load.spritesheet('slash','assets/Slash.png', {frameWidth : 65, frameHeight : 65});
     this.load.spritesheet('slashGuard','assets/SlashGuard.png', {frameWidth : 8, frameHeight : 23});
     this.load.spritesheet('piecette','assets/Coin.png', {frameWidth : 8, frameHeight : 8});
@@ -116,7 +117,7 @@ function create(){
     /// SET VARIABLE    
     attackintheair = false;
     counterMove = 0;
-    playerVelocityX = 350;
+    playerVelocityX = 150;
     playerInGround = false;
     PlayerTouchEnemy = false;
     attackinground = false;
@@ -129,25 +130,25 @@ function create(){
     
    /// OBJECT
 
-    skyBg = this.add.tileSprite(0, 400, 404, 542, 'sky').setScale(3); //image ciel
-    var sol1 = this.add.sprite(200, 570, 'ground').setScale(3);//image sol
-    var sol2 = this.add.sprite(1422, 500, 'ground').setScale(3);//image sol
-    var sol3 = this.add.sprite(2512, 700, 'ground').setScale(3);//image sol
+    skyBg = this.add.tileSprite(0, 500, 404, 542, 'sky'); //image ciel
+    var sol1 = this.add.sprite(100, 570, 'ground');//image sol
+    var sol2 = this.add.sprite(511, 550, 'ground');//image sol
+    var sol3 = this.add.sprite(900, 600, 'ground');//image sol
 
 
-    enemy1Spawn = this.add.image(1700, 300, 'spawner').setVisible(false);         //spawn enemy
-    enemyCrossBowSpawn = this.add.image(2000, 300, 'spawner').setVisible(false);  //spawn enemy
+    enemy1Spawn = this.add.image(525, 300, 'spawner').setVisible(false);         //spawn enemy
+    enemyCrossBowSpawn = this.add.image(700, 300, 'spawner').setVisible(false);  //spawn enemy
     boxSpawn = this.add.group({
         key : 'box',
         visible : false,
     });            //spawn enemy
 
     
-    healthBar = this.add.rectangle(0,0,200,20,0xB14F37).setStrokeStyle(2, 0xFFFFFF); //healthbar
+    healthBar = this.add.rectangle(0,0,100,10,0xB14F37).setStrokeStyle(2, 0xFFFFFF); //healthbar
     
     Coin = this.physics.add.group({                                                 // Coin
         //key :'piecette',
-        setXY:{x: -800, y :60},
+        setXY:{x: -400, y :30},
         visible : false,
     });
 
@@ -169,7 +170,7 @@ function create(){
     // box.children.iterateLocal('setSize', 35,35)
     // box.setVelocityY(600)
     
-    player = this.physics.add.sprite(200, 310,'hero').setScale(3);                  // player
+    player = this.physics.add.sprite(200, 310,'hero');                  // player
     player.body.setSize(25, 58)                                         
     player.setData('health', 10)
     player.setData('Guard', false)
@@ -182,18 +183,19 @@ function create(){
         allowGravity : false,
         disableBody : true,
         visible : false,
-        data : {'Eject': false}
+        data : {'Eject': false},
         // size : {x : 200, y : 200}
-        //setXY : {x : -999, y : -999}
+        setXY : {x : -999, y : -999}
     })
     
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     // TEXT
 
-    text = this.add.text(0,0, ' << CONTROL >> \n LEFT = press "Q"\n RIGHT = press "D"\n JUMP  = press "Z"\n ATTACK = press "J"\n GUARD = press "I" \n GAMEPAD : disconected\n version : O.10 | 30.07.22' , {fontFamily : 'PixelFont'}); 
-    scoreText = this.add.text(0,0, 'SCORE : 0',{ fontFamily : 'PixelFont',fontWeight :'20px', color : '#353535'})
+    text = this.add.text(0,0, ' << CONTROL >> \n LEFT = press "Q"\n RIGHT = press "D"\n JUMP  = press "Z"\n ATTACK = press "J"\n GUARD = press "I" \n GAMEPAD : disconected\n version : O.10 | 30.07.22' , {fontFamily : 'PixelFont', fontSize :'8px'}); 
+    scoreText = this.add.text(0,0, 'SCORE : 0',{ fontFamily : 'PixelFont',fontSize :'8px', color : '#353535'})
 
+    //text.setFontSize(text.fontSize - 2)
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     
     // CAMERA
@@ -281,7 +283,7 @@ function create(){
         this.physics.add.collider(hittableObject, platform, function(htblobjct, pltfrm){})   //collision Enemy + platform
 
         this.physics.add.overlap(hittableObject, platform, function(htblobjct, pltfrm){      //overlap Enemy + platform
-            htblobjct.body.velocity.y = -150
+            htblobjct.body.velocity.y = -75
         })
     
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////// 
@@ -450,6 +452,7 @@ function create(){
     });
 
     ///// animations enemy
+
     this.anims.create({
         key: 'stancebox',
         frames: this.anims.generateFrameNumbers('box',{frames : [0]}),
@@ -485,7 +488,7 @@ function create(){
     this.anims.create({
         key: 'walkPoleAxe',
         frames: this.anims.generateFrameNumbers('theEnemyPoleAxe',{frames : [1, 2, 3, 4]}),
-        frameRate: 4,
+        frameRate: 3,
         repeat : -1,
     });
     // this.anims.create({
@@ -542,11 +545,11 @@ function create(){
         frames: this.anims.generateFrameNumbers('theEnemyPoleAxe',{frames : [ 18, 19, 19, 19, 19, 19, 19, 0, 0]}),
         frameRate: 9,
     });
-    this.anims.create({
-        key: 'knockbackbox',
-        frames: this.anims.generateFrameNumbers('box',{frames : [ 0]}),
-        frameRate: 20,
-    });
+    // this.anims.create({
+    //     key: 'knockbackbox',
+    //     frames: this.anims.generateFrameNumbers('box',{frames : [ 0]}),
+    //     frameRate: 20,
+    // });
     this.anims.create({
         key: 'fallEnemy1',
         frames: this.anims.generateFrameNumbers('theEnemyfall',{frames : [0, 1, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3]}),
@@ -608,6 +611,7 @@ function create(){
     createEnemies(enemy1Spawn,'PoleAxe');
     createEnemies(enemyCrossBowSpawn,'Enemy1');
     createEnemies(enemyCrossBowSpawn,'Enemy1');
+    createEnemies(enemyCrossBowSpawn,'box');
     //createEnemies(enemyCrossBowSpawn,'CrossBow');
     createEnemies(boxSpawn,'box');
     
@@ -640,13 +644,13 @@ function update(time, delta){
     //BACKGROUND AND TEXT
     skyBg.x = player.body.position.x;                                                               // position du ciel
     skyBg.tilePositionX += 0.5;
-    text.x = player.body.position.x - 450;                                                          // position text
-    text.y = player.body.position.y + 210;
-    healthBar.x = player.body.position.x - 340;                                                     // position healthbar
-    healthBar.y = player.body.position.y - 185;
-    healthBar.width = player.data.list.health * 20;
-    scoreText.x = player.body.position.x + 400;                                                     // position Score
-    scoreText.y = player.body.position.y -200;
+    text.x = player.body.position.x - 155;                                                          // position text
+    text.y = player.body.position.y + 50;
+    healthBar.x = player.body.position.x - 108;                                                     // position healthbar
+    healthBar.y = player.body.position.y - 62;
+    healthBar.width = player.data.list.health * 10;
+    scoreText.x = player.body.position.x + 120;                                                     // position Score
+    scoreText.y = player.body.position.y -70;
     scoreText.setText('SCORE : '+ Score);                                                           // maj score
 
     //ENEMY UPDATE
@@ -732,14 +736,14 @@ function update(time, delta){
 
             //////////////////////////////////////////////////////////////////////////////////////////////
 
-            if(Phaser.Math.Distance.BetweenPoints(currentEnemy,player) >= 202 &&                        // walk enemies
+            if(Phaser.Math.Distance.BetweenPoints(currentEnemy,player) >= 51 &&                        // walk enemies
             currentEnemy.data.list.AttackIsFinish === true){
                 currentEnemy.data.list.CounterMove = 1; 
                 currentEnemy.data.list.EnemyIsAttack = true; 
             }
 
-            if(Phaser.Math.Distance.BetweenPoints(currentEnemy,player) < 500 &&                         // attack CrossBow
-            Phaser.Math.Distance.BetweenPoints(currentEnemy,player) > 198 &&
+            if(Phaser.Math.Distance.BetweenPoints(currentEnemy,player) < 250 &&                         // attack CrossBow
+            Phaser.Math.Distance.BetweenPoints(currentEnemy,player) > 99 &&
             currentEnemy.data.list.AttackIsFinish === true &&
             currentEnemy.data.list.type === 'CrossBow'){
 
@@ -748,7 +752,7 @@ function update(time, delta){
 
 
 
-            if(Phaser.Math.Distance.BetweenPoints(currentEnemy,player) <= 198 &&                        // action enemies
+            if(Phaser.Math.Distance.BetweenPoints(currentEnemy,player) <= 49 &&                        // action enemies
             currentEnemy.data.list.type != 'box' &&
             currentEnemy.data.list.EnemyIsAttack === true && 
             currentEnemy.data.list.AttackIsFinish === true){
@@ -820,11 +824,12 @@ function update(time, delta){
             
         }
         else if(hittableObject.children.entries[i].data.list.name === 'slash'){                         //img attack slash
+            hittableObject.children.entries[i].body.checkCollision.none = true;
             if(player.flipX === true){
-                hittableObject.children.entries[i].x = player.x - 150
+                hittableObject.children.entries[i].x = player.x - 45
                 hittableObject.children.entries[i].y = player.y
             }else{
-                hittableObject.children.entries[i].x = player.x + 150
+                hittableObject.children.entries[i].x = player.x + 45
                 hittableObject.children.entries[i].y = player.y
             }
         }
@@ -923,7 +928,7 @@ function update(time, delta){
         if (Phaser.Input.Keyboard.JustDown(upkey) && playerInGround === true && counterMove === 0       //jump
         || gamepadJump === true && playerInGround === true && counterMove === 0){ //gamepad
             gamepadJump = false
-            player.setVelocityY(-500);
+            player.setVelocityY(-250);
             playerInGround = false;
             jumpAction();
         }
@@ -961,13 +966,13 @@ function attackComboOne(){                                                      
         var nameAttack = 'attackOne'
         player.anims.play(nameAttack, true);
         var colAtk2 = colideATK2.get();
-        colAtk2.setSize(120,120)
+        colAtk2.setSize(60,60)
         colAtk2.visible = false;
             player.on('animationupdate', ()=>{
                 if(nameAttack === player.anims.currentAnim.key){
                     if(4 === player.anims.currentFrame.index){
-                            if(playerFlip === true){colAtk2.setX(player.x -90);colAtk2.setY(player.y);}
-                            if(playerFlip === false){colAtk2.setX(player.x +90);colAtk2.setY(player.y)}      
+                            if(playerFlip === true){colAtk2.setX(player.x -20);colAtk2.setY(player.y);}
+                            if(playerFlip === false){colAtk2.setX(player.x +20);colAtk2.setY(player.y)}      
                     };
                     if(player.anims.currentFrame.index >= 5){
                         colAtk2.destroy()
@@ -990,7 +995,7 @@ if(player.anims.currentAnim.key === 'attackOne'){
         player.anims.play('attackTwo', true);
     var nameAttack2 = 'attackTwo'
     var colAtk2 = colideATK2.get();
-    colAtk2.setSize(120,120)
+    colAtk2.setSize(60,60)
     colAtk2.visible = false;
 
     player.on('animationupdate', ()=>{
@@ -998,8 +1003,8 @@ if(player.anims.currentAnim.key === 'attackOne'){
             if(player.anims.currentFrame.index <= 3){
             }
             if(player.anims.currentFrame.index === 4){
-                if(playerFlip === true){colAtk2.setX(player.x -90);colAtk2.setY(player.y)}
-                if(playerFlip === false){colAtk2.setX(player.x +90);colAtk2.setY(player.y)}
+                if(playerFlip === true){colAtk2.setX(player.x -20);colAtk2.setY(player.y)}
+                if(playerFlip === false){colAtk2.setX(player.x +20);colAtk2.setY(player.y)}
             }
             if(player.anims.currentFrame.index >= 5){
                 colAtk2.destroy()
@@ -1030,8 +1035,8 @@ function attackComboThree(){
                 if(playerFlip === false){colAtk2.setX(player.x +140);colAtk2.setY(player.y)} 
             }
             if(player.anims.currentFrame.index <= 6){
-                if(playerFlip === true){player.setVelocityX(-1000)}
-                if(playerFlip === false){player.setVelocityX(1000)}
+                if(playerFlip === true){player.setVelocityX(-500)}
+                if(playerFlip === false){player.setVelocityX(500)}
                 touchesAttack.enabled = false; 
             }
 
@@ -1056,14 +1061,14 @@ function attackJump(){                                                          
     player.anims.play('jumpAtk', true);
     var nameAttack4 = 'jumpAtk';
     var colAtk5 = colideATK2.get();
-    colAtk5.setSize(120,120)
+    colAtk5.setSize(60,60)
     colAtk5.visible = false;
     attackintheair = true;
     player.on('animationupdate', ()=>{
         if(nameAttack4 === player.anims.currentAnim.key){
             if(player.anims.currentFrame.index === 4){
-                if(playerFlip === true){colAtk5.setX(player.x -80);colAtk5.setY(player.y +20)}
-                if(playerFlip === false){colAtk5.setX(player.x +80);colAtk5.setY(player.y +20)} 
+                if(playerFlip === true){colAtk5.setX(player.x -17);colAtk5.setY(player.y +10)}
+                if(playerFlip === false){colAtk5.setX(player.x +17);colAtk5.setY(player.y +10)} 
             }
             if(playerInGround === true || player.anims.currentFrame.index >= 25){
                 counterMove = 0; 
@@ -1078,9 +1083,9 @@ function tornadoSlash(){                                                        
     player.anims.play('shoryuSlash', true);
 
     var nameAttack = 'shoryuSlash';
-    var colAtk = colideATK2.get().setSize(120,120);
-    var colAtkTwo = colideATK2.get().setSize(200,120);
-    var colAtkThree = colideATK2.get().setSize(120,120);
+    var colAtk = colideATK2.get().setSize(60,60);
+    var colAtkTwo = colideATK2.get().setSize(80,60);
+    var colAtkThree = colideATK2.get().setSize(60,60);
 
     colAtk.visible = false;
     colAtkTwo.visible = false;
@@ -1091,15 +1096,15 @@ function tornadoSlash(){                                                        
         if(nameAttack === player.anims.currentAnim.key){
 
             if(player.anims.currentFrame.index <= 3 ){
-                player.setGravityY(-1000);
+                player.setGravityY(-500);
                 if(playerFlip === true){player.setVelocityX(-playerVelocityX * 6)}
                 if(playerFlip === false){player.setVelocityX(playerVelocityX * 6)} 
             }
 
             if(player.anims.currentFrame.index === 2 ){
-                // player.anims.stop()
-                if(playerFlip === true){colAtk.setX(player.x -130);colAtk.setY(player.y +20)}
-                if(playerFlip === false){colAtk.setX(player.x +130);colAtk.setY(player.y +20)} 
+                //player.anims.stop()
+                if(playerFlip === true){colAtk.setX(player.x -30);colAtk.setY(player.y +10)}
+                if(playerFlip === false){colAtk.setX(player.x +30);colAtk.setY(player.y +10)} 
             }
 
             if(player.anims.currentFrame.index === 4 ){
@@ -1109,21 +1114,23 @@ function tornadoSlash(){                                                        
                 colAtk.destroy();
                 player.data.list.Eject = true;
                 // player.anims.stop()
-                if(playerFlip === true){colAtkTwo.setX(player.x -50);colAtkTwo.setY(player.y -65)}
-                if(playerFlip === false){colAtkTwo.setX(player.x +50);colAtkTwo.setY(player.y -65)} 
+                if(playerFlip === true){colAtkTwo.setX(player.x -10);colAtkTwo.setY(player.y -32)}
+                if(playerFlip === false){colAtkTwo.setX(player.x +10);colAtkTwo.setY(player.y -32)} 
             }
 
             if(player.anims.currentFrame.index === 6 ){
                 colAtkTwo.destroy();
-                if(playerFlip === true){colAtkThree.setX(player.x -50);colAtkThree.setY(player.y -150)}
-                if(playerFlip === false){colAtkThree.setX(player.x +50);colAtkThree.setY(player.y -150)} 
+                //player.anims.stop()
+
+                if(playerFlip === true){colAtkThree.setX(player.x -10);colAtkThree.setY(player.y -40)}
+                if(playerFlip === false){colAtkThree.setX(player.x +10);colAtkThree.setY(player.y -40)} 
             }
 
             if(player.anims.currentFrame.index === 7 ){colAtkThree.destroy();}
 
             if(player.anims.currentFrame.index >= 4 &&
                 player.anims.currentFrame.index <= 6){
-                player.setVelocityY(-350)
+                player.setVelocityY(-175)
             }
 
             if(player.anims.currentFrame.index >= 16){
@@ -1151,10 +1158,10 @@ function KnockBack(){                                                           
         if(nameAction === player.anims.currentAnim.key){
             if(player.anims.currentFrame.index <=4){
                 if(player.flipX === true){
-                    player.setVelocityX(800)
+                    player.setVelocityX(400)
                 }
                 if(player.flipX === false){
-                    player.setVelocityX(-800)
+                    player.setVelocityX(-400)
                 } 
             }
             if(player.anims.currentFrame.index >=5){
@@ -1166,23 +1173,23 @@ function KnockBack(){                                                           
                         counterMove = 0;
                     }
                 }else{
-                    player.setGravityY(-1500)
+                    player.setGravityY(-750)
                     // player.body.checkCollision.right = false;
                     // player.body.checkCollision.left = false;
                     if(player.flipX === true){
-                        player.setGravityX(20000)
+                        player.setGravityX(10000)
                         
                     }
                     if(player.flipX === false){
-                        player.setGravityX(-20000)
+                        player.setGravityX(-10000)
                     } 
                 }
             }
             if(player.anims.currentFrame.index >=10){
-                player.setGravityY(-1200)
+                player.setGravityY(-600)
             }
             if(player.anims.currentFrame.index >=12){
-                player.setGravityY(8000)
+                player.setGravityY(4000)
             }
             if(player.anims.currentFrame.index >=18){
                 player.setGravityX(0)
@@ -1203,8 +1210,8 @@ function GuardKnockBack(){
     player.on('animationupdate', ()=>{
         if(nameAction === player.anims.currentAnim.key){
             if(player.anims.currentFrame.index <=4){
-                if(playerFlip === true){player.setVelocityX(600)}
-                if(playerFlip === false){player.setVelocityX(-600)} 
+                if(playerFlip === true){player.setVelocityX(300)}
+                if(playerFlip === false){player.setVelocityX(-300)} 
             }
             if(player.anims.currentFrame.index >=5){
                 if(player.body.velocity.y != 0){
@@ -1219,12 +1226,11 @@ function GuardKnockBack(){
 }
 
 function createCoin(thebox){                                                                            //Coin
-    var randomNbr = Phaser.Math.Between(-30,30);
+    var randomNbr = Phaser.Math.Between(-15,15);
     var piece = Coin.create(thebox.x + randomNbr, thebox.y + randomNbr,'piecette',0,true);
     piece.anims.play('turnPiecette',true)
-    piece.setScale(3)
     piece.setBounce(1);
-    piece.setVelocityX(Phaser.Math.Between(-100, 100))
+    piece.setVelocityX(Phaser.Math.Between(-50, 50))
    
     //setTimeout(()=>{piece.setVelocityX(0);},1000)
 }
@@ -1233,7 +1239,6 @@ function createSlash(){
     var slash = hittableObject.create(0,0,'slash',0,true);
     slash.anims.play('slashed', true)
     slash.rotation = Phaser.Math.Between(0,2);;
-    slash.setScale(3);
     slash.setData('name', 'slash');
     slash.on('animationcomplete', ()=>{
         slash.destroy();
@@ -1244,8 +1249,9 @@ function createSlashGuard(){
     var slash = hittableObject.create(0,0,'slashGuard',0,true);
     slash.anims.play('slashedGuard', true)
     
-    slash.setScale(5);
+    //slash.setScale(2);
     slash.setData('name', 'slash');
+    enemyone.setSize(5, 5);
     slash.on('animationcomplete', ()=>{
         slash.destroy();
         PlayerTouchEnemy = false
@@ -1258,7 +1264,6 @@ function createEnemies(enemySpawner, typeOfEnemy){                              
     var id = enemyNumberId++;
     enemyone.anims.play(animsName,true);
     enemyone.setSize(25, 56);
-    enemyone.setScale(3);
     enemyone.setData('CounterMove', 0);
     enemyone.setData('EnemyIsAttack', false);
     enemyone.setData('AttackIsFinish', true);
@@ -1270,26 +1275,26 @@ function createEnemies(enemySpawner, typeOfEnemy){                              
     enemyone.setData('type', typeOfEnemy);
     enemyone.setData('id', id);
     enemyone.setData('id_arrow', id);
-    enemyone.setData('randomValue',Phaser.Math.Between(50,200));
+    enemyone.setData('randomValue',Phaser.Math.Between(25,100));
     enemyone.body.checkCollision.up = false
     enemyone.setFriction(0)
     enemyone.setDepth(0);
 
     if(typeOfEnemy === 'CrossBow'){                                                                     //create Arrow
         var arrow = Arrow.create(enemyone.x, enemyone.y - 9,'carreau',0,true);
-        arrow.setScale(3);
         arrow.setSize(20, 4);
         arrow.setData('id', id);
     }
     if(typeOfEnemy === 'PoleAxe'){
         enemyone.setData('health', 20);
+        enemyone.setData('randomValue',Phaser.Math.Between(10,50));
     }
     if(typeOfEnemy === 'box'){                                                                          //create box
         enemyone.setSize(35, 35);
         enemyone.body.checkCollision.up = true;
         enemyone.body.checkCollision.left = false;
         enemyone.body.checkCollision.right = false;
-        enemyone.setData('health', 4);
+        enemyone.setData('health', 3);
     }       
 }
 
@@ -1308,7 +1313,7 @@ if(enemy1.data.list.type != 'box'){
     enemy1.on('animationupdate', ()=>{
         if(animsName === enemy1.anims.currentAnim.key){
             game.physics.moveToObject(enemy1, target, enemy1.data.list.randomValue);
-            enemy1.setVelocityY(600);
+            enemy1.setVelocityY(300);
             if(enemy1.body.velocity.x != 0){    //flip enemy
                 if(enemy1.body.velocity.x < 0){
                     enemy1.flipX = false;
@@ -1328,7 +1333,7 @@ function enemyWalkBack(enemy1,target,game){                                     
 
     game.physics.moveToObject(enemy1, target, - (enemy1.data.list.randomValue));
     enemy1.data.list.AttackIsFinish = false
-    enemy1.setVelocityY(800);
+    enemy1.setVelocityY(400);
     
     enemy1.on('animationupdate', ()=>{
         if(animsName === enemy1.anims.currentAnim.key){
@@ -1356,8 +1361,8 @@ function enemyAttack(enemyone, currentArrow){
         if('attackEnemy1' === enemyone.anims.currentAnim.key){
             if(enemyone.anims.currentFrame.index >= 4 &&
                 enemyone.anims.currentFrame.index <= 6){
-                    if(enemyone.flipX === true){enemyone.setVelocityX(400)}
-                    if(enemyone.flipX === false){enemyone.setVelocityX(-400)}
+                    if(enemyone.flipX === true){enemyone.setVelocityX(200)}
+                    if(enemyone.flipX === false){enemyone.setVelocityX(-200)}
             }
             if(enemyone.anims.currentFrame.index === 5){
                 enemyone.data.list.AtkCollide = true
@@ -1431,45 +1436,14 @@ function createArrow(enemy){                                                    
         if(enemy.flipX === true)
         {
             currentArrow.flipX = true;
-            currentArrow.setX(enemy.x + 100)
-            currentArrow.setVelocityX(400)
+            currentArrow.setX(enemy.x + 50)
+            currentArrow.setVelocityX(200)
         }
         else
         {
             currentArrow.flipX = false;
-            currentArrow.setX(enemy.x - 100) 
-            currentArrow.setVelocityX(-400)
-        }
-    }
-}
-
-function createColideAtkEnemy(enemy){                                                                      // call Atk enemy
-    var currentAtk = null;
-
-    for(var i = 0; i < Arrow.children.entries.length; i++)
-    {
-        if(Arrow.children.entries[i].data.list.id === enemy.data.list.id_arrow)
-        {
-            currentAtk = Arrow.children.entries[i];
-            break;
-        }
-    }
-
-    if(currentArrow != null)
-    {
-        currentArrow.setY(enemy.y - 35)  
-
-        if(enemy.flipX === true)
-        {
-            currentArrow.flipX = true;
-            currentArrow.setX(enemy.x + 100)
-            currentArrow.setVelocityX(400)
-        }
-        else
-        {
-            currentArrow.flipX = false;
-            currentArrow.setX(enemy.x - 100) 
-            currentArrow.setVelocityX(-400)
+            currentArrow.setX(enemy.x - 50) 
+            currentArrow.setVelocityX(-200)
         }
     }
 }
@@ -1489,8 +1463,8 @@ function enemyKnockBack(enmy){
                 enmy.on('animationupdate', ()=>{
                     if(animsName === enmy.anims.currentAnim.key){
                         if(enmy.anims.currentFrame.index <= 3){
-                            if(enmy.flipX === true){enmy.setVelocityX(-100)}
-                            if(enmy.flipX === false){enmy.setVelocityX(100)}   
+                            if(enmy.flipX === true){enmy.setVelocityX(-50)}
+                            if(enmy.flipX === false){enmy.setVelocityX(50)}   
                         }
                         if(enmy.anims.currentFrame.index >= 5 &&
                             player.data.list.Eject === false){ 
@@ -1529,21 +1503,21 @@ function enemyKnockBack(enmy){
             enmy.on('animationupdate', ()=>{
                 if(animsName2 === enmy.anims.currentAnim.key){
                     if(enmy.anims.currentFrame.index <= 5){
-                        if(enmy.flipX === true){enmy.setVelocityX(-100)}
-                        if(enmy.flipX === false){enmy.setVelocityX(100)}   
-                        enmy.setVelocityY(-400)
+                        if(enmy.flipX === true){enmy.setVelocityX(-50)}
+                        if(enmy.flipX === false){enmy.setVelocityX(50)}   
+                        enmy.setVelocityY(-100)
                     }
                     if(enmy.anims.currentFrame.index >= 6 &&
                         enmy.anims.currentFrame.index <= 7){
-                            if(enmy.flipX === true){enmy.setVelocityX(-200)}
-                            if(enmy.flipX === false){enmy.setVelocityX(200)}
+                            if(enmy.flipX === true){enmy.setVelocityX(-100)}
+                            if(enmy.flipX === false){enmy.setVelocityX(100)}
                             enmy.setVelocityY(0)
                         }
                         if(enmy.anims.currentFrame.index >= 8 &&
                             enmy.anims.currentFrame.index <= 10){
-                                if(enmy.flipX === true){enmy.setVelocityX(-100)}
-                                if(enmy.flipX === false){enmy.setVelocityX(100)}   
-                                enmy.setVelocityY(500)
+                                if(enmy.flipX === true){enmy.setVelocityX(-50)}
+                                if(enmy.flipX === false){enmy.setVelocityX(50)}   
+                                enmy.setVelocityY(250)
                                 enmy.setBounce(0.5,0.5)
                         }
                     if(enmy.anims.currentFrame.index >= 11){
@@ -1574,13 +1548,13 @@ function enemyDie(enmyOne){
             if(animsName === enmyOne.anims.currentAnim.key){
                 if(enmyOne.anims.currentFrame.index <= 3 &&
                     enmyOne.data.list.type != 'box'){
-                    if(enmyOne.flipX === true){enmyOne.setVelocityX(-150)}
-                    if(enmyOne.flipX === false){enmyOne.setVelocityX(150)}
+                    if(enmyOne.flipX === true){enmyOne.setVelocityX(-75)}
+                    if(enmyOne.flipX === false){enmyOne.setVelocityX(75)}
                 }
                 if(enmyOne.anims.currentFrame.index >= 6){
                     if(enmyOne.body.velocity.y !=0){
                         enmyOne.setVelocityX(0)
-                        enmyOne.setVelocityY(600)
+                        enmyOne.setVelocityY(300)
                     }else{enmyOne.body.destroy(); }
                 } 
                 if(enmyOne.anims.currentFrame.index === 10 &&
