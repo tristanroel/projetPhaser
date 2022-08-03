@@ -161,7 +161,7 @@ function create(){
     Decor.setDepth(1);
     // Fond.setScale(1.5)
 
-    console.log(CrossPlatform);
+    // console.log(CrossPlatform);
 
 
     ////////////////////////////////////////////////////////////////////
@@ -235,7 +235,7 @@ function create(){
 
     // TEXT
 
-    text = this.add.text(0,0, ' << CONTROL >> \n LEFT = press "Q"\n RIGHT = press "D"\n JUMP  = press "Z"\n ATTACK = press "J"\n GUARD = press "I" \n GAMEPAD : disconected\n version : O.10 | 30.07.22' , {fontFamily : 'PixelFont'}); 
+    text = this.add.text(0,0, ' << CONTROL >> \n LEFT = press "Q"\n RIGHT = press "D"\n JUMP  = press "Z"\n ATTACK = press "J"\n GUARD = press "I" \n GAMEPAD : disconected\n version : O.11 | 3.08.22' , {fontFamily : 'PixelFont'}); 
     scoreText = this.add.text(0,0, 'SCORE : 0',{ fontFamily : 'PixelFont', color : '#353535'})
     text.setDepth(2);
     scoreText.setDepth(2);
@@ -621,7 +621,7 @@ function create(){
     this.anims.create({
         key: 'knockbackEnemy1',
         frames: this.anims.generateFrameNumbers('theEnemy',{frames : [ 10, 11, 11, 11, 11, 11, 11, 11, 0]}),
-        frameRate: 25,
+        frameRate: 35,
     });
     this.anims.create({
         key: 'knockbackCrossBow',
@@ -799,7 +799,7 @@ function update(time, delta){
 
                     }
                 }else{
-                    // counterMove = 28
+                    //counterMove = 28
                 }
             });
 
@@ -814,8 +814,10 @@ function update(time, delta){
 
                 //console.log(htblObjct.data.list.CounterMove);
                 //createSlash();
-                slashAtk.setX(atk.x)
-                slashAtk.setY(atk.y)
+                //console.log(player.body);
+                slashAtk.setY(player.y)
+                if(player.flipX === true){slashAtk.setX(player.x -100)}
+                if(player.flipX === false){slashAtk.setX(player.x +100)}
                 slashAtk.anims.play('slashed', true)
                 slashAtk.rotation = Phaser.Math.Between(0,2);
                 atk.setX(0);
@@ -842,7 +844,6 @@ function update(time, delta){
             currentEnemy.data.list.AttackIsFinish === true &&
             currentEnemy.data.list.CounterMove != 3){
                 currentEnemy.data.list.CounterMove = 1; 
-                console.log('les go');
                 currentEnemy.data.list.EnemyIsAttack = true; 
             }
 
