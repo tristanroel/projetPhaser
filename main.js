@@ -366,6 +366,7 @@ function create(){
         //             boite.destroy();})
         //     }
         // })
+
         
         this.physics.add.collider(hittableObject, newPlatform, function(htblobjct, Platform){})   //collision Enemy + platform
 
@@ -606,7 +607,7 @@ function create(){
     this.anims.create({
         key: 'attackEnemy1',
         frames: this.anims.generateFrameNumbers('theEnemy',{frames : [4, 5, 5, 6, 7, 8, 9, 9, 9, 0, 0, 0, 0, 0, 0, 0, 0]}),
-        frameRate: 15,
+        frameRate: 10,
     });
     this.anims.create({
         key: 'attackCrossBow',
@@ -696,7 +697,7 @@ function create(){
 
 // CREATE ENEMIES
 
-    //createEnemies(enemy1Spawn,'PoleAxe');
+    createEnemies(enemy1Spawn,'PoleAxe');
     createEnemies(enemy1Spawn,'Enemy1');
     // createEnemies(enemyCrossBowSpawn,'Enemy1');
     // createEnemies(enemyCrossBowSpawn,'Enemy1');
@@ -807,36 +808,40 @@ function update(time, delta){
             
             //COLLISION Attack + enemy
 
-            //this.physics.overlap(currentEnemy, colideATK, collisionAtkEnemies,null,this)
-            this.physics.add.overlap(currentEnemy, colideATK, function(htblObjct, atk){  
-                htblObjct.data.list.CounterMove = 3;
+            this.physics.overlap(currentEnemy, colideATK, collisionAtkEnemies,null,this)
+            // this.physics.add.overlap(currentEnemy, colideATK, function(htblObjct, atk){  
                 
+                // atk.setX(0);
+                // atk.setY(0);
+                
+                
+                // //console.log(htblObjct.data.list.CounterMove);
+                // //createSlash();
+                // //atk.body.enable = false;
+                // slashAtk.setY(player.y)
+                // if(player.flipX === true){slashAtk.setX(player.x -100)}
+                // if(player.flipX === false){slashAtk.setX(player.x +100)}
+                // slashAtk.anims.play('slashed', true)
+                // slashAtk.rotation = Phaser.Math.Between(0,2);
 
-                //console.log(htblObjct.data.list.CounterMove);
-                //createSlash();
-                //console.log(player.body);
-                slashAtk.setY(player.y)
-                if(player.flipX === true){slashAtk.setX(player.x -100)}
-                if(player.flipX === false){slashAtk.setX(player.x +100)}
-                slashAtk.anims.play('slashed', true)
-                slashAtk.rotation = Phaser.Math.Between(0,2);
-                atk.setX(0);
+                // //htblObjct.data.list.health = htblObjct.data.list.health - 1;   
                 
                 // if(htblObjct.data.list.IsInvulnerable === false)
                 // {
-                    PlayerTouchEnemy = true;
-                    player.anims.pause();
-                    setTimeout(()=>{
-                        player.anims.resume()
-                        slashAtk.setX(0);
-                    },150)
-                    //htblObjct.data.list.health = htblObjct.data.list.health - 1;   
-                    // console.log(htblObjct.data.list.health);
-                    //console.log(htblObjct.data.list);
+                //     htblObjct.data.list.CounterMove = 3;
+                //     PlayerTouchEnemy = true;
+                //     player.anims.pause();
+                //     setTimeout(()=>{
+                //         player.anims.resume()
+                //         slashAtk.setX(0);
+                //         atk.body.enable = true;
+                //     },150)
+                //     // htblObjct.data.list.health = htblObjct.data.list.health - 1; 
+                //     //console.log(htblObjct.data.list.health);
+                //     //console.log(htblObjct.data.list);
                 // }else{
-                    // htblObjct.data.list.health = htblObjct.data.list.health - 1;   
                 // }
-            })
+            // })
 
             //////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -986,8 +991,8 @@ function update(time, delta){
     if(player.data.list.health <= 0){                                                              //Player Die
         counterMovePlayer = 999;
         player.data.list.health = 0;
-        player.body.checkCollision.right = false;
-        player.body.checkCollision.left = false;
+        // player.body.checkCollision.right = false;
+        // player.body.checkCollision.left = false;
     }
     // CONTROL PLAYER
 
@@ -1091,6 +1096,7 @@ function attackComboOne(){                                                      
                     };
                     if(13 === player.anims.currentFrame.index){
                         counterMovePlayer = 0;
+                        //colideATK.body.enable = true;
                         attackinground = false;
                     }
                 }
@@ -1123,6 +1129,7 @@ if(player.anims.currentAnim.key === 'attackOne'){
             if(12 === player.anims.currentFrame.index){//reset counterMove : 0
                 counterMovePlayer = 0;
                 countTest = 0;
+                //colideATK.body.enable = true;
                 attackinground = false;
             }
         }
@@ -1187,6 +1194,7 @@ function attackJump(){                                                          
             }
             if(playerInGround === true || player.anims.currentFrame.index >= 25){
                 counterMovePlayer = 0; 
+                //colideATK.body.enable = true;
                 // colAtk5.destroy();
             ;}
         }
@@ -1226,19 +1234,22 @@ function tornadoSlash(){                                                        
             if(player.anims.currentFrame.index >= 3 ){
                 player.data.list.Eject = false;
                 colideATK.setX(0);
-                // colAtk.destroy();
+                //colideATK.body.enable = true;
+                
             }
             if(player.anims.currentFrame.index === 4 ){
                 player.setGravityY(0);
                 player.data.list.Eject = true;
-                // console.log(player.body.checkCollision.left = true);
-                // console.log(player.body.checkCollision.right = true);
                 //player.anims.stop()
                 if(playerFlip === true){colideATK.setX(player.x -60);colideATK.setY(player.y -32)}
                 if(playerFlip === false){colideATK.setX(player.x +60);colideATK.setY(player.y -32)} 
             }
 
-            if(player.anims.currentFrame.index === 6 ){
+            if(player.anims.currentFrame.index === 5 ){
+                //colideATK.body.enable = true;
+                colideATK.setX(0)
+            }
+                if(player.anims.currentFrame.index === 6 ){
                 //colAtkTwo.destroy();
                 //player.anims.stop()
                 colideATK.setY(player.y -120)
@@ -1248,6 +1259,7 @@ function tornadoSlash(){                                                        
             
             if(player.anims.currentFrame.index === 7 ){
                 // colAtkThree.destroy();
+                colideATK.body.enable = true;
                 colideATK.setX(0);
             }
 
@@ -1296,7 +1308,7 @@ function KnockBack(){                                                           
                         counterMovePlayer = 0;
                     }
                 }else{
-                    player.setGravityY(-750)
+                    player.setGravityY(-1500)
                     // player.body.checkCollision.right = false;
                     // player.body.checkCollision.left = false;
                     if(player.flipX === true){
@@ -1316,8 +1328,8 @@ function KnockBack(){                                                           
             }
             if(player.anims.currentFrame.index >=18){
                 player.setGravityX(0)
-                if(player.body.velocity.y === 0){
-                    player.body.destroy();
+                if(player.body.velocity === 0){
+                    //player.body.destroy();
                 }
             }
         }
@@ -1395,7 +1407,7 @@ function createEnemies(enemySpawner, typeOfEnemy){                              
     enemyone.setData('AtkCollide', false);
     enemyone.setData('EnemyIsDie', false);
     enemyone.setData('IsInvulnerable', false);
-    enemyone.setData('health', 100);
+    enemyone.setData('health', 8);
     enemyone.setData('name', 'EnemyOne');
     enemyone.setData('type', typeOfEnemy);
     enemyone.setData('id', id);
@@ -1517,8 +1529,10 @@ function enemyAttack(enemyone, currentArrow){
                     enemyone.data.list.AtkCollide = false
                 },150)
             }
+            if(enemyone.anims.currentFrame.index >= 15){
+                    enemyone.data.list.IsInvulnerable = false
+            }
             if(enemyone.anims.currentFrame.index === 21 ){
-                enemyone.data.list.IsInvulnerable = false
                 enemyone.data.list.AtkCollide = true
                 enemyone.setSize(180,56)
                 setTimeout(()=>{
@@ -1710,11 +1724,38 @@ function enemyDie(enmyOne){
         }else{console.log(hittableObject.children.entries);}   
     });
 }
-function collisionAtkEnemies(enemy,colAtk){
-   
-    enemy.data.list.CounterMove = 3;
-    colAtk.setX(0);
+function collisionAtkEnemies(htblObjct,atk){
+    atk.setX(0);
+    atk.setY(0);
     
+    
+    //console.log(htblObjct.data.list.CounterMove);
+    //createSlash();
+    //atk.body.enable = false;
+    slashAtk.setY(player.y)
+    if(player.flipX === true){slashAtk.setX(player.x -100)}
+    if(player.flipX === false){slashAtk.setX(player.x +100)}
+    slashAtk.anims.play('slashed', true)
+    slashAtk.rotation = Phaser.Math.Between(0,2);
+
+    htblObjct.data.list.health = htblObjct.data.list.health - 1;   
+    
+    if(htblObjct.data.list.IsInvulnerable === false)
+    {
+        htblObjct.data.list.CounterMove = 3;
+        PlayerTouchEnemy = true;
+        player.anims.pause();
+        setTimeout(()=>{
+            player.anims.resume()
+            slashAtk.setX(0);
+            //atk.body.enable = true;
+        },150)
+        // htblObjct.data.list.health = htblObjct.data.list.health - 1; 
+        //console.log(htblObjct.data.list.health);
+        //console.log(htblObjct.data.list);
+    }else{
+    }
+    //console.log('kikou');
 }
 
 
