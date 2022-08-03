@@ -606,7 +606,7 @@ function create(){
     this.anims.create({
         key: 'attackEnemy1',
         frames: this.anims.generateFrameNumbers('theEnemy',{frames : [4, 5, 5, 6, 7, 8, 9, 9, 9, 0, 0, 0, 0, 0, 0, 0, 0]}),
-        frameRate: 8,
+        frameRate: 15,
     });
     this.anims.create({
         key: 'attackCrossBow',
