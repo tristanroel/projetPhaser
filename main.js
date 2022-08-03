@@ -1,9 +1,10 @@
 var configuration = {
     type: Phaser.AUTO,
     pixelArt : true,
-    // width : 1000,
-    // height : 600,
-    backgroundColor : '#353535',
+    width : 3000,
+    height : 2000,
+    // backgroundColor : '#353535',
+    backgroundColor : '#FFFFFF',
     fps: {
         target: 50,
         forceSetTimeOut: true
@@ -13,8 +14,9 @@ var configuration = {
     },
     scale:{
        mode : Phaser.Scale.FIT,
-       width : 360,
-       height : 210,
+       autoCenter: true,
+    //    width : 720,
+    //    height : 420,
     },
     scene:{
         preload : preload,
@@ -25,7 +27,8 @@ var configuration = {
         default : 'arcade',
         arcade :{
                     debug : false,
-                    gravity : {y : 600},
+                    tileBias : 36,
+                    gravity : {y : 1000},
                 }
     },
 }
@@ -49,7 +52,7 @@ var gamePadCombo;
 var player;
 var playerVelocityX;
 var playerInGround; // : boolean
-var counterMove; // compteur combo attack : number
+var counterMovePlayer; // compteur combo attack : number
 var playerFlip; // direction du joueur : boulean
 var PlayerTouchEnemy; // : boolean
 var colideATK1; // collision attaque 1 : sprite
@@ -63,8 +66,9 @@ var enemy1Spawn; //spawn enemy
 var enemyCrossBowSpawn;
 var boxSpawn;
 
+
 var enemyNumberId;
-var colideATKEnemy;
+ var colideATK;
 
 var box; // caisse en bois : sprite
 
@@ -76,6 +80,7 @@ var Score = 0; // Score
 var scoreText;
 var healthBar; 
 
+
 var countTest = 0;
 
 var currentEnemy
@@ -86,7 +91,10 @@ function preload(){
     this.load.image('ATK1','assets/TRlogo.png');
     this.load.image('spawner','assets/ROELprod.png');
     this.load.image('carreau', 'assets/carreau.png');
-    this.load.image('TilesLevel', 'assets/levelOne/Decor1.png');
+    
+    this.load.image('forest', 'assets/levelOne/Decor2.png');
+    this.load.tilemapTiledJSON('tiles', 'assets/levelOne/forest.json')
+
     this.load.spritesheet('slash','assets/Slash.png', {frameWidth : 65, frameHeight : 65});
     this.load.spritesheet('slashGuard','assets/SlashGuard.png', {frameWidth : 8, frameHeight : 23});
     this.load.spritesheet('piecette','assets/Coin.png', {frameWidth : 8, frameHeight : 8});
@@ -116,8 +124,8 @@ function create(){
 
     /// SET VARIABLE    
     attackintheair = false;
-    counterMove = 0;
-    playerVelocityX = 150;
+    counterMovePlayer = 0;
+    playerVelocityX = 270;
     playerInGround = false;
     PlayerTouchEnemy = false;
     attackinground = false;
@@ -130,13 +138,40 @@ function create(){
     
    /// OBJECT
 
-    skyBg = this.add.tileSprite(0, 500, 404, 542, 'sky'); //image ciel
-    var sol1 = this.add.sprite(100, 570, 'ground');//image sol
-    var sol2 = this.add.sprite(511, 550, 'ground');//image sol
-    var sol3 = this.add.sprite(900, 600, 'ground');//image sol
+    skyBg = this.add.tileSprite(0, 0, 404, 482, 'sky').setScale(2); //image ciel
+
+    ////////////////////////////////////////////////////////////////////
+
+    // LEVEL
+
+    const map = this.make.tilemap({ key : 'tiles'})                                                    // TILED level
+    const tileset = map.addTilesetImage('map','forest');
+
+    const BackGround = map.createLayer('Fond', tileset, -200, 0)
+    const newPlatform = map.createLayer('Ground', tileset, -200, 0)
+    const CrossPlatform = map.createLayer('CrossGround', tileset, -200, 0)
+    const Decor = map.createLayer('Decors', tileset, -200, 0)
+    
+    newPlatform.setCollisionByProperty({collides : true})
+    CrossPlatform.setCollisionByProperty({collides : true})
+    BackGround.setScale(2);
+    newPlatform.setScale(2);
+    CrossPlatform.setScale(2);
+    Decor.setScale(2)
+    Decor.setDepth(1);
+    // Fond.setScale(1.5)
+
+    console.log(CrossPlatform);
 
 
-    enemy1Spawn = this.add.image(525, 300, 'spawner').setVisible(false);         //spawn enemy
+    ////////////////////////////////////////////////////////////////////
+
+    // var sol1 = this.add.sprite(300, 400, 'ground');//image sol
+    // var sol2 = this.add.sprite(511, 550, 'ground');//image sol
+    // var sol3 = this.add.sprite(900, 600, 'ground');//image sol
+
+
+    enemy1Spawn = this.add.image(1000, 1100, 'spawner').setVisible(false);         //spawn enemy
     enemyCrossBowSpawn = this.add.image(700, 300, 'spawner').setVisible(false);  //spawn enemy
     boxSpawn = this.add.group({
         key : 'box',
@@ -170,57 +205,67 @@ function create(){
     // box.children.iterateLocal('setSize', 35,35)
     // box.setVelocityY(600)
     
-    player = this.physics.add.sprite(200, 310,'hero');                  // player
+    player = this.physics.add.sprite(600, 1150,'hero').setScale(2);                  // player
     player.body.setSize(25, 58)                                         
     player.setData('health', 10)
     player.setData('Guard', false)
     player.setData('Eject', false)
-    //console.log(player);
-    
+    player.body.checkCollision.up = false;
+    //console.log(player.body);
 
-    colideATK2 = this.physics.add.group({                                           // collision attack
-        key : 'ATK1',
-        allowGravity : false,
-        disableBody : true,
-        visible : false,
-        data : {'Eject': false},
-        // size : {x : 200, y : 200}
-        setXY : {x : -999, y : -999}
-    })
-    
+    // colideATK2 = this.physics.add.group({                                           // collision attack
+    //     key : 'ATK1',
+    //     allowGravity : false,
+    //     // disableBody : true,
+    //     // visible : false,
+    //     //data : {'Eject': false},
+    //     //size : {x : 20, y : 20},
+    //     setXY : {x : 1199, y :1199}
+    // })
+
+    colideATK = this.add.rectangle(0,0,50,50,0xB14F37)                         // collision attack final
+    this.physics.add.existing(colideATK);
+    colideATK.setVisible(false)
+    colideATK.body.allowGravity = false;
+
+    slashAtk = this.add.sprite(0,0,'slash').setScale(2);                            // img Slash
+    slashAtk.setDepth(1);
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     // TEXT
 
-    text = this.add.text(0,0, ' << CONTROL >> \n LEFT = press "Q"\n RIGHT = press "D"\n JUMP  = press "Z"\n ATTACK = press "J"\n GUARD = press "I" \n GAMEPAD : disconected\n version : O.10 | 30.07.22' , {fontFamily : 'PixelFont', fontSize :'8px'}); 
-    scoreText = this.add.text(0,0, 'SCORE : 0',{ fontFamily : 'PixelFont',fontSize :'8px', color : '#353535'})
-
+    text = this.add.text(0,0, ' << CONTROL >> \n LEFT = press "Q"\n RIGHT = press "D"\n JUMP  = press "Z"\n ATTACK = press "J"\n GUARD = press "I" \n GAMEPAD : disconected\n version : O.10 | 30.07.22' , {fontFamily : 'PixelFont'}); 
+    scoreText = this.add.text(0,0, 'SCORE : 0',{ fontFamily : 'PixelFont', color : '#353535'})
+    text.setDepth(2);
+    scoreText.setDepth(2);
     //text.setFontSize(text.fontSize - 2)
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     
     // CAMERA
 
     this.cameras.main.startFollow(player);
+    this.cameras.main.setZoom(4);
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     // COLLISIONS
 
-    var platform = this.physics.add.staticGroup();// groupe plateforme
-        platform.add(sol1)//asigne
-        platform.add(sol2)//asigne
-        platform.add(sol3)//asigne
+    // var platform = this.physics.add.staticGroup();// groupe plateforme
+    //     platform.add(sol1)//asigne
+    //     platform.add(sol2)//asigne
+    //     platform.add(sol3)//asigne
 
-        this.physics.add.collider(platform,player, function( pl4yer,theplatform){ //collision entre la plateforrme et le joueur 
-            if(theplatform.body.touching.up && pl4yer.body.touching.down){
-                attackintheair = false;
-                playerInGround = true;
-            }
+        // this.physics.add.collider(platform,player, function( pl4yer,theplatform){ //collision entre la plateforrme et le joueur 
+        //     if(theplatform.body.touching.up && pl4yer.body.touching.down){
+        //         attackintheair = false;
+        //         playerInGround = true;
+        //     }
             // if(theplatform.body.touching.right || theplatform.body.touching.left){
             //     //console.log('ju');
             //     //playerVelocityX = 0
             // }
-        })
+        // })
         //this.physics.add.collider(platform,box)                     //collision plateforme et boites
 
         // this.physics.add.collider(box,box, function(box2, box1){    // collisions entre boites
@@ -242,11 +287,11 @@ function create(){
             arrw.setVelocityY(0)
             // console.log(plyr.data.list.Guard);
             if(plyr.data.list.Guard === true){
-                counterMove = 14
+                counterMovePlayer = 14
             }else{
                 if(plyr.body.touching.right){plyr.flipX = false};
                 if(plyr.body.touching.left){plyr.flipX = true};
-                counterMove = 28;
+                counterMovePlayer = 28;
                 plyr.data.list.health--;
             }
         })
@@ -259,7 +304,49 @@ function create(){
         //     }
         // });
 
-        this.physics.add.collider(Coin, platform)
+        // this.physics.add.collider(Coin, platform)
+        this.physics.add.collider(Coin, newPlatform)
+
+        this.physics.add.collider(player, newPlatform, function(plyr,pltfrm){       //collision player + platform tiles
+            if(pltfrm.faceLeft && plyr.body.velocity.y != 0|| 
+                pltfrm.faceRight && plyr.body.velocity.y != 0){
+                    playerInGround = false;
+                }
+                else{
+                attackintheair = false;
+                playerInGround = true;
+            }
+        })
+
+        this.physics.add.collider(player, CrossPlatform, function(plyr,pltfrm){       //collision player + CrossPlatform tiles
+            // console.log(pltfrm);
+            pltfrm.faceLeft = false;
+            pltfrm.faceRight = false;
+            pltfrm.faceBottom = false;
+
+            attackintheair = false;
+            playerInGround = true;
+        })
+
+        // this.physics.add.overlap(player,CrossPlatform, function(plyr,CrssPltfrm){       //collision platform + cross Platform tiles
+        //     CrssPltfrm.faceLeft = false;
+        //     CrssPltfrm.faceRight = false;
+        //     CrssPltfrm.faceBottom = false;
+        //     console.log(CrssPltfrm);
+        // })
+
+
+        // console.log(CrossPlatform.displayList.list.length);
+        // console.log(CrossPlatform.displayList.list[0]);
+        
+        // for(var i = 0; i < CrossPlatform.displayList.list.length; i++){
+        //     CrossPlatform.displayList.list[i].faceLeft = false;
+        //     CrossPlatform.displayList.list[i].faceRight = false;
+        //     CrossPlatform.displayList.list[i].faceBottom = false;
+        //     console.log('fdp');
+        // }
+
+
 
         // this.physics.add.overlap(colideATK2, box, function(colAtk2, boite){     // collision entre attaque et boites 
         //     boite.data.list.pv = boite.data.list.pv - 1;
@@ -280,11 +367,12 @@ function create(){
         //     }
         // })
         
-        this.physics.add.collider(hittableObject, platform, function(htblobjct, pltfrm){})   //collision Enemy + platform
+        this.physics.add.collider(hittableObject, newPlatform, function(htblobjct, Platform){})   //collision Enemy + platform
 
-        this.physics.add.overlap(hittableObject, platform, function(htblobjct, pltfrm){      //overlap Enemy + platform
-            htblobjct.body.velocity.y = -75
-        })
+        // this.physics.add.overlap(hittableObject, newPlatform, function(htblobjct, Platform){      //overlap Enemy + platform
+        //     //htblobjct.body.velocity.y = -75
+        //     //console.log('ho');
+        // })
     
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////// 
 
@@ -301,8 +389,8 @@ function create(){
     var tornadoSlashRight = this.input.keyboard.createCombo([83, 81, 74], {resetOnMatch:true, maxKeyDelay:700}); 
 
     this.input.keyboard.on('keycombomatch', function(combo){ //verification du secialAtk entré
-        if((combo === tornadoSlashLeft || tornadoSlashRight )&& player.body.touching.down && counterMove === 0){
-            counterMove = 32;
+        if((combo === tornadoSlashLeft || tornadoSlashRight )&& playerInGround === true && counterMovePlayer === 0){
+            counterMovePlayer = 32;
             tornadoSlash();
         }
     }) 
@@ -316,7 +404,7 @@ function create(){
         theGamePad = pad
         text.setText('Playing with : ' + pad.id);
         //console.log(pad.id);
-        if(pad._RCBottom.pressed && playerInGround === true && counterMove === 0){ //jump
+        if(pad._RCBottom.pressed && playerInGround === true && counterMovePlayer === 0){ //jump
             gamepadJump = true;
         }
         if(pad._RCLeft.pressed){ //Attack
@@ -533,7 +621,7 @@ function create(){
     this.anims.create({
         key: 'knockbackEnemy1',
         frames: this.anims.generateFrameNumbers('theEnemy',{frames : [ 10, 11, 11, 11, 11, 11, 11, 11, 0]}),
-        frameRate: 9,
+        frameRate: 25,
     });
     this.anims.create({
         key: 'knockbackCrossBow',
@@ -595,8 +683,8 @@ function create(){
     });
     this.anims.create({
         key: 'slashed',
-        frames: this.anims.generateFrameNumbers('slash',{frames: [0, 1, 1, 1]}),
-        frameRate: 25,
+        frames: this.anims.generateFrameNumbers('slash',{frames: [1, 2, 3]}),
+        frameRate: 10,
     });
     this.anims.create({
         key: 'slashedGuard',
@@ -608,16 +696,17 @@ function create(){
 
 // CREATE ENEMIES
 
-    createEnemies(enemy1Spawn,'PoleAxe');
-    createEnemies(enemyCrossBowSpawn,'Enemy1');
-    createEnemies(enemyCrossBowSpawn,'Enemy1');
-    createEnemies(enemyCrossBowSpawn,'box');
-    //createEnemies(enemyCrossBowSpawn,'CrossBow');
-    createEnemies(boxSpawn,'box');
+    //createEnemies(enemy1Spawn,'PoleAxe');
+    createEnemies(enemy1Spawn,'Enemy1');
+    // createEnemies(enemyCrossBowSpawn,'Enemy1');
+    // createEnemies(enemyCrossBowSpawn,'Enemy1');
+    // createEnemies(enemyCrossBowSpawn,'box');
+    // //createEnemies(enemyCrossBowSpawn,'CrossBow');
+    // createEnemies(boxSpawn,'box');
     
-    // for(var i = 0;i < 1; i++){
-    //     setTimeout(()=>{createEnemies(enemySpawn, 'Enemy1')},9000 + (i * 7000))
-    // }
+    for(var i = 0;i < 1; i++){
+        setTimeout(()=>{createEnemies(enemy1Spawn, 'Enemy1')},9000 + (i * 7000))
+    }
    
     // for(var i = 0;i < 2; i++){
     //     setTimeout(()=>{createEnemies(enemySpawn,'CrossBow');},9000 + (i * 7000))
@@ -643,27 +732,28 @@ function update(time, delta){
 
     //BACKGROUND AND TEXT
     skyBg.x = player.body.position.x;                                                               // position du ciel
+    skyBg.y = player.body.position.y;                                                               // position du ciel
     skyBg.tilePositionX += 0.5;
-    text.x = player.body.position.x - 155;                                                          // position text
-    text.y = player.body.position.y + 50;
-    healthBar.x = player.body.position.x - 108;                                                     // position healthbar
-    healthBar.y = player.body.position.y - 62;
+    text.x = player.body.position.x - 345;                                                          // position text
+    text.y = player.body.position.y + 140;
+    healthBar.x = player.body.position.x - 270;                                                     // position healthbar
+    healthBar.y = player.body.position.y - 160;
     healthBar.width = player.data.list.health * 10;
-    scoreText.x = player.body.position.x + 120;                                                     // position Score
-    scoreText.y = player.body.position.y -70;
+    scoreText.x = player.body.position.x + 260;                                                     // position Score
+    scoreText.y = player.body.position.y -170;
     scoreText.setText('SCORE : '+ Score);                                                           // maj score
 
     //ENEMY UPDATE
     for(var i = 0; i < hittableObject.children.entries.length; i++){
         if(hittableObject.children.entries[i] != undefined && hittableObject.children.entries[i].data.list.name === 'EnemyOne'){
             
-            currentEnemy = hittableObject.children.entries[i]; 
+            var currentEnemy = hittableObject.children.entries[i]; 
 
             //COLLISION Enemy + player
 
             this.physics.add.collider(currentEnemy, player, function(htblobjct, plyr){              // COLLISIONS
             
-            
+            //playerVelocityX = 20;
                
             if(htblobjct.data.list.type === 'box'){
                 htblobjct.setVelocityX(0);                                                              //collision player + box
@@ -684,26 +774,26 @@ function update(time, delta){
                     if(plyr.data.list.Guard === true){
                         // htblobjct.data.list.AtkCollide = false;
                         if(plyr.flipX === false && htblobjct.flipX === false){
-                            counterMove = 14;
+                            counterMovePlayer = 14;
                             htblobjct.data.list.AtkCollide = false;
                         }
 
                         else if(plyr.flipX === true && htblobjct.flipX === true){
-                            counterMove = 14;
+                            counterMovePlayer = 14;
                             //console.log(plyr.body.velocity);
                             htblobjct.data.list.AtkCollide = false;
 
                         }else if(plyr.flipX === true && htblobjct.flipX === false){
                             
-                            counterMove = 28
+                            counterMovePlayer = 28
                         }
 
                         else if(plyr.flipX === false && htblobjct.flipX === true){
                             
-                            counterMove = 28
+                            counterMovePlayer = 28
                         }
                     }else{                                                                          // collision Player KnockBack
-                        counterMove = 28
+                        counterMovePlayer = 28
                         plyr.data.list.health--;
                         htblobjct.data.list.AtkCollide = false;
 
@@ -717,33 +807,47 @@ function update(time, delta){
             
             //COLLISION Attack + enemy
 
-            this.physics.add.overlap(colideATK2, hittableObject, function(atk, htblObjct){  
+            //this.physics.overlap(currentEnemy, colideATK, collisionAtkEnemies,null,this)
+            this.physics.add.overlap(currentEnemy, colideATK, function(htblObjct, atk){  
+                htblObjct.data.list.CounterMove = 3;
                 
-                atk.destroy();
-                createSlash();
+
+                //console.log(htblObjct.data.list.CounterMove);
+                //createSlash();
+                slashAtk.setX(atk.x)
+                slashAtk.setY(atk.y)
+                slashAtk.anims.play('slashed', true)
+                slashAtk.rotation = Phaser.Math.Between(0,2);
+                atk.setX(0);
                 
-                if(htblObjct.data.list.IsInvulnerable === false)
-                {
-                    htblObjct.data.list.CounterMove = 3;
+                // if(htblObjct.data.list.IsInvulnerable === false)
+                // {
                     PlayerTouchEnemy = true;
                     player.anims.pause();
-                    setTimeout(()=>{player.anims.resume()},150)
-                    htblObjct.data.list.health = htblObjct.data.list.health - 1;   
-                }else{
-                    htblObjct.data.list.health = htblObjct.data.list.health - 1;   
-                }
+                    setTimeout(()=>{
+                        player.anims.resume()
+                        slashAtk.setX(0);
+                    },150)
+                    //htblObjct.data.list.health = htblObjct.data.list.health - 1;   
+                    // console.log(htblObjct.data.list.health);
+                    //console.log(htblObjct.data.list);
+                // }else{
+                    // htblObjct.data.list.health = htblObjct.data.list.health - 1;   
+                // }
             })
 
             //////////////////////////////////////////////////////////////////////////////////////////////
 
-            if(Phaser.Math.Distance.BetweenPoints(currentEnemy,player) >= 51 &&                        // walk enemies
-            currentEnemy.data.list.AttackIsFinish === true){
+            if(Phaser.Math.Distance.BetweenPoints(currentEnemy,player) >= 200 &&                        // walk enemies
+            currentEnemy.data.list.AttackIsFinish === true &&
+            currentEnemy.data.list.CounterMove != 3){
                 currentEnemy.data.list.CounterMove = 1; 
+                console.log('les go');
                 currentEnemy.data.list.EnemyIsAttack = true; 
             }
 
-            if(Phaser.Math.Distance.BetweenPoints(currentEnemy,player) < 250 &&                         // attack CrossBow
-            Phaser.Math.Distance.BetweenPoints(currentEnemy,player) > 99 &&
+            if(Phaser.Math.Distance.BetweenPoints(currentEnemy,player) < 300 &&                         // attack CrossBow
+            Phaser.Math.Distance.BetweenPoints(currentEnemy,player) > 149 &&
             currentEnemy.data.list.AttackIsFinish === true &&
             currentEnemy.data.list.type === 'CrossBow'){
 
@@ -752,17 +856,17 @@ function update(time, delta){
 
 
 
-            if(Phaser.Math.Distance.BetweenPoints(currentEnemy,player) <= 49 &&                        // action enemies
+            if(Phaser.Math.Distance.BetweenPoints(currentEnemy,player) <= 149 &&                        // action enemies
             currentEnemy.data.list.type != 'box' &&
             currentEnemy.data.list.EnemyIsAttack === true && 
             currentEnemy.data.list.AttackIsFinish === true){
                 currentEnemy.data.list.AttackIsFinish = false
                 currentEnemy.data.list.EnemyIsAttack = false
                 if(currentEnemy.data.list.randomValue % 2 === 1){
-                    currentEnemy.data.list.CounterMove = 5;
+                    currentEnemy.data.list.CounterMove = 2;
                     currentEnemy.data.list.randomValue = currentEnemy.data.list.randomValue + 1;
                 }else{
-                    currentEnemy.data.list.CounterMove = 2;
+                    currentEnemy.data.list.CounterMove = 5;
                     currentEnemy.data.list.randomValue = currentEnemy.data.list.randomValue + 1;
                 }
             }
@@ -771,7 +875,6 @@ function update(time, delta){
                 if(currentEnemy.data.list.health <= 0){
                     currentEnemy.data.list.CounterMove = 4
                 }
-
                 switch(currentEnemy.data.list.CounterMove){
                     case 0: enemyStand(currentEnemy); break;
                     case 1: enemyWalkFront(currentEnemy,player,this); break;
@@ -826,17 +929,17 @@ function update(time, delta){
         else if(hittableObject.children.entries[i].data.list.name === 'slash'){                         //img attack slash
             hittableObject.children.entries[i].body.checkCollision.none = true;
             if(player.flipX === true){
-                hittableObject.children.entries[i].x = player.x - 45
+                hittableObject.children.entries[i].x = player.x - 90
                 hittableObject.children.entries[i].y = player.y
             }else{
-                hittableObject.children.entries[i].x = player.x + 45
+                hittableObject.children.entries[i].x = player.x + 90
                 hittableObject.children.entries[i].y = player.y
             }
         }
 
         else{hittableObject.children.entries[i] = [];} 
     }
-    //console.log(player.data.list.Guard);
+    //console.log(player.data.list.Eject);
     //console.log(currentEnemy);
     //console.log(Arrow);
     //console.log(Phaser.Math.Distance.BetweenPoints(hittableObject.children.entries[0],player));
@@ -854,7 +957,7 @@ function update(time, delta){
     //console.log(playerInGround);
     //console.log(-26 * 6);
     //console.log(hittableObject.children.entries);
-    //console.log(hittableObject.children.entries[0].body.position.x);
+    //console.log(hittableObject.children.entries[0].data.list.CounterMove);
     //console.log(currentEnemy);
     //console.log(player.anims.currentAnim);
     //console.log(player.anims.currentAnim);
@@ -873,14 +976,14 @@ function update(time, delta){
     //console.log(player.body.velocity.y);
     
 
-    if(counterMove === 28){
+    if(counterMovePlayer === 28){
         KnockBack()
     }
-    if(counterMove === 14){
+    if(counterMovePlayer === 14){
         GuardKnockBack()
     }
     if(player.data.list.health <= 0){                                                              //Player Die
-        counterMove = 999;
+        counterMovePlayer = 999;
         player.data.list.health = 0;
         player.body.checkCollision.right = false;
         player.body.checkCollision.left = false;
@@ -888,9 +991,9 @@ function update(time, delta){
     // CONTROL PLAYER
 
     if((theGamePad.X)){                                                                             //Gamepad Combo
-            if(counterMove === 0 && gamePadCombo.includes("BDA") || gamePadCombo.includes("BGA")){
+            if(counterMovePlayer === 0 && gamePadCombo.includes("BDA") || gamePadCombo.includes("BGA")){
                 if(playerInGround === true){
-                    counterMove = 32;
+                    counterMovePlayer = 32;
                     tornadoSlash();
                     //console.log('tornadoSash');
                     gamePadCombo = [];
@@ -900,7 +1003,7 @@ function update(time, delta){
             }
     }
    
-        if (leftkey.isDown && counterMove === 0 || theGamePad.left  && counterMove === 0){              //left
+        if (leftkey.isDown && counterMovePlayer === 0 || theGamePad.left  && counterMovePlayer === 0){              //left
                 player.setVelocityX(-playerVelocityX);
                 playerFlip = player.flipX=true;
 
@@ -908,7 +1011,7 @@ function update(time, delta){
                     player.anims.play('runLeft', true);
                 }
             }
-        else if (rightkey.isDown && counterMove === 0 || theGamePad.right && counterMove === 0){       //right
+        else if (rightkey.isDown && counterMovePlayer === 0 || theGamePad.right && counterMovePlayer === 0){       //right
                 player.setVelocityX(playerVelocityX);
                 playerFlip = player.flipX=false;
             
@@ -917,71 +1020,76 @@ function update(time, delta){
                 }
             }
         else if (player.setVelocityX(0)){                                                               //idle
-                if(playerInGround === true && counterMove === 0){
+                if(playerInGround === true && counterMovePlayer === 0){
                     player.anims.play('idle', true);
                     player.setGravityY(0);
                     player.body.checkCollision.right = true;
                     player.body.checkCollision.left = true;
                 }
             }
+
         
-        if (Phaser.Input.Keyboard.JustDown(upkey) && playerInGround === true && counterMove === 0       //jump
-        || gamepadJump === true && playerInGround === true && counterMove === 0){ //gamepad
+        if (Phaser.Input.Keyboard.JustDown(upkey) && playerInGround === true && counterMovePlayer === 0       //jump
+        || gamepadJump === true && playerInGround === true && counterMovePlayer === 0){ //gamepad
             gamepadJump = false
-            player.setVelocityY(-250);
+            player.setVelocityY(-450);
             playerInGround = false;
             jumpAction();
         }
         if(player.body.velocity.y > 0 &&                                                                //fall
             attackintheair === false &&                                    
-            counterMove != 28 && 
-            counterMove != 14 && 
+            counterMovePlayer != 28 && 
+            counterMovePlayer != 14 && 
             playerCanFall === true &&
             attackinground === false){               
             fallAction()
             playerInGround = false
         }     
         
-        if (touchesGuard.isDown && playerInGround === true && counterMove === 0 ||
-            theGamePad.Y && playerInGround === true && counterMove === 0 ){                             //guard
+        if (touchesGuard.isDown && playerInGround === true && counterMovePlayer === 0 ||
+            theGamePad.Y && playerInGround === true && counterMovePlayer === 0 ){                             //guard
             player.setVelocityX(0);
             player.setVelocityY(0);
             player.anims.play('guard', true);
             player.data.list.Guard = true
-        }else if(touchesGuard.isUp && playerInGround === true && counterMove != 14){
+        }else if(touchesGuard.isUp && playerInGround === true && counterMovePlayer != 14){
              player.data.list.Guard = false}
         
         if(Phaser.Input.Keyboard.JustDown(touchesAttack) || gamepadAttack === true){                    //attack                                            //attack
             gamepadAttack = false;
-            counterMove++;
-            if(counterMove === 1 && playerInGround === true){attackComboOne();}
-            else if (counterMove >= 2 && playerInGround === true){attackComboTwo();}
-            else if(counterMove === 1 && playerInGround === false){attackJump();}
+            counterMovePlayer++;
+            if(counterMovePlayer === 1 && playerInGround === true){attackComboOne();}
+            else if (counterMovePlayer >= 2 && playerInGround === true){attackComboTwo();}
+            else if(counterMovePlayer === 1 && playerInGround === false){attackJump();}
         }    
 }
+
 //FUNCTIONS
 
 function attackComboOne(){                                                                              // attack one
         attackinground = true;
         var nameAttack = 'attackOne'
         player.anims.play(nameAttack, true);
-        var colAtk2 = colideATK2.get();
-        colAtk2.setSize(60,60)
-        colAtk2.visible = false;
+        //var colAtk2 = colideATK2.get(); 
+        //colAtk2.setScale(2)
+        //colAtk2.visible = false;
             player.on('animationupdate', ()=>{
                 if(nameAttack === player.anims.currentAnim.key){
                     if(4 === player.anims.currentFrame.index){
-                            if(playerFlip === true){colAtk2.setX(player.x -20);colAtk2.setY(player.y);}
-                            if(playerFlip === false){colAtk2.setX(player.x +20);colAtk2.setY(player.y)}      
+                            // if(playerFlip === true){colAtk2.setX(player.x -80);colAtk2.setY(player.y);}
+                            // if(playerFlip === false){colAtk2.setX(player.x +80);colAtk2.setY(player.y)}      
+                            if(playerFlip === true){colideATK.setX(player.x -75);colideATK.setY(player.y);}
+                            if(playerFlip === false){colideATK.setX(player.x +75);colideATK.setY(player.y)}    
                     };
                     if(player.anims.currentFrame.index >= 5){
-                        colAtk2.destroy()
+                        colideATK.setX(0)
+                        //colAtk2.destroy()
                     }
                     if(player.anims.currentFrame.index >= 6){
                         countTest = 1
                     };
                     if(13 === player.anims.currentFrame.index){
-                        counterMove = 0;
+                        counterMovePlayer = 0;
                         attackinground = false;
                     }
                 }
@@ -994,23 +1102,25 @@ if(player.anims.currentAnim.key === 'attackOne'){
     if(countTest === 1){
         player.anims.play('attackTwo', true);
     var nameAttack2 = 'attackTwo'
-    var colAtk2 = colideATK2.get();
-    colAtk2.setSize(60,60)
-    colAtk2.visible = false;
+    // var colAtk2 = colideATK2.get();
+    // colAtk2.setScale(2)
+    // colAtk2.setSize(60,60)
+    // colAtk2.visible = false;
 
     player.on('animationupdate', ()=>{
         if(nameAttack2 === player.anims.currentAnim.key){
             if(player.anims.currentFrame.index <= 3){
             }
             if(player.anims.currentFrame.index === 4){
-                if(playerFlip === true){colAtk2.setX(player.x -20);colAtk2.setY(player.y)}
-                if(playerFlip === false){colAtk2.setX(player.x +20);colAtk2.setY(player.y)}
+                if(playerFlip === true){colideATK.setX(player.x -75);colideATK.setY(player.y)}
+                if(playerFlip === false){colideATK.setX(player.x +75);colideATK.setY(player.y)}
             }
             if(player.anims.currentFrame.index >= 5){
-                colAtk2.destroy()
+                colideATK.setX(0)
+                // colAtk2.destroy()
             }
             if(12 === player.anims.currentFrame.index){//reset counterMove : 0
-                counterMove = 0;
+                counterMovePlayer = 0;
                 countTest = 0;
                 attackinground = false;
             }
@@ -1045,7 +1155,7 @@ function attackComboThree(){
                 colAtk2.setY(player.y - 9999)//position en dehors de l'éccran
             }
             if(10 === player.anims.currentFrame.index){//reset counterMove : 0
-                counterMove = 0;
+                counterMovePlayer = 0;
             }
         }
     });
@@ -1060,19 +1170,23 @@ function fallAction(){                                                          
 function attackJump(){                                                                                      //attack jump
     player.anims.play('jumpAtk', true);
     var nameAttack4 = 'jumpAtk';
-    var colAtk5 = colideATK2.get();
-    colAtk5.setSize(60,60)
-    colAtk5.visible = false;
+    // var colAtk5 = colideATK2.get();
+    // colAtk5.setScale(2)
+    // colAtk5.setSize(60,60)
+    // colAtk5.visible = false;
     attackintheair = true;
     player.on('animationupdate', ()=>{
         if(nameAttack4 === player.anims.currentAnim.key){
             if(player.anims.currentFrame.index === 4){
-                if(playerFlip === true){colAtk5.setX(player.x -17);colAtk5.setY(player.y +10)}
-                if(playerFlip === false){colAtk5.setX(player.x +17);colAtk5.setY(player.y +10)} 
+                if(playerFlip === true){colideATK.setX(player.x -65);colideATK.setY(player.y +20)}
+                if(playerFlip === false){colideATK.setX(player.x +65);colideATK.setY(player.y +20)} 
+            }
+            if(player.anims.currentFrame.index >= 5){
+                colideATK.setX(0)
             }
             if(playerInGround === true || player.anims.currentFrame.index >= 25){
-                counterMove = 0; 
-                colAtk5.destroy();
+                counterMovePlayer = 0; 
+                // colAtk5.destroy();
             ;}
         }
     });
@@ -1083,54 +1197,62 @@ function tornadoSlash(){                                                        
     player.anims.play('shoryuSlash', true);
 
     var nameAttack = 'shoryuSlash';
-    var colAtk = colideATK2.get().setSize(60,60);
-    var colAtkTwo = colideATK2.get().setSize(80,60);
-    var colAtkThree = colideATK2.get().setSize(60,60);
+    // var colAtk = colideATK2.get().setSize(60,60);
+    // var colAtkTwo = colideATK2.get().setSize(80,60);
+    // var colAtkThree = colideATK2.get().setSize(60,60);
 
-    colAtk.visible = false;
-    colAtkTwo.visible = false;
-    colAtkThree.visible = false;
+    // colAtk.visible = false;
+    // colAtkTwo.visible = false;
+    // colAtkThree.visible = false;
 
     player.on('animationupdate', ()=>{
 
         if(nameAttack === player.anims.currentAnim.key){
 
             if(player.anims.currentFrame.index <= 3 ){
-                player.setGravityY(-500);
-                if(playerFlip === true){player.setVelocityX(-playerVelocityX * 6)}
-                if(playerFlip === false){player.setVelocityX(playerVelocityX * 6)} 
+                player.setGravityY(-1200);
+                if(playerFlip === true){player.setVelocityX(-playerVelocityX * 4)}
+                if(playerFlip === false){player.setVelocityX(playerVelocityX * 4)} 
+                // console.log(player.body.checkCollision.left = false);
+                // console.log(player.body.checkCollision.right = false);
             }
 
             if(player.anims.currentFrame.index === 2 ){
                 //player.anims.stop()
-                if(playerFlip === true){colAtk.setX(player.x -30);colAtk.setY(player.y +10)}
-                if(playerFlip === false){colAtk.setX(player.x +30);colAtk.setY(player.y +10)} 
+                if(playerFlip === true){colideATK.setX(player.x -84);colideATK.setY(player.y +10)}
+                if(playerFlip === false){colideATK.setX(player.x +84);colideATK.setY(player.y +10)} 
             }
-
+            if(player.anims.currentFrame.index >= 3 ){
+                player.data.list.Eject = false;
+                colideATK.setX(0);
+                // colAtk.destroy();
+            }
             if(player.anims.currentFrame.index === 4 ){
                 player.setGravityY(0);
-                player.body.checkCollision.right = true;
-                player.body.checkCollision.left = true;
-                colAtk.destroy();
                 player.data.list.Eject = true;
-                // player.anims.stop()
-                if(playerFlip === true){colAtkTwo.setX(player.x -10);colAtkTwo.setY(player.y -32)}
-                if(playerFlip === false){colAtkTwo.setX(player.x +10);colAtkTwo.setY(player.y -32)} 
+                // console.log(player.body.checkCollision.left = true);
+                // console.log(player.body.checkCollision.right = true);
+                //player.anims.stop()
+                if(playerFlip === true){colideATK.setX(player.x -60);colideATK.setY(player.y -32)}
+                if(playerFlip === false){colideATK.setX(player.x +60);colideATK.setY(player.y -32)} 
             }
 
             if(player.anims.currentFrame.index === 6 ){
-                colAtkTwo.destroy();
+                //colAtkTwo.destroy();
                 //player.anims.stop()
-
-                if(playerFlip === true){colAtkThree.setX(player.x -10);colAtkThree.setY(player.y -40)}
-                if(playerFlip === false){colAtkThree.setX(player.x +10);colAtkThree.setY(player.y -40)} 
+                colideATK.setY(player.y -120)
+                if(playerFlip === true){colideATK.setX(player.x -30);}
+                if(playerFlip === false){colideATK.setX(player.x +30);} 
             }
-
-            if(player.anims.currentFrame.index === 7 ){colAtkThree.destroy();}
+            
+            if(player.anims.currentFrame.index === 7 ){
+                // colAtkThree.destroy();
+                colideATK.setX(0);
+            }
 
             if(player.anims.currentFrame.index >= 4 &&
                 player.anims.currentFrame.index <= 6){
-                player.setVelocityY(-175)
+                player.setVelocityY(-320)
             }
 
             if(player.anims.currentFrame.index >= 16){
@@ -1141,7 +1263,7 @@ function tornadoSlash(){                                                        
 
                 }else{
                     playerCanFall = true;
-                    counterMove = 0;
+                    counterMovePlayer = 0;
                 }
                 
             }
@@ -1170,7 +1292,7 @@ function KnockBack(){                                                           
                         playerCanFall = false
                     }else{
                         playerCanFall = true;
-                        counterMove = 0;
+                        counterMovePlayer = 0;
                     }
                 }else{
                     player.setGravityY(-750)
@@ -1218,7 +1340,7 @@ function GuardKnockBack(){
                     playerCanFall = false
                 }else{
                     playerCanFall = true;
-                        counterMove = 0;   
+                        counterMovePlayer = 0;   
                 }
             }
         }
@@ -1238,7 +1360,8 @@ function createCoin(thebox){                                                    
 function createSlash(){
     var slash = hittableObject.create(0,0,'slash',0,true);
     slash.anims.play('slashed', true)
-    slash.rotation = Phaser.Math.Between(0,2);;
+    slash.rotation = Phaser.Math.Between(0,2);
+    slash.setScale(2);
     slash.setData('name', 'slash');
     slash.on('animationcomplete', ()=>{
         slash.destroy();
@@ -1264,20 +1387,22 @@ function createEnemies(enemySpawner, typeOfEnemy){                              
     var id = enemyNumberId++;
     enemyone.anims.play(animsName,true);
     enemyone.setSize(25, 56);
+    enemyone.setScale(2);
     enemyone.setData('CounterMove', 0);
     enemyone.setData('EnemyIsAttack', false);
     enemyone.setData('AttackIsFinish', true);
     enemyone.setData('AtkCollide', false);
     enemyone.setData('EnemyIsDie', false);
     enemyone.setData('IsInvulnerable', false);
-    enemyone.setData('health', 6);
+    enemyone.setData('health', 100);
     enemyone.setData('name', 'EnemyOne');
     enemyone.setData('type', typeOfEnemy);
     enemyone.setData('id', id);
     enemyone.setData('id_arrow', id);
     enemyone.setData('randomValue',Phaser.Math.Between(25,100));
     enemyone.body.checkCollision.up = false
-    enemyone.setFriction(0)
+    //enemyone.setMass(22)
+    //enemyone.setFriction(1)
     enemyone.setDepth(0);
 
     if(typeOfEnemy === 'CrossBow'){                                                                     //create Arrow
@@ -1304,7 +1429,7 @@ function enemyStand(enmy1){                                                     
 }
 
 function enemyWalkFront(enemy1,target,game){                                                            // enemy Walk
-
+enemy1.setBounce(0, 0)
 if(enemy1.data.list.type != 'box'){
     var animsName = 'walk'+enemy1.data.list.type;
 
@@ -1327,7 +1452,7 @@ if(enemy1.data.list.type != 'box'){
 }
 
 function enemyWalkBack(enemy1,target,game){                                                             // enemy walkBack
-    enemy1.setBounce(0,0)
+    enemy1.setBounce(0, 0)
     var animsName = 'walkback'+enemy1.data.list.type;
     enemy1.anims.play(animsName, true)
 
@@ -1416,7 +1541,6 @@ function enemyAttack(enemyone, currentArrow){
     });
 }
 
-
 function createArrow(enemy){                                                                             // call Arrow 
     var currentArrow = null;
 
@@ -1449,26 +1573,34 @@ function createArrow(enemy){                                                    
 }
 
 function enemyKnockBack(enmy){
-
-
+//console.log('hello');
     if(player.data.list.Eject === false){                                                               // knock back enemy
                                                              
         if(enmy.data.list.type != 'box'){
 
             enmy.data.list.EnemyIsAttack = false;
             var animsName = 'knockback'+enmy.data.list.type
-            enmy.anims.play({key : animsName, startFrame : 0},true);
-            //var enemyAction2 = 'knockbackenemy1';
-            
+            enmy.anims.play(animsName,true);
+            //var enemyAction2 = 'knockbackEnemy1';
+            //console.log(animsName);
                 enmy.on('animationupdate', ()=>{
                     if(animsName === enmy.anims.currentAnim.key){
+                    
+                        if(enmy.anims.currentFrame.index <= 2){
+
+                            if(enmy.flipX === true){enmy.setVelocityX(1200)}
+                            if(enmy.flipX === false){enmy.setVelocityX(-1200)}
+                            
+                        }
                         if(enmy.anims.currentFrame.index <= 3){
-                            if(enmy.flipX === true){enmy.setVelocityX(-50)}
-                            if(enmy.flipX === false){enmy.setVelocityX(50)}   
+                            
+                            if(enmy.flipX === true){enmy.setVelocityX(-100)}
+                            if(enmy.flipX === false){enmy.setVelocityX(100)}   
                         }
                         if(enmy.anims.currentFrame.index >= 5 &&
                             player.data.list.Eject === false){ 
-                            enmy.data.list.CounterMove = 0
+                                enmy.data.list.CounterMove = 0
+
                             enmy.data.list.AttackIsFinish = true
                         }
                     }
@@ -1483,11 +1615,11 @@ function enemyKnockBack(enmy){
             enmy.on('animationupdate', ()=>{
                 
                 if(enmy.anims.currentFrame.index === 8){
-                    enmy.data.list.CounterMove = 0
+                    //enmy.data.list.CounterMove = 0
                     enmy.data.list.AttackIsFinish = true
                 }
                 if(enmy.anims.currentFrame.index === 5){
-                    enmy.data.list.CounterMove = 0
+                    //enmy.data.list.CounterMove = 0
                     enmy.data.list.AttackIsFinish = true
                 }
             });
@@ -1502,21 +1634,27 @@ function enemyKnockBack(enmy){
         //enmy.body.setSize(15,56)
             enmy.on('animationupdate', ()=>{
                 if(animsName2 === enmy.anims.currentAnim.key){
-                    if(enmy.anims.currentFrame.index <= 5){
-                        if(enmy.flipX === true){enmy.setVelocityX(-50)}
-                        if(enmy.flipX === false){enmy.setVelocityX(50)}   
-                        enmy.setVelocityY(-100)
+                    if(enmy.anims.currentFrame.index <= 3){
+                        if(enmy.flipX === true){enmy.setVelocityX(-200)}
+                        if(enmy.flipX === false){enmy.setVelocityX(200)}  
+                        enmy.setVelocityY(-300)
+
+                    }
+                    if(enmy.anims.currentFrame.index === 5){
+                        if(enmy.flipX === true){enmy.setVelocityX(-100)}
+                        if(enmy.flipX === false){enmy.setVelocityX(100)}   
+                        enmy.setVelocityY(-200)
                     }
                     if(enmy.anims.currentFrame.index >= 6 &&
                         enmy.anims.currentFrame.index <= 7){
-                            if(enmy.flipX === true){enmy.setVelocityX(-100)}
-                            if(enmy.flipX === false){enmy.setVelocityX(100)}
+                            if(enmy.flipX === true){enmy.setVelocityX(-200)}
+                            if(enmy.flipX === false){enmy.setVelocityX(200)}
                             enmy.setVelocityY(0)
                         }
                         if(enmy.anims.currentFrame.index >= 8 &&
                             enmy.anims.currentFrame.index <= 10){
-                                if(enmy.flipX === true){enmy.setVelocityX(-50)}
-                                if(enmy.flipX === false){enmy.setVelocityX(50)}   
+                                if(enmy.flipX === true){enmy.setVelocityX(-100)}
+                                if(enmy.flipX === false){enmy.setVelocityX(100)}   
                                 enmy.setVelocityY(250)
                                 enmy.setBounce(0.5,0.5)
                         }
@@ -1531,7 +1669,7 @@ function enemyKnockBack(enmy){
                             if(enmy.data.list.type === 'CrossBow'){
                                 enmy.data.list.CounterMove = 2
                             }else{
-                                enmy.data.list.CounterMove = 0
+                                // enmy.data.list.CounterMove = 0
                             }
                     }
                 }
@@ -1570,6 +1708,12 @@ function enemyDie(enmyOne){
             }
         }else{console.log(hittableObject.children.entries);}   
     });
+}
+function collisionAtkEnemies(enemy,colAtk){
+   
+    enemy.data.list.CounterMove = 3;
+    colAtk.setX(0);
+    
 }
 
 
