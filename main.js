@@ -202,7 +202,7 @@ function create(){
 
     Arrow = this.physics.add.group({allowGravity : false})                          // Arrow 
 
-    hittableObject = this.physics.add.group()                                       // enemy and other...
+    hittableObject = this.physics.add.group({immovable: true})                                       // enemy and other...
 
     // box = this.physics.add.group({                                                  // woodBox
     //     key : 'box',
@@ -242,7 +242,7 @@ function create(){
     slashAtk = this.add.sprite(0,0,'slash').setScale(2);                            // img Slash
     slashAtk.setDepth(1);
 
-    spawnDetector = this.add.rectangle(1200,1000,50,400,0xB14F37);
+    spawnDetector = this.add.rectangle(1300,1000,50,400,0xB14F37);
     this.physics.add.existing(spawnDetector);
     //spawnDetector.setData('Active', false)
     //spawnDetector.setVisible(false)
@@ -360,7 +360,7 @@ function create(){
 
             spawnCounter ++;
 
-            detector.body.position.x = player.body.position.x +600
+            detector.body.position.x = player.body.position.x +800
             detector.body.position.y = player.body.position.y -150
 
             //console.log(detector);
@@ -428,8 +428,15 @@ function create(){
         //     }
         // })
 
-        
-        this.physics.add.collider(hittableObject, newPlatform, function(htblobjct, Platform){})   //collision Enemy + platform
+        this.physics.add.collider(hittableObject, CrossPlatform, function(enemy,pltfrm){       //collision enemy + CrossPlatform tiles
+            // console.log(pltfrm);
+            console.log(enemy.data.list.randomValue = 5);
+            pltfrm.faceLeft = false;
+            pltfrm.faceRight = false;
+            pltfrm.faceBottom = false;
+            pltfrm.faceUp = true;
+        })
+        this.physics.add.collider(hittableObject, newPlatform, function(htblobjct, Platform){})   //collision Enemy + platform 
 
         // this.physics.add.overlap(hittableObject, newPlatform, function(htblobjct, Platform){      //overlap Enemy + platform
         //     //htblobjct.body.velocity.y = -75
@@ -674,7 +681,7 @@ function create(){
     this.anims.create({
         key: 'attackCrossBow',
         frames: this.anims.generateFrameNumbers('theEnemyCrossBow',{frames : [ 10, 10, 10, 10, 0, 0, 0, 0, 1, 2, 3, 3, 3, 3, 3, 4, 5, 5, 5, 6, 7, 7, 7, 7, 8, 8, 9, 9]}),
-        frameRate: 6,
+        frameRate: 10,
     })
     this.anims.create({
         key: 'attackPoleAxe',
