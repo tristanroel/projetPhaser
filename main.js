@@ -162,6 +162,7 @@ function create(){
     CrossPlatform.setCollisionByProperty({collides : true})
 
     Spawner.setScale(2);
+    Spawner.setVisible(false)
     BackGround.setScale(2);
     newPlatform.setScale(2);
     CrossPlatform.setScale(2);
@@ -241,7 +242,7 @@ function create(){
     slashAtk = this.add.sprite(0,0,'slash').setScale(2);                            // img Slash
     slashAtk.setDepth(1);
 
-    spawnDetector = this.add.rectangle(900,1000,50,400,0xB14F37);
+    spawnDetector = this.add.rectangle(1200,1000,50,400,0xB14F37);
     this.physics.add.existing(spawnDetector);
     //spawnDetector.setData('Active', false)
     //spawnDetector.setVisible(false)
@@ -257,7 +258,7 @@ function create(){
 
     // TEXT
 
-    text = this.add.text(0,0, ' << CONTROL >> \n LEFT = press "Q"\n RIGHT = press "D"\n JUMP  = press "Z"\n ATTACK = press "J"\n GUARD = press "I" \n GAMEPAD : disconected\n version : O.11 | 3.08.22' , {fontFamily : 'PixelFont'}); 
+    text = this.add.text(0,0, ' << CONTROL >> \n LEFT = press "Q"\n RIGHT = press "D"\n JUMP  = press "Z"\n ATTACK = press "J"\n GUARD = press "I" \n GAMEPAD : disconected\n version : O.12 | 4.08.22' , {fontFamily : 'PixelFont'}); 
     scoreText = this.add.text(0,0, 'SCORE : 0',{ fontFamily : 'PixelFont', color : '#353535'})
     text.setDepth(2);
     scoreText.setDepth(2);
