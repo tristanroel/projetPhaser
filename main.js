@@ -2,7 +2,7 @@ var configuration = {
     type: Phaser.AUTO,
     pixelArt : true,
     width : 3000,
-    height : 2000,
+    height : 1780,
     // backgroundColor : '#353535',
     backgroundColor : '#FFFFFF',
     fps: {
@@ -68,22 +68,26 @@ var boxSpawn;
 
 
 var enemyNumberId;
- var colideATK;
+var colideATK;
 
-var box; // caisse en bois : sprite
+var box;    // caisse en bois : sprite
 
 var skyBg; //ciel
-var Coin; //pieces
+var Coin;  //pieces
 var Arrow;
-var text; // info command list
+var text;  // info command list
 var Score = 0; // Score
 var scoreText;
 var healthBar; 
 
+var spawnDetector;
+var spawnReActivator;
+var spawnCounter = 0;
 
 var countTest = 0;
 
-var currentEnemy
+
+var currentEnemy;
 
 function preload(){
     this.load.image('sky','assets/Thesky.png');
@@ -147,18 +151,24 @@ function create(){
     const map = this.make.tilemap({ key : 'tiles'})                                                    // TILED level
     const tileset = map.addTilesetImage('map','forest');
 
+    const Spawner = map.createLayer('Spawners', tileset, -200, 0)
     const BackGround = map.createLayer('Fond', tileset, -200, 0)
     const newPlatform = map.createLayer('Ground', tileset, -200, 0)
     const CrossPlatform = map.createLayer('CrossGround', tileset, -200, 0)
     const Decor = map.createLayer('Decors', tileset, -200, 0)
     
+    Spawner.setCollisionByProperty({collides : true})
     newPlatform.setCollisionByProperty({collides : true})
     CrossPlatform.setCollisionByProperty({collides : true})
+
+    Spawner.setScale(2);
     BackGround.setScale(2);
     newPlatform.setScale(2);
     CrossPlatform.setScale(2);
     Decor.setScale(2)
     Decor.setDepth(1);
+
+    Spawner.setData('Activate', false);
     // Fond.setScale(1.5)
 
     // console.log(CrossPlatform);
@@ -230,6 +240,18 @@ function create(){
 
     slashAtk = this.add.sprite(0,0,'slash').setScale(2);                            // img Slash
     slashAtk.setDepth(1);
+
+    spawnDetector = this.add.rectangle(900,1000,50,400,0xB14F37);
+    this.physics.add.existing(spawnDetector);
+    //spawnDetector.setData('Active', false)
+    //spawnDetector.setVisible(false)
+    spawnDetector.body.allowGravity = false;
+
+    // spawnReActivator = this.add.rectangle(400,1000,50,400,0x3F88E8);
+    // this.physics.add.existing(spawnReActivator);
+    // //spawnDetector.setData('Active', false)
+    // //spawnDetector.setVisible(false)
+    // spawnReActivator.body.allowGravity = false;
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -328,6 +350,44 @@ function create(){
             playerInGround = true;
         })
 
+        this.physics.add.collider(Spawner, spawnDetector, function(detector, spawn){
+            
+            console.log(spawn.pixelX);
+            console.log(spawn.pixelY);
+            // console.log(spawn.body.checkCollision.none);
+            console.log('spawnCounter :' +spawnCounter);
+
+            spawnCounter ++;
+
+            detector.body.position.x = player.body.position.x +600
+            detector.body.position.y = player.body.position.y -150
+
+            //console.log(detector);
+            detector.body.checkCollision.none = true
+            setTimeout(()=>{detector.body.checkCollision.none = false},3000)
+            switch(spawnCounter){
+                case 1: createEnemies(detector,'Enemy1'); break;
+                case 2: createEnemies(detector,'box'); break;
+                case 3: createEnemies(detector,'Enemy1'); break;
+                case 4: createEnemies(detector,'box'); break;
+                case 5: createEnemies(detector,'CrossBow'); break;
+                case 6: createEnemies(detector,'box'); break;
+                case 7: createEnemies(detector,'Enemy1'); break;
+                case 8: createEnemies(detector,'box'); break;
+                case 9: createEnemies(detector,'PoleAxe'); break;
+                case 10: spawnCounter = 0; break;
+
+            }
+            
+
+
+        })
+
+        // this.physics.add.collider(Spawner, spawnReActivator, function(spawn,detector){
+        //     spawn.body.checkCollision.none = false;
+
+        // })
+
         // this.physics.add.overlap(player,CrossPlatform, function(plyr,CrssPltfrm){       //collision platform + cross Platform tiles
         //     CrssPltfrm.faceLeft = false;
         //     CrssPltfrm.faceRight = false;
@@ -374,6 +434,7 @@ function create(){
         //     //htblobjct.body.velocity.y = -75
         //     //console.log('ho');
         // })
+        
     
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////// 
 
@@ -697,17 +758,17 @@ function create(){
 
 // CREATE ENEMIES
 
-    createEnemies(enemy1Spawn,'PoleAxe');
-    createEnemies(enemy1Spawn,'Enemy1');
+    // createEnemies(enemy1Spawn,'box');
+    // createEnemies(enemy1Spawn,'Enemy1');
     // createEnemies(enemyCrossBowSpawn,'Enemy1');
     // createEnemies(enemyCrossBowSpawn,'Enemy1');
     // createEnemies(enemyCrossBowSpawn,'box');
     // //createEnemies(enemyCrossBowSpawn,'CrossBow');
     // createEnemies(boxSpawn,'box');
     
-    for(var i = 0;i < 1; i++){
-        setTimeout(()=>{createEnemies(enemy1Spawn, 'Enemy1')},9000 + (i * 7000))
-    }
+    // for(var i = 0;i < 1; i++){
+    //     setTimeout(()=>{createEnemies(enemy1Spawn, 'Enemy1')},9000 + (i * 7000))
+    // }
    
     // for(var i = 0;i < 2; i++){
     //     setTimeout(()=>{createEnemies(enemySpawn,'CrossBow');},9000 + (i * 7000))
@@ -736,13 +797,18 @@ function update(time, delta){
     skyBg.y = player.body.position.y;                                                               // position du ciel
     skyBg.tilePositionX += 0.5;
     text.x = player.body.position.x - 345;                                                          // position text
-    text.y = player.body.position.y + 140;
+    text.y = player.body.position.y + 120;
     healthBar.x = player.body.position.x - 270;                                                     // position healthbar
-    healthBar.y = player.body.position.y - 160;
+    healthBar.y = player.body.position.y - 140;
     healthBar.width = player.data.list.health * 10;
     scoreText.x = player.body.position.x + 260;                                                     // position Score
-    scoreText.y = player.body.position.y -170;
+    scoreText.y = player.body.position.y -150;
     scoreText.setText('SCORE : '+ Score);                                                           // maj score
+    spawnDetector.body.velocity.x = player.body.velocity.x ;
+    spawnDetector.body.velocity.y = player.body.velocity.y ;
+    // spawnReActivator.body.velocity.x = player.body.velocity.x ;
+    // spawnReActivator.body.velocity.y = player.body.velocity.y ;
+    // spawnDetector.y = player.body.position.y;
 
     //ENEMY UPDATE
     for(var i = 0; i < hittableObject.children.entries.length; i++){
@@ -1361,11 +1427,12 @@ function GuardKnockBack(){
 }
 
 function createCoin(thebox){                                                                            //Coin
-    var randomNbr = Phaser.Math.Between(-15,15);
+    var randomNbr = Phaser.Math.Between(-55, 2);
     var piece = Coin.create(thebox.x + randomNbr, thebox.y + randomNbr,'piecette',0,true);
+    piece.setScale(2);
     piece.anims.play('turnPiecette',true)
     piece.setBounce(1);
-    piece.setVelocityX(Phaser.Math.Between(-50, 50))
+    piece.setVelocityX(Phaser.Math.Between(-110, 110))
    
     //setTimeout(()=>{piece.setVelocityX(0);},1000)
 }
@@ -1395,7 +1462,8 @@ function createSlashGuard(){
 }
 
 function createEnemies(enemySpawner, typeOfEnemy){                                                      //create Enemies
-    var enemyone = hittableObject.create(enemySpawner.x, enemySpawner.y,'enemy', 0, true);
+    var enemyone = hittableObject.create(enemySpawner.x, enemySpawner.y -100,'enemy', 0, true);
+    console.log(enemySpawner.y);
     var animsName = 'stance'+typeOfEnemy;
     var id = enemyNumberId++;
     enemyone.anims.play(animsName,true);
