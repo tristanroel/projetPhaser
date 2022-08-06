@@ -120,6 +120,7 @@ function preload(){
     this.load.spritesheet('theEnemyfall', 'assets/Enemy/enemi1falling.png',{frameWidth: 170, frameHeight: 170});
     this.load.spritesheet('theEnemyCrossBow', 'assets/Enemy/arbaletrier.png',{frameWidth: 170, frameHeight: 170});
     this.load.spritesheet('theEnemyPoleAxe', 'assets/Enemy/poleaxegiant.png',{frameWidth: 180, frameHeight: 170});
+    this.load.spritesheet('theEnemySpearMan', 'assets/Enemy/spearman.png',{frameWidth: 190, frameHeight: 170});
 
 }
 
@@ -151,16 +152,19 @@ function create(){
     const map = this.make.tilemap({ key : 'tiles'})                                                    // TILED level
     const tileset = map.addTilesetImage('map','forest');
 
+    const DieTile = map.createLayer('DieTiles', tileset, -200, 0)
     const Spawner = map.createLayer('Spawners', tileset, -200, 0)
     const BackGround = map.createLayer('Fond', tileset, -200, 0)
     const newPlatform = map.createLayer('Ground', tileset, -200, 0)
     const CrossPlatform = map.createLayer('CrossGround', tileset, -200, 0)
     const Decor = map.createLayer('Decors', tileset, -200, 0)
     
+    DieTile.setCollisionByProperty({collides : true})
     Spawner.setCollisionByProperty({collides : true})
     newPlatform.setCollisionByProperty({collides : true})
     CrossPlatform.setCollisionByProperty({collides : true})
 
+    DieTile.setScale(2);
     Spawner.setScale(2);
     Spawner.setVisible(false)
     BackGround.setScale(2);
@@ -353,10 +357,10 @@ function create(){
 
         this.physics.add.collider(Spawner, spawnDetector, function(detector, spawn){
             
-            console.log(spawn.pixelX);
-            console.log(spawn.pixelY);
-            // console.log(spawn.body.checkCollision.none);
-            console.log('spawnCounter :' +spawnCounter);
+            // console.log(spawn.pixelX);
+            // console.log(spawn.pixelY);
+            // // console.log(spawn.body.checkCollision.none);
+            // console.log('spawnCounter :' +spawnCounter);
 
             spawnCounter ++;
 
@@ -367,7 +371,7 @@ function create(){
             detector.body.checkCollision.none = true
             setTimeout(()=>{detector.body.checkCollision.none = false},3000)
             switch(spawnCounter){
-                case 1: createEnemies(detector,'Enemy1'); break;
+                case 1: createEnemies(detector,'SpearMan'); break;
                 case 2: createEnemies(detector,'box'); break;
                 case 3: createEnemies(detector,'Enemy1'); break;
                 case 4: createEnemies(detector,'box'); break;
@@ -430,7 +434,14 @@ function create(){
 
         this.physics.add.collider(hittableObject, CrossPlatform, function(enemy,pltfrm){       //collision enemy + CrossPlatform tiles
             // console.log(pltfrm);
-            console.log(enemy.data.list.randomValue = 5);
+            //console.log(enemy.data.list.CounterMove);
+            enemy.data.list.EnemyStay = true;
+            if(enemy.data.list.CounterMove === 1){
+                console.log(enemy.data.list.EnemyStay);
+                //console.log(enemy.data.list.randomValue = 0);
+                
+            };
+
             pltfrm.faceLeft = false;
             pltfrm.faceRight = false;
             pltfrm.faceBottom = false;
@@ -442,6 +453,15 @@ function create(){
         //     //htblobjct.body.velocity.y = -75
         //     //console.log('ho');
         // })
+        this.physics.add.collider(DieTile, hittableObject, function(enemy, die){
+            enemy.data.list.health = 0;
+            console.log(enemy);
+        });
+        this.physics.add.collider(DieTile, player, function(plyr, die){
+            plyr.data.list.health = 0;
+            counterMovePlayer = 28;
+            console.log(plyr);
+        });
         
     
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////// 
@@ -632,6 +652,11 @@ function create(){
         frameRate: 6,
     });
     this.anims.create({
+        key: 'stanceSpearMan',
+        frames: this.anims.generateFrameNumbers('theEnemySpearMan',{frames : [0]}),
+        frameRate: 6,
+    });
+    this.anims.create({
         key: 'walkEnemy1',
         frames: this.anims.generateFrameNumbers('theEnemy',{frames : [1, 2, 3, 4]}),
         frameRate: 4,
@@ -649,12 +674,12 @@ function create(){
         frameRate: 3,
         repeat : -1,
     });
-    // this.anims.create({
-    //     key: 'walkbox',
-    //     frames: this.anims.generateFrameNumbers('theEnemyPoleAxe',{frames : [1, 2, 3, 4]}),
-    //     frameRate: 4,
-    //     repeat : -1,
-    // });
+    this.anims.create({
+        key: 'walkSpearMan',
+        frames: this.anims.generateFrameNumbers('theEnemySpearMan',{frames : [1, 2, 3, 4]}),
+        frameRate: 4,
+        repeat : -1,
+    });
     this.anims.create({
         key: 'walkbackEnemy1',
         frames: this.anims.generateFrameNumbers('theEnemy',{frames : [4, 3, 2, 1, 4, 3, 2, 1, 4, 3, 2, 1]}),
@@ -674,6 +699,12 @@ function create(){
         repeat : -1,
     });
     this.anims.create({
+        key: 'walkbackSpearMan',
+        frames: this.anims.generateFrameNumbers('theEnemySpearMan',{frames : [4, 3, 2, 1, 4, 3, 2, 1, 4, 3, 2, 1]}),
+        frameRate: 4,
+        repeat : -1,
+    });
+    this.anims.create({
         key: 'attackEnemy1',
         frames: this.anims.generateFrameNumbers('theEnemy',{frames : [4, 5, 5, 6, 7, 8, 9, 9, 9, 0, 0, 0, 0, 0, 0, 0, 0]}),
         frameRate: 10,
@@ -689,6 +720,11 @@ function create(){
         frameRate: 10,
     })
     this.anims.create({
+        key: 'attackSpearMan',
+        frames: this.anims.generateFrameNumbers('theEnemySpearMan',{frames : [ 0, 5, 5, 5, 6, 7, 8, 0, 0, 0, 0, 0, 0, 0, 0]}),
+        frameRate: 10,
+    })
+    this.anims.create({
         key: 'knockbackEnemy1',
         frames: this.anims.generateFrameNumbers('theEnemy',{frames : [ 10, 11, 11, 11, 11, 11, 11, 11, 0]}),
         frameRate: 35,
@@ -701,6 +737,11 @@ function create(){
     this.anims.create({
         key: 'knockbackPoleAxe',
         frames: this.anims.generateFrameNumbers('theEnemyPoleAxe',{frames : [ 18, 19, 19, 19, 19, 19, 19, 0, 0]}),
+        frameRate: 9,
+    });
+    this.anims.create({
+        key: 'knockbackSpearMan',
+        frames: this.anims.generateFrameNumbers('theEnemySpearMan',{frames : [9, 10, 10, 10, 10, 10, 10, 10, 0]}),
         frameRate: 9,
     });
     // this.anims.create({
@@ -724,6 +765,11 @@ function create(){
         frameRate: 8,
     })
     this.anims.create({
+        key: 'fallSpearMan',
+        frames: this.anims.generateFrameNumbers('theEnemySpearMan',{frames : [10, 11, 12, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13]}),
+        frameRate: 8,
+    })
+    this.anims.create({
         key: 'fallbox',
         frames: this.anims.generateFrameNumbers('box',{frames : [15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 24, 24, 24, 24, 24]}),
         frameRate: 15,
@@ -741,6 +787,11 @@ function create(){
     this.anims.create({
         key: 'ejectPoleAxe',
         frames: this.anims.generateFrameNumbers('theEnemyPoleAxe',{frames : [20, 20, 20, 20, 20, 20, 21, 21, 21, 21, 21, 21, 22, 22, 22, 22, 22, 22, 22, 22]}),
+        frameRate: 8,
+    })
+    this.anims.create({
+        key: 'ejectSpearMan',
+        frames: this.anims.generateFrameNumbers('theEnemySpearMan',{frames : [11, 11, 11, 11, 11, 11, 12, 12, 12, 12, 12, 12, 13, 13, 13, 13, 13, 13, 13, 13]}),
         frameRate: 8,
     })
 
@@ -799,6 +850,7 @@ function create(){
 
 
 function update(time, delta){
+
 
     //BACKGROUND AND TEXT
     skyBg.x = player.body.position.x;                                                               // position du ciel
@@ -921,7 +973,8 @@ function update(time, delta){
 
             if(Phaser.Math.Distance.BetweenPoints(currentEnemy,player) >= 200 &&                        // walk enemies
             currentEnemy.data.list.AttackIsFinish === true &&
-            currentEnemy.data.list.CounterMove != 3){
+            currentEnemy.data.list.CounterMove != 3 &&
+            currentEnemy.data.list.EnemyStay === false){
                 currentEnemy.data.list.CounterMove = 1; 
                 currentEnemy.data.list.EnemyIsAttack = true; 
             }
@@ -1065,8 +1118,7 @@ function update(time, delta){
     if(player.data.list.health <= 0){                                                              //Player Die
         counterMovePlayer = 999;
         player.data.list.health = 0;
-        // player.body.checkCollision.right = false;
-        // player.body.checkCollision.left = false;
+        // this.anims.pauseAll();
     }
     // CONTROL PLAYER
 
@@ -1398,7 +1450,7 @@ function KnockBack(){                                                           
                 player.setGravityY(-600)
             }
             if(player.anims.currentFrame.index >=12){
-                player.setGravityY(4000)
+                player.setGravityY(2000)
             }
             if(player.anims.currentFrame.index >=18){
                 player.setGravityX(0)
@@ -1471,7 +1523,7 @@ function createSlashGuard(){
 
 function createEnemies(enemySpawner, typeOfEnemy){                                                      //create Enemies
     var enemyone = hittableObject.create(enemySpawner.x, enemySpawner.y -100,'enemy', 0, true);
-    console.log(enemySpawner.y);
+    // console.log(enemySpawner.y);
     var animsName = 'stance'+typeOfEnemy;
     var id = enemyNumberId++;
     enemyone.anims.play(animsName,true);
@@ -1483,6 +1535,7 @@ function createEnemies(enemySpawner, typeOfEnemy){                              
     enemyone.setData('AtkCollide', false);
     enemyone.setData('EnemyIsDie', false);
     enemyone.setData('IsInvulnerable', false);
+    enemyone.setData('EnemyStay', false);
     enemyone.setData('health', 8);
     enemyone.setData('name', 'EnemyOne');
     enemyone.setData('type', typeOfEnemy);
@@ -1495,8 +1548,9 @@ function createEnemies(enemySpawner, typeOfEnemy){                              
     enemyone.setDepth(0);
 
     if(typeOfEnemy === 'CrossBow'){                                                                     //create Arrow
-        var arrow = Arrow.create(enemyone.x, enemyone.y - 9,'carreau',0,true);
+        var arrow = Arrow.create(0, 0,'carreau',0,true);
         arrow.setSize(20, 4);
+        arrow.setScale(2)
         arrow.setData('id', id);
     }
     if(typeOfEnemy === 'PoleAxe'){
@@ -1646,18 +1700,18 @@ function createArrow(enemy){                                                    
 
     if(currentArrow != null)
     {
-        currentArrow.setY(enemy.y - 35)  
+        currentArrow.setY(enemy.y - 25)  
 
         if(enemy.flipX === true)
         {
             currentArrow.flipX = true;
-            currentArrow.setX(enemy.x + 50)
+            currentArrow.setX(enemy.x + 35)
             currentArrow.setVelocityX(200)
         }
         else
         {
             currentArrow.flipX = false;
-            currentArrow.setX(enemy.x - 50) 
+            currentArrow.setX(enemy.x - 35) 
             currentArrow.setVelocityX(-200)
         }
     }
