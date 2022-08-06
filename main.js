@@ -26,7 +26,7 @@ var configuration = {
     physics :{
         default : 'arcade',
         arcade :{
-                    debug : false,
+                    debug : true,
                     tileBias : 36,
                     gravity : {y : 1000},
                 }
@@ -262,7 +262,7 @@ function create(){
 
     // TEXT
 
-    text = this.add.text(0,0, ' << CONTROL >> \n LEFT = press "Q"\n RIGHT = press "D"\n JUMP  = press "Z"\n ATTACK = press "J"\n GUARD = press "I" \n GAMEPAD : disconected\n version : O.12 | 4.08.22' , {fontFamily : 'PixelFont'}); 
+    text = this.add.text(0,0, ' << CONTROL >> \n LEFT = press "Q"\n RIGHT = press "D"\n JUMP  = press "Z"\n ATTACK = press "J"\n GUARD = press "I" \n GAMEPAD : disconected\n version : O.13 | 6.08.22' , {fontFamily : 'PixelFont'}); 
     scoreText = this.add.text(0,0, 'SCORE : 0',{ fontFamily : 'PixelFont', color : '#353535'})
     text.setDepth(2);
     scoreText.setDepth(2);
@@ -453,10 +453,12 @@ function create(){
         //     //htblobjct.body.velocity.y = -75
         //     //console.log('ho');
         // })
+
         this.physics.add.collider(DieTile, hittableObject, function(enemy, die){
             enemy.data.list.health = 0;
             console.log(enemy);
         });
+
         this.physics.add.collider(DieTile, player, function(plyr, die){
             plyr.data.list.health = 0;
             counterMovePlayer = 28;
@@ -1367,13 +1369,14 @@ function tornadoSlash(){                                                        
                 player.setGravityY(0);
                 player.data.list.Eject = true;
                 //player.anims.stop()
-                if(playerFlip === true){colideATK.setX(player.x -60);colideATK.setY(player.y -32)}
-                if(playerFlip === false){colideATK.setX(player.x +60);colideATK.setY(player.y -32)} 
+                if(playerFlip === true){colideATK.setX(player.x -78);colideATK.setY(player.y -32)}
+                if(playerFlip === false){colideATK.setX(player.x +78);colideATK.setY(player.y -32)} 
             }
 
             if(player.anims.currentFrame.index === 5 ){
                 //colideATK.body.enable = true;
                 colideATK.setX(0)
+                colideATK.setY(0)
             }
                 if(player.anims.currentFrame.index === 6 ){
                 //colAtkTwo.destroy();
@@ -1387,6 +1390,7 @@ function tornadoSlash(){                                                        
                 // colAtkThree.destroy();
                 colideATK.body.enable = true;
                 colideATK.setX(0);
+                colideATK.setY(0);
             }
 
             if(player.anims.currentFrame.index >= 4 &&
@@ -1626,7 +1630,8 @@ function enemyAttack(enemyone, currentArrow){
     enemyone.anims.play(animsName,true)
     
     enemyone.on('animationupdate', ()=>{                                                                // attack enemy1
-        if('attackEnemy1' === enemyone.anims.currentAnim.key){
+        if('attackEnemy1' === enemyone.anims.currentAnim.key ||
+        'attackSpearMan' === enemyone.anims.currentAnim.key){
             if(enemyone.anims.currentFrame.index >= 4 &&
                 enemyone.anims.currentFrame.index <= 6){
                     if(enemyone.flipX === true){enemyone.setVelocityX(200)}
