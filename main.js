@@ -26,7 +26,7 @@ var configuration = {
     physics :{
         default : 'arcade',
         arcade :{
-                    debug : false,
+                    debug : true,
                     tileBias : 36,
                     gravity : {y : 1000},
                 }
@@ -83,6 +83,7 @@ var healthBar;
 var spawnDetector;
 var spawnReActivator;
 var spawnCounter = 0;
+var CrossPlatform;
 
 var countTest = 0;
 
@@ -156,7 +157,7 @@ function create(){
     const Spawner = map.createLayer('Spawners', tileset, -200, 0)
     const BackGround = map.createLayer('Fond', tileset, -200, 0)
     const newPlatform = map.createLayer('Ground', tileset, -200, 0)
-    const CrossPlatform = map.createLayer('CrossGround', tileset, -200, 0)
+    CrossPlatform = map.createLayer('CrossGround', tileset, -200, 0)
     const Decor = map.createLayer('Decors', tileset, -200, 0)
     
     DieTile.setCollisionByProperty({collides : true})
@@ -432,21 +433,21 @@ function create(){
         //     }
         // })
 
-        this.physics.add.collider(hittableObject, CrossPlatform, function(enemy,pltfrm){       //collision enemy + CrossPlatform tiles
-            // console.log(pltfrm);
-            //console.log(enemy.data.list.CounterMove);
-            enemy.data.list.EnemyStay = true;
-            if(enemy.data.list.CounterMove === 1){
-                console.log(enemy.data.list.EnemyStay);
-                //console.log(enemy.data.list.randomValue = 0);
+        // this.physics.add.collider(hittableObject, CrossPlatform, function(enemy,pltfrm){       //collision enemy + CrossPlatform tiles
+        //     // console.log(pltfrm);
+        //     //console.log(enemy.data.list.CounterMove);
+           
+        //     if(enemy.data.list.CounterMove === 1){
+               
+        //         //console.log(enemy.data.list.randomValue = 0);
                 
-            };
+        //     };
 
-            pltfrm.faceLeft = false;
-            pltfrm.faceRight = false;
-            pltfrm.faceBottom = false;
-            pltfrm.faceUp = true;
-        })
+        //     pltfrm.faceLeft = false;
+        //     pltfrm.faceRight = false;
+        //     pltfrm.faceBottom = false;
+        //     pltfrm.faceUp = true;
+        // })
         this.physics.add.collider(hittableObject, newPlatform, function(htblobjct, Platform){})   //collision Enemy + platform 
 
         // this.physics.add.overlap(hittableObject, newPlatform, function(htblobjct, Platform){      //overlap Enemy + platform
@@ -971,12 +972,27 @@ function update(time, delta){
                 // }
             // })
 
+            this.physics.add.collider(currentEnemy, CrossPlatform, stopEnemies,null,this)
+
+            // this.physics.add.collider(currentEnemy, CrossPlatform, function(enemy,pltfrm){       //collision enemy + CrossPlatform tiles
+            //     //console.log('yéyo');
+            //     // console.log(pltfrm);
+            //     console.log(enemy.data.list.stopMove);
+               
+            //     enemy.data.list.stopMove = true
+                
+    
+            //     pltfrm.faceLeft = false;
+            //     pltfrm.faceRight = false;
+            //     pltfrm.faceBottom = false;
+            //     pltfrm.faceUp = true;
+            // })
+
             //////////////////////////////////////////////////////////////////////////////////////////////
 
             if(Phaser.Math.Distance.BetweenPoints(currentEnemy,player) >= 200 &&                        // walk enemies
             currentEnemy.data.list.AttackIsFinish === true &&
-            currentEnemy.data.list.CounterMove != 3 &&
-            currentEnemy.data.list.EnemyStay === false){
+            currentEnemy.data.list.stopMove === false){
                 currentEnemy.data.list.CounterMove = 1; 
                 currentEnemy.data.list.EnemyIsAttack = true; 
             }
@@ -991,7 +1007,7 @@ function update(time, delta){
 
 
 
-            if(Phaser.Math.Distance.BetweenPoints(currentEnemy,player) <= 149 &&                        // action enemies
+            if(Phaser.Math.Distance.BetweenPoints(currentEnemy,player) <= 145 &&                        // action enemies
             currentEnemy.data.list.type != 'box' &&
             currentEnemy.data.list.EnemyIsAttack === true && 
             currentEnemy.data.list.AttackIsFinish === true){
@@ -1538,8 +1554,8 @@ function createEnemies(enemySpawner, typeOfEnemy){                              
     enemyone.setData('AttackIsFinish', true);
     enemyone.setData('AtkCollide', false);
     enemyone.setData('EnemyIsDie', false);
+    enemyone.setData('stopMove', true);
     enemyone.setData('IsInvulnerable', false);
-    enemyone.setData('EnemyStay', false);
     enemyone.setData('health', 8);
     enemyone.setData('name', 'EnemyOne');
     enemyone.setData('type', typeOfEnemy);
@@ -1891,6 +1907,11 @@ function collisionAtkEnemies(htblObjct,atk){
     }else{
     }
     //console.log('kikou');
+}
+
+function stopEnemies(enemy){
+    enemy.data.list.stopMove = true
+    console.log(false);
 }
 
 
