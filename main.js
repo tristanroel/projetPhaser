@@ -26,7 +26,7 @@ var configuration = {
     physics :{
         default : 'arcade',
         arcade :{
-                    debug : true,
+                    debug : false,
                     tileBias : 36,
                     gravity : {y : 1000},
                 }
@@ -384,9 +384,6 @@ function create(){
                 case 10: spawnCounter = 0; break;
 
             }
-            
-
-
         })
 
         // this.physics.add.collider(Spawner, spawnReActivator, function(spawn,detector){
@@ -825,15 +822,15 @@ function create(){
     // createEnemies(enemyCrossBowSpawn,'Enemy1');
     // createEnemies(enemyCrossBowSpawn,'Enemy1');
     // createEnemies(enemyCrossBowSpawn,'box');
-    // //createEnemies(enemyCrossBowSpawn,'CrossBow');
+    // createEnemies(enemyCrossBowSpawn,'CrossBow');
     // createEnemies(boxSpawn,'box');
     
     // for(var i = 0;i < 1; i++){
     //     setTimeout(()=>{createEnemies(enemy1Spawn, 'Enemy1')},9000 + (i * 7000))
     // }
    
-    // for(var i = 0;i < 2; i++){
-    //     setTimeout(()=>{createEnemies(enemySpawn,'CrossBow');},9000 + (i * 7000))
+    // for(var i = 0;i < 4; i++){
+    //     setTimeout(()=>{createEnemies(enemy1Spawn,'CrossBow');},9000 + (i * 7000))
     // }
 
     // for(var i = 0;i < 2; i++){
@@ -881,7 +878,7 @@ function update(time, delta){
 
             //COLLISION Enemy + player
 
-            this.physics.add.collider(currentEnemy, player, function(htblobjct, plyr){              // COLLISIONS
+            this.physics.add.collider(currentEnemy, player, function(htblobjct, plyr){                  // COLLISIONS
             
             //playerVelocityX = 20;
                
@@ -990,22 +987,21 @@ function update(time, delta){
 
             //////////////////////////////////////////////////////////////////////////////////////////////
 
-            if(Phaser.Math.Distance.BetweenPoints(currentEnemy,player) >= 200 &&                        // walk enemies
-            currentEnemy.data.list.AttackIsFinish === true &&
-            currentEnemy.data.list.stopMove === false){
-                currentEnemy.data.list.CounterMove = 1; 
-                currentEnemy.data.list.EnemyIsAttack = true; 
+            if(currentEnemy.data.list.stopMove === false){
+                if(Phaser.Math.Distance.BetweenPoints(currentEnemy,player) >= 200 &&                        // walk enemies
+                currentEnemy.data.list.AttackIsFinish === true &&
+                currentEnemy.data.list.stopMove === false){
+                    currentEnemy.data.list.CounterMove = 1; 
+                    currentEnemy.data.list.EnemyIsAttack = true; 
+                }
             }
 
             if(Phaser.Math.Distance.BetweenPoints(currentEnemy,player) < 300 &&                         // attack CrossBow
             Phaser.Math.Distance.BetweenPoints(currentEnemy,player) > 149 &&
             currentEnemy.data.list.AttackIsFinish === true &&
             currentEnemy.data.list.type === 'CrossBow'){
-
                 currentEnemy.data.list.CounterMove = 2; 
             }
-
-
 
             if(Phaser.Math.Distance.BetweenPoints(currentEnemy,player) <= 145 &&                        // action enemies
             currentEnemy.data.list.type != 'box' &&
@@ -1045,8 +1041,7 @@ function update(time, delta){
                         break;
                 }
 
-
-                if(currentEnemy.data.list.EnemyIsDie === true)
+                if(currentEnemy.data.list.EnemyIsDie === true)                                              // Delete Enemies 
                 {
                     // Delete arrow for the crossbow enemy
                     if(currentEnemy.data.list.type == "CrossBow")
@@ -1107,6 +1102,7 @@ function update(time, delta){
     //console.log(box.children.entries);
     //console.log(playerInGround);
     //console.log(-26 * 6);
+    //console.log( player.data.list.Eject);
     //console.log(hittableObject.children.entries);
     //console.log(hittableObject.children.entries[0].data.list.CounterMove);
     //console.log(currentEnemy);
@@ -1395,16 +1391,15 @@ function tornadoSlash(){                                                        
                 colideATK.setY(0)
             }
                 if(player.anims.currentFrame.index === 6 ){
-                //colAtkTwo.destroy();
+      
                 //player.anims.stop()
                 colideATK.setY(player.y -120)
+                player.data.list.Eject = true;
                 if(playerFlip === true){colideATK.setX(player.x -30);}
                 if(playerFlip === false){colideATK.setX(player.x +30);} 
             }
             
             if(player.anims.currentFrame.index === 7 ){
-                // colAtkThree.destroy();
-                colideATK.body.enable = true;
                 colideATK.setX(0);
                 colideATK.setY(0);
             }
@@ -1554,7 +1549,7 @@ function createEnemies(enemySpawner, typeOfEnemy){                              
     enemyone.setData('AttackIsFinish', true);
     enemyone.setData('AtkCollide', false);
     enemyone.setData('EnemyIsDie', false);
-    enemyone.setData('stopMove', true);
+    enemyone.setData('stopMove', false);
     enemyone.setData('IsInvulnerable', false);
     enemyone.setData('health', 8);
     enemyone.setData('name', 'EnemyOne');
@@ -1875,11 +1870,10 @@ function enemyDie(enmyOne){
         }else{console.log(hittableObject.children.entries);}   
     });
 }
+
 function collisionAtkEnemies(htblObjct,atk){
     atk.setX(0);
     atk.setY(0);
-    
-    
     //console.log(htblObjct.data.list.CounterMove);
     //createSlash();
     //atk.body.enable = false;
@@ -1911,7 +1905,8 @@ function collisionAtkEnemies(htblObjct,atk){
 
 function stopEnemies(enemy){
     enemy.data.list.stopMove = true
-    console.log(false);
+    enemy.data.list.CounterMove = 0;
+    console.log('kikoou' + enemy.data.list.CounterMove);
 }
 
 
