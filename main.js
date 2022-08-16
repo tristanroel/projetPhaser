@@ -356,7 +356,7 @@ function create(){
             playerInGround = true;
         })
 
-        this.physics.add.collider(Spawner, spawnDetector, function(detector, spawn){
+        this.physics.add.collider(Spawner, spawnDetector, function(detector, spawn){    // spawn collider
             
             // console.log(spawn.pixelX);
             // console.log(spawn.pixelY);
@@ -366,11 +366,13 @@ function create(){
             spawnCounter ++;
 
             detector.body.position.x = player.body.position.x +800
-            detector.body.position.y = player.body.position.y -150
+            detector.body.position.y = player.body.position.y -140
 
-            //console.log(detector);
+            console.log(spawnCounter);
+            //console.log(spawn);
+            // console.log(detector);
             detector.body.checkCollision.none = true
-            setTimeout(()=>{detector.body.checkCollision.none = false},3000)
+            setTimeout(()=>{detector.body.checkCollision.none = false},400)
             switch(spawnCounter){
                 case 1: createEnemies(detector,'SpearMan'); break;
                 case 2: createEnemies(detector,'box'); break;
@@ -381,8 +383,7 @@ function create(){
                 case 7: createEnemies(detector,'Enemy1'); break;
                 case 8: createEnemies(detector,'box'); break;
                 case 9: createEnemies(detector,'PoleAxe'); break;
-                case 10: spawnCounter = 0; break;
-
+                case 10: spawnCounter = 0; detector.body.checkCollision.none = true; break;
             }
         })
 
@@ -430,21 +431,23 @@ function create(){
         //     }
         // })
 
-        // this.physics.add.collider(hittableObject, CrossPlatform, function(enemy,pltfrm){       //collision enemy + CrossPlatform tiles
-        //     // console.log(pltfrm);
-        //     //console.log(enemy.data.list.CounterMove);
+        this.physics.add.overlap(hittableObject, CrossPlatform, function(enemy, pltfrm){     // collision entre attaque et boites 
+            pltfrm.faceLeft = false;
+            pltfrm.faceRight = false;
+            pltfrm.faceBottom = false;
+            pltfrm.faceUp = true;
+        });
+        
+        this.physics.add.collider(hittableObject, CrossPlatform, function(enemy,pltfrm){       //collision enemy + CrossPlatform tiles
+            // console.log(pltfrm);
+            //console.log(enemy.setData('stopMove',true));
            
-        //     if(enemy.data.list.CounterMove === 1){
+            if(enemy.data.list.CounterMove === 1){
                
-        //         //console.log(enemy.data.list.randomValue = 0);
+                //console.log(enemy.data.list.randomValue = 0);
                 
-        //     };
-
-        //     pltfrm.faceLeft = false;
-        //     pltfrm.faceRight = false;
-        //     pltfrm.faceBottom = false;
-        //     pltfrm.faceUp = true;
-        // })
+            };
+        })
         this.physics.add.collider(hittableObject, newPlatform, function(htblobjct, Platform){})   //collision Enemy + platform 
 
         // this.physics.add.overlap(hittableObject, newPlatform, function(htblobjct, Platform){      //overlap Enemy + platform
@@ -969,7 +972,7 @@ function update(time, delta){
                 // }
             // })
 
-            this.physics.add.collider(currentEnemy, CrossPlatform, stopEnemies,null,this)
+            // this.physics.add.collider(currentEnemy, CrossPlatform, stopEnemies,null,this)
 
             // this.physics.add.collider(currentEnemy, CrossPlatform, function(enemy,pltfrm){       //collision enemy + CrossPlatform tiles
             //     //console.log('yéyo');
@@ -989,11 +992,13 @@ function update(time, delta){
 
             if(currentEnemy.data.list.stopMove === false){
                 if(Phaser.Math.Distance.BetweenPoints(currentEnemy,player) >= 200 &&                        // walk enemies
-                currentEnemy.data.list.AttackIsFinish === true &&
-                currentEnemy.data.list.stopMove === false){
+                currentEnemy.data.list.AttackIsFinish === true){
                     currentEnemy.data.list.CounterMove = 1; 
                     currentEnemy.data.list.EnemyIsAttack = true; 
                 }
+            }else{
+                currentEnemy.data.list.CounterMove = 0; 
+                console.log('eh beh');
             }
 
             if(Phaser.Math.Distance.BetweenPoints(currentEnemy,player) < 300 &&                         // attack CrossBow
@@ -1903,11 +1908,12 @@ function collisionAtkEnemies(htblObjct,atk){
     //console.log('kikou');
 }
 
-function stopEnemies(enemy){
-    enemy.data.list.stopMove = true
-    enemy.data.list.CounterMove = 0;
-    console.log('kikoou' + enemy.data.list.CounterMove);
-}
+// function stopEnemies(enemy){
+//     enemy.data.list.stopMove = true
+//     // enemy.data.list.CounterMove = 74;
+//     console.log('kikoou' + enemy.data.list.CounterMove);
+//     console.log(enemy.data.list);
+// }
 
 
 
