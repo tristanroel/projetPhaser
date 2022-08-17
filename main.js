@@ -77,6 +77,7 @@ var Coin;  //pieces
 var Arrow;
 var text;  // info command list
 var Score = 0; // Score
+var personalBestText;
 var scoreText;
 var healthBar; 
 
@@ -89,6 +90,9 @@ var countTest = 0;
 
 
 var currentEnemy;
+
+var personalBest = localStorage.getItem('score');                                               //best score in localStorage
+var GameOver = false;
 
 function preload(){
     this.load.image('sky','assets/Thesky.png');
@@ -153,6 +157,7 @@ function create(){
     const map = this.make.tilemap({ key : 'tiles'})                                                    // TILED level
     const tileset = map.addTilesetImage('map','forest');
 
+    const ResetTile = map.createLayer('Reset', tileset, -200, 0)
     const DieTile = map.createLayer('DieTiles', tileset, -200, 0)
     const Spawner = map.createLayer('Spawners', tileset, -200, 0)
     const BackGround = map.createLayer('Fond', tileset, -200, 0)
@@ -160,11 +165,13 @@ function create(){
     CrossPlatform = map.createLayer('CrossGround', tileset, -200, 0)
     const Decor = map.createLayer('Decors', tileset, -200, 0)
     
+    ResetTile.setCollisionByProperty({collides : true})
     DieTile.setCollisionByProperty({collides : true})
     Spawner.setCollisionByProperty({collides : true})
     newPlatform.setCollisionByProperty({collides : true})
     CrossPlatform.setCollisionByProperty({collides : true})
 
+    ResetTile.setScale(2);
     DieTile.setScale(2);
     Spawner.setScale(2);
     Spawner.setVisible(false)
@@ -196,6 +203,8 @@ function create(){
 
     
     healthBar = this.add.rectangle(0,0,100,10,0xB14F37).setStrokeStyle(2, 0xFFFFFF); //healthbar
+    healthBar.setDepth(2);
+
     
     Coin = this.physics.add.group({                                                 // Coin
         //key :'piecette',
@@ -263,10 +272,12 @@ function create(){
 
     // TEXT
 
-    text = this.add.text(0,0, ' << CONTROL >> \n LEFT = press "Q"\n RIGHT = press "D"\n JUMP  = press "Z"\n ATTACK = press "J"\n GUARD = press "I" \n GAMEPAD : disconected\n version : O.13 | 6.08.22' , {fontFamily : 'PixelFont'}); 
-    scoreText = this.add.text(0,0, 'SCORE : 0',{ fontFamily : 'PixelFont', color : '#353535'})
+    text = this.add.text(0,0, ' << CONTROL >> \n LEFT = press "Q"\n RIGHT = press "D"\n JUMP  = press "Z"\n ATTACK = press "J"\n GUARD = press "I" \n GAMEPAD : disconected\n version : O.14 | 16.08.22' , {fontFamily : 'PixelFont'}); 
+    personalBestText = this.add.text(0,0,'YOUR BEST : 0',{ fontFamily : 'PixelFont'})
+    scoreText = this.add.text(0,0, 'SCORE : 0',{ fontFamily : 'PixelFont'})
     text.setDepth(2);
     scoreText.setDepth(2);
+    personalBestText.setDepth(2);
     //text.setFontSize(text.fontSize - 2)
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     
@@ -356,6 +367,17 @@ function create(){
             playerInGround = true;
         })
 
+        this.physics.add.collider(ResetTile, player, function(theplayer, reset){   // collision reset et joueur 
+            console.log(hittableObject.children.entries.length = 0);
+            console.log(reset);
+
+            reset.collideDown = false
+            reset.collideLeft = false
+            reset.collideRight = false
+            reset.collideUp = false
+
+        });
+
         this.physics.add.collider(Spawner, spawnDetector, function(detector, spawn){    // spawn collider
             
             // console.log(spawn.pixelX);
@@ -365,7 +387,7 @@ function create(){
 
             spawnCounter ++;
 
-            detector.body.position.x = player.body.position.x +800
+            detector.body.position.x = player.body.position.x +600
             detector.body.position.y = player.body.position.y -140
 
             console.log(spawnCounter);
@@ -839,6 +861,8 @@ function create(){
     // for(var i = 0;i < 2; i++){
     //     setTimeout(()=>{createEnemies(enemySpawn,'box');},9000 + (i * 7000))
     // }
+
+    console.log(localStorage);
     
 }
 
@@ -854,7 +878,7 @@ function create(){
 
 function update(time, delta){
 
-
+// if(GameOver === false){
     //BACKGROUND AND TEXT
     skyBg.x = player.body.position.x;                                                               // position du ciel
     skyBg.y = player.body.position.y;                                                               // position du ciel
@@ -865,8 +889,11 @@ function update(time, delta){
     healthBar.y = player.body.position.y - 140;
     healthBar.width = player.data.list.health * 10;
     scoreText.x = player.body.position.x + 260;                                                     // position Score
-    scoreText.y = player.body.position.y -150;
+    personalBestText.x = player.body.position.x + 60;                                                     // position Score
+    scoreText.y = player.body.position.y -160;
+    personalBestText.y = player.body.position.y -160;
     scoreText.setText('SCORE : '+ Score);                                                           // maj score
+    personalBestText.setText('YOUR BEST : '+ personalBest);                                               // maj score
     spawnDetector.body.velocity.x = player.body.velocity.x ;
     spawnDetector.body.velocity.y = player.body.velocity.y ;
     // spawnReActivator.body.velocity.x = player.body.velocity.x ;
@@ -1137,7 +1164,13 @@ function update(time, delta){
     if(player.data.list.health <= 0){                                                              //Player Die
         counterMovePlayer = 999;
         player.data.list.health = 0;
-        // this.anims.pauseAll();
+        player.on('animationcomplete', ()=>{
+            this.anims.pauseAll();
+            GameOver = true;
+            if(Score > personalBest){
+                localStorage.setItem('score', Score)
+            }
+        });
     }
     // CONTROL PLAYER
 
@@ -1212,7 +1245,8 @@ function update(time, delta){
             if(counterMovePlayer === 1 && playerInGround === true){attackComboOne();}
             else if (counterMovePlayer >= 2 && playerInGround === true){attackComboTwo();}
             else if(counterMovePlayer === 1 && playerInGround === false){attackJump();}
-        }    
+        }  
+// }  
 }
 
 //FUNCTIONS
@@ -1474,9 +1508,6 @@ function KnockBack(){                                                           
             }
             if(player.anims.currentFrame.index >=18){
                 player.setGravityX(0)
-                if(player.body.velocity === 0){
-                    //player.body.destroy();
-                }
             }
         }
     });
@@ -1593,25 +1624,27 @@ function enemyStand(enmy1){                                                     
 
 function enemyWalkFront(enemy1,target,game){                                                            // enemy Walk
 enemy1.setBounce(0, 0)
-if(enemy1.data.list.type != 'box'){
-    var animsName = 'walk'+enemy1.data.list.type;
+    if(enemy1.data.list.type != 'box'){
+        var animsName = 'walk'+enemy1.data.list.type;
 
-    enemy1.anims.play(animsName, true)
+        enemy1.anims.play(animsName, true)
 
-    enemy1.on('animationupdate', ()=>{
-        if(animsName === enemy1.anims.currentAnim.key){
-            game.physics.moveToObject(enemy1, target, enemy1.data.list.randomValue);
-            enemy1.setVelocityY(300);
-            if(enemy1.body.velocity.x != 0){    //flip enemy
-                if(enemy1.body.velocity.x < 0){
-                    enemy1.flipX = false;
-                }else{enemy1.flipX = true;}
-            }
+        if(GameOver === false){
+            enemy1.on('animationupdate', ()=>{
+                if(animsName === enemy1.anims.currentAnim.key){
+                        game.physics.moveToObject(enemy1, target, enemy1.data.list.randomValue);
+                        enemy1.setVelocityY(300);
+                        if(enemy1.body.velocity.x != 0){    //flip enemy
+                            if(enemy1.body.velocity.x < 0){
+                                enemy1.flipX = false;
+                            }else{enemy1.flipX = true;}
+                        }
+                    }
+                })
+        }else{
+            game.physics.moveToObject(enemy1, target, 0);
         }
-    })
-}else{}    
-    
-
+    }else{}    
 }
 
 function enemyWalkBack(enemy1,target,game){                                                             // enemy walkBack
