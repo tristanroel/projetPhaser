@@ -79,6 +79,7 @@ var text;  // info command list
 var Score = 0; // Score
 var personalBestText;
 var scoreText;
+var gameOverText;
 var healthBar; 
 
 var spawnDetector;
@@ -275,6 +276,8 @@ function create(){
     text = this.add.text(0,0, ' << CONTROL >> \n LEFT = press "Q"\n RIGHT = press "D"\n JUMP  = press "Z"\n ATTACK = press "J"\n GUARD = press "I" \n GAMEPAD : disconected\n version : O.15 | 17.08.22' , {fontFamily : 'PixelFont'}); 
     personalBestText = this.add.text(0,0,'YOUR BEST : 0',{ fontFamily : 'PixelFont'})
     scoreText = this.add.text(0,0, 'SCORE : 0',{ fontFamily : 'PixelFont'})
+    gameOverText = this.add.text(0,0, 'GAME OVER \n score : 0 \n press any to restart', { fontFamily : 'PixelFont', fontSize : '60px', color : '#FFF05B'});
+    gameOverText.setDepth(-2);
     text.setDepth(2);
     scoreText.setDepth(2);
     personalBestText.setDepth(2);
@@ -479,13 +482,13 @@ function create(){
 
         this.physics.add.collider(DieTile, hittableObject, function(enemy, die){
             enemy.data.list.health = 0;
-            console.log(enemy);
+            //console.log(enemy);
         });
 
         this.physics.add.collider(DieTile, player, function(plyr, die){
             plyr.data.list.health = 0;
             counterMovePlayer = 28;
-            console.log(plyr);
+            //console.log(plyr);
         });
         
     
@@ -862,7 +865,18 @@ function create(){
     //     setTimeout(()=>{createEnemies(enemySpawn,'box');},9000 + (i * 7000))
     // }
 
-    console.log(localStorage);
+    //console.log(localStorage);
+
+
+    // if(GameOver === true){
+        // setTimeout(()=>{
+        //     this.registry.destroy(); // destroy registry
+        //     this.events.off(); // disable all active events
+        //     this.scene.restart(); // restart current scene
+        //     spawnCounter = 0;
+        //     Score = 0;
+        // },9000)
+    // }
     
 }
 
@@ -893,7 +907,10 @@ function update(time, delta){
     scoreText.y = player.body.position.y -160;
     personalBestText.y = player.body.position.y -160;
     scoreText.setText('SCORE : '+ Score);                                                           // maj score
+    gameOverText.setText('   GAME OVER \n   score : '+ Score + '\npress "J" to restart');                                                           // maj score
     personalBestText.setText('YOUR BEST : '+ personalBest);                                               // maj score
+    gameOverText.x = player.body.position.x - 260
+    gameOverText.y = player.body.position.y
     spawnDetector.body.velocity.x = player.body.velocity.x ;
     spawnDetector.body.velocity.y = player.body.velocity.y ;
     // spawnReActivator.body.velocity.x = player.body.velocity.x ;
@@ -1153,7 +1170,7 @@ function update(time, delta){
     //console.log(this.input.gamepad.gamepads.length);
     //if(player.flipX === true && player.body.velocity.x === 0){console.log('flip');}
     //console.log(player.body.velocity.y);
-    
+    console.log(touchesAttack._justDown);
 
     if(counterMovePlayer === 28){
         KnockBack()
@@ -1161,16 +1178,34 @@ function update(time, delta){
     if(counterMovePlayer === 14){
         GuardKnockBack()
     }
-    if(player.data.list.health <= 0){                                                              //Player Die
+    if(player.data.list.health <= 0){                                                              //Player Die 
+
         counterMovePlayer = 999;
         player.data.list.health = 0;
-        player.on('animationcomplete', ()=>{
+
+        player.on('animationcomplete', ()=>{                                                        // GAME OVER
             this.anims.pauseAll();
             GameOver = true;
             if(Score > personalBest){
                 localStorage.setItem('score', Score)
             }
+            gameOverText.setDepth(3);
         });
+        setTimeout(()=>{
+            if(touchesAttack._justDown === true && GameOver === true){                                                   // Restart Game
+                this.registry.destroy(); //destroy registry
+                this.events.off(); // disable all active events
+                this.scene.start(); // restart current scene
+                spawnCounter = 0;
+                Score = 0;
+                GameOver = false;
+                this.anims.resumeAll();
+                counterMovePlayer = 0;
+            }
+        },5000)
+        
+        // if(Phaser.Input.Keyboard.JustDown(touchesAttack) || gamepadAttack === true){
+            
     }
     // CONTROL PLAYER
 
