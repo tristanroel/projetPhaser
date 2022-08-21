@@ -31,6 +31,9 @@ var configuration = {
                     gravity : {y : 1000},
                 }
     },
+    audio: {
+        disableWebAudio: true
+    }
 }
 
 var game = new Phaser.Game(configuration);
@@ -81,6 +84,7 @@ var personalBestText;
 var scoreText;
 var gameOverText;
 var healthBar; 
+var specialBar;
 
 var spawnDetector;
 var spawnReActivator;
@@ -96,6 +100,10 @@ var personalBest = localStorage.getItem('score');                               
 var GameOver = false;
 
 function preload(){
+    this.load.audio('theme', [
+        'assets/audio/gamesong.wav'
+    ]);
+
     this.load.image('sky','assets/Thesky.png');
     this.load.image('ground','assets/solPave.png');
     this.load.image('ATK1','assets/TRlogo.png');
@@ -117,6 +125,7 @@ function preload(){
     this.load.spritesheet('heroProtectGuard', 'assets/Sprites/Playerkbtest.png',{frameWidth: 170, frameHeight: 170});
     this.load.spritesheet('heroKnockBack', 'assets/Sprites/KnockBack.png',{frameWidth: 170, frameHeight: 170});
     this.load.spritesheet('shoryu', 'assets/Sprites/shoryu.png',{frameWidth: 170, frameHeight: 170});
+    this.load.spritesheet('ultimate', 'assets/Sprites/SuperAttack.png',{frameWidth: 170, frameHeight: 170});
     this.load.spritesheet('pushBox', 'assets/Sprites/pousse.png',{frameWidth: 170, frameHeight: 170});
     //this.load.spritesheet('carreau', 'assets/carreau.png',{frameWidth: 20, frameHeight: 4});
 
@@ -146,7 +155,11 @@ function create(){
 
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    
+    /// SONG
+    var themeSong = this.sound.add('theme');
+    themeSong.loop = true ;
+    themeSong.play();
+
    /// OBJECT
 
     skyBg = this.add.tileSprite(0, 0, 404, 482, 'sky').setScale(2); //image ciel
@@ -175,11 +188,11 @@ function create(){
     ResetTile.setScale(2);
     DieTile.setScale(2);
     Spawner.setScale(2);
-    Spawner.setVisible(false)
+    Spawner.setVisible(false);
     BackGround.setScale(2);
     newPlatform.setScale(2);
     CrossPlatform.setScale(2);
-    Decor.setScale(2)
+    Decor.setScale(2);
     Decor.setDepth(1);
 
     Spawner.setData('Activate', false);
@@ -187,13 +200,11 @@ function create(){
 
     // console.log(CrossPlatform);
 
-
     ////////////////////////////////////////////////////////////////////
 
     // var sol1 = this.add.sprite(300, 400, 'ground');//image sol
     // var sol2 = this.add.sprite(511, 550, 'ground');//image sol
     // var sol3 = this.add.sprite(900, 600, 'ground');//image sol
-
 
     enemy1Spawn = this.add.image(1000, 1100, 'spawner').setVisible(false);         //spawn enemy
     enemyCrossBowSpawn = this.add.image(700, 300, 'spawner').setVisible(false);  //spawn enemy
@@ -205,6 +216,9 @@ function create(){
     
     healthBar = this.add.rectangle(0,0,100,10,0xB14F37).setStrokeStyle(2, 0xFFFFFF); //healthbar
     healthBar.setDepth(2);
+
+    specialBar = this.add.rectangle(0,0,100,10,0xFFDF5B).setStrokeStyle(2, 0xFFFFFF); //healthbar
+    specialBar.setDepth(2);
 
     
     Coin = this.physics.add.group({                                                 // Coin
@@ -234,8 +248,11 @@ function create(){
     player = this.physics.add.sprite(600, 1150,'hero').setScale(2);                  // player
     player.body.setSize(25, 58)                                         
     player.setData('health', 10)
-    player.setData('Guard', false)
-    player.setData('Eject', false)
+    player.setData('special', 10)
+    player.setData('Guard', false);
+    // player.setData('Atk2', false);
+    // player.setData('Expulse', false);
+    player.setData('Eject', 0);
     player.body.checkCollision.up = false;
     //console.log(player.body);
 
@@ -249,7 +266,7 @@ function create(){
     //     setXY : {x : 1199, y :1199}
     // })
 
-    colideATK = this.add.rectangle(0,0,50,50,0xB14F37)                         // collision attack final
+    colideATK = this.add.rectangle(0,0,100,100,0xB14F37)                         // collision attack final
     this.physics.add.existing(colideATK);
     colideATK.setVisible(false)
     colideATK.body.allowGravity = false;
@@ -281,7 +298,7 @@ function create(){
     text.setDepth(2);
     scoreText.setDepth(2);
     personalBestText.setDepth(2);
-    //text.setFontSize(text.fontSize - 2)
+    //text.setFontSize(text.fontSize - 2);
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     
     // CAMERA
@@ -350,6 +367,7 @@ function create(){
         this.physics.add.collider(Coin, newPlatform)
 
         this.physics.add.collider(player, newPlatform, function(plyr,pltfrm){       //collision player + platform tiles
+           // playerCanFall = true;
             if(pltfrm.faceLeft && plyr.body.velocity.y != 0|| 
                 pltfrm.faceRight && plyr.body.velocity.y != 0){
                     playerInGround = false;
@@ -371,8 +389,8 @@ function create(){
         })
 
         this.physics.add.collider(ResetTile, player, function(theplayer, reset){   // collision reset et joueur 
-            console.log(hittableObject.children.entries.length = 0);
-            console.log(reset);
+            hittableObject.children.entries.length = 0
+            //console.log(reset);
 
             reset.collideDown = false
             reset.collideLeft = false
@@ -434,8 +452,6 @@ function create(){
         //     CrossPlatform.displayList.list[i].faceBottom = false;
         //     console.log('fdp');
         // }
-
-
 
         // this.physics.add.overlap(colideATK2, box, function(colAtk2, boite){     // collision entre attaque et boites 
         //     boite.data.list.pv = boite.data.list.pv - 1;
@@ -506,10 +522,20 @@ function create(){
     var tornadoSlashLeft = this.input.keyboard.createCombo([83, 68, 74], {resetOnMatch:true, maxKeyDelay:700}); //300ms pour taper le combo, sinon se reinitialise
     var tornadoSlashRight = this.input.keyboard.createCombo([83, 81, 74], {resetOnMatch:true, maxKeyDelay:700}); 
 
+    var UltraSlashLeft = this.input.keyboard.createCombo([81, 68, 74], {resetOnMatch:true, maxKeyDelay:700}); //300ms pour taper le combo, sinon se reinitialise
+    var UltraSlashRight = this.input.keyboard.createCombo([68, 81, 74], {resetOnMatch:true, maxKeyDelay:700}); 
+
     this.input.keyboard.on('keycombomatch', function(combo){ //verification du secialAtk entré
-        if((combo === tornadoSlashLeft || tornadoSlashRight )&& playerInGround === true && counterMovePlayer === 0){
-            counterMovePlayer = 32;
-            tornadoSlash();
+        console.log(combo);
+        if(playerInGround === true && counterMovePlayer === 0){
+            if(combo.keyCodes[0] === 83){
+                counterMovePlayer = 32;
+                tornadoSlash();
+            }
+            if(combo.keyCodes[0] === 68 || combo.keyCodes[0] === 81 ){
+                counterMovePlayer = 33;
+                UltraSlash();
+            }
         }
     }) 
     //////////////////////////////////////////////////////////////////////////////////////////////////
@@ -629,6 +655,11 @@ function create(){
         frames: this.anims.generateFrameNumbers('shoryu',{frames: [0, 2, 3, 4, 5, 6, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7]}),
         frameRate: 12,
         repeat : -1,
+    });
+    this.anims.create({
+        key: 'ultra',
+        frames: this.anims.generateFrameNumbers('ultimate',{frames: [1, 2, 3, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 59, 59, 59, 59]}),
+        frameRate: 15,
     });
     this.anims.create({
         key: 'pushBox',
@@ -755,7 +786,7 @@ function create(){
     this.anims.create({
         key: 'knockbackEnemy1',
         frames: this.anims.generateFrameNumbers('theEnemy',{frames : [ 10, 11, 11, 11, 11, 11, 11, 11, 0]}),
-        frameRate: 35,
+        frameRate: 9,
     });
     this.anims.create({
         key: 'knockbackCrossBow',
@@ -820,6 +851,26 @@ function create(){
     this.anims.create({
         key: 'ejectSpearMan',
         frames: this.anims.generateFrameNumbers('theEnemySpearMan',{frames : [11, 11, 11, 11, 11, 11, 12, 12, 12, 12, 12, 12, 13, 13, 13, 13, 13, 13, 13, 13]}),
+        frameRate: 8,
+    })
+    this.anims.create({
+        key: 'expulseEnemy1',
+        frames: this.anims.generateFrameNumbers('theEnemy',{frames : [15 ,16, 16,16, 16,16, 16, 15, 15]}),
+        frameRate: 8,
+    })
+    this.anims.create({
+        key: 'expulseCrossBow',
+        frames: this.anims.generateFrameNumbers('theEnemyCrossBow',{frames : [20, 21, 21, 21, 21, 21, 21, 20, 20]}),
+        frameRate: 8,
+    })
+    this.anims.create({
+        key: 'expulsePoleAxe',
+        frames: this.anims.generateFrameNumbers('theEnemyPoleAxe',{frames : [20, 21, 21, 21, 21, 21, 21, 20, 20]}),
+        frameRate: 8,
+    })
+    this.anims.create({
+        key: 'expulseSpearMan',
+        frames: this.anims.generateFrameNumbers('theEnemySpearMan',{frames : [14, 15, 15, 15, 15, 15, 15, 14, 14]}),
         frameRate: 8,
     })
 
@@ -894,6 +945,7 @@ function update(time, delta){
 
 // if(GameOver === false){
     //BACKGROUND AND TEXT
+    
     skyBg.x = player.body.position.x;                                                               // position du ciel
     skyBg.y = player.body.position.y;                                                               // position du ciel
     skyBg.tilePositionX += 0.5;
@@ -901,11 +953,16 @@ function update(time, delta){
     text.y = player.body.position.y + 120;
     healthBar.x = player.body.position.x - 270;                                                     // position healthbar
     healthBar.y = player.body.position.y - 140;
-    healthBar.width = player.data.list.health * 10;
+    specialBar.x = player.body.position.x - 270;                                                     // position healthbar
+    specialBar.y = player.body.position.y - 120;
     scoreText.x = player.body.position.x + 260;                                                     // position Score
     personalBestText.x = player.body.position.x + 60;                                                     // position Score
     scoreText.y = player.body.position.y -160;
     personalBestText.y = player.body.position.y -160;
+
+    healthBar.width = player.data.list.health * 10;
+    specialBar.width = player.data.list.special * 10;
+
     scoreText.setText('SCORE : '+ Score);                                                           // maj score
     gameOverText.setText('   GAME OVER \n   score : '+ Score + '\npress "J" to restart');                                                           // maj score
     personalBestText.setText('YOUR BEST : '+ personalBest);                                               // maj score
@@ -1151,7 +1208,7 @@ function update(time, delta){
     //console.log(box.children.entries);
     //console.log(playerInGround);
     //console.log(-26 * 6);
-    //console.log( player.data.list.Eject);
+    //console.log(player.data.list.Eject);
     //console.log(hittableObject.children.entries);
     //console.log(hittableObject.children.entries[0].data.list.CounterMove);
     //console.log(currentEnemy);
@@ -1170,7 +1227,7 @@ function update(time, delta){
     //console.log(this.input.gamepad.gamepads.length);
     //if(player.flipX === true && player.body.velocity.x === 0){console.log('flip');}
     //console.log(player.body.velocity.y);
-    console.log(touchesAttack._justDown);
+    //console.log(touchesAttack._justDown);
 
     if(counterMovePlayer === 28){
         KnockBack()
@@ -1192,7 +1249,7 @@ function update(time, delta){
             gameOverText.setDepth(3);
         });
         setTimeout(()=>{
-            if(touchesAttack._justDown === true && GameOver === true){                                                   // Restart Game
+            if(touchesAttack._justDown === true  && GameOver === true){                                                   // Restart Game
                 this.registry.destroy(); //destroy registry
                 this.events.off(); // disable all active events
                 this.scene.start(); // restart current scene
@@ -1201,6 +1258,8 @@ function update(time, delta){
                 GameOver = false;
                 this.anims.resumeAll();
                 counterMovePlayer = 0;
+                console.log(gamePadCombo.includes);
+                
             }
         },5000)
         
@@ -1217,7 +1276,16 @@ function update(time, delta){
                     //console.log('tornadoSash');
                     gamePadCombo = [];
                 }
-            }else{
+            }
+            else if(counterMovePlayer === 0 && gamePadCombo.includes("GDA") || gamePadCombo.includes("DGA")){
+                if(playerInGround === true){
+                    console.log('ultra');
+                    counterMovePlayer = 33;
+                    UltraSlash();
+                    gamePadCombo = [];
+                }
+            }
+            else{
                 gamePadCombo = [];
             }
     }
@@ -1244,6 +1312,7 @@ function update(time, delta){
                     player.setGravityY(0);
                     player.body.checkCollision.right = true;
                     player.body.checkCollision.left = true;
+                    playerCanFall = true;
                 }
             }
 
@@ -1274,7 +1343,7 @@ function update(time, delta){
         }else if(touchesGuard.isUp && playerInGround === true && counterMovePlayer != 14){
              player.data.list.Guard = false}
         
-        if(Phaser.Input.Keyboard.JustDown(touchesAttack) || gamepadAttack === true){                    //attack                                            //attack
+        if(Phaser.Input.Keyboard.JustDown(touchesAttack) || gamepadAttack === true){                            //attack                                            //attack
             gamepadAttack = false;
             counterMovePlayer++;
             if(counterMovePlayer === 1 && playerInGround === true){attackComboOne();}
@@ -1286,7 +1355,7 @@ function update(time, delta){
 
 //FUNCTIONS
 
-function attackComboOne(){                                                                              // attack one
+function attackComboOne(){                                                                                      // attack one
         attackinground = true;
         var nameAttack = 'attackOne'
         player.anims.play(nameAttack, true);
@@ -1298,8 +1367,8 @@ function attackComboOne(){                                                      
                     if(4 === player.anims.currentFrame.index){
                             // if(playerFlip === true){colAtk2.setX(player.x -80);colAtk2.setY(player.y);}
                             // if(playerFlip === false){colAtk2.setX(player.x +80);colAtk2.setY(player.y)}      
-                            if(playerFlip === true){colideATK.setX(player.x -75);colideATK.setY(player.y);}
-                            if(playerFlip === false){colideATK.setX(player.x +75);colideATK.setY(player.y)}    
+                            if(playerFlip === true){colideATK.setX(player.x -50);colideATK.setY(player.y);}
+                            if(playerFlip === false){colideATK.setX(player.x +50);colideATK.setY(player.y)}    
                     };
                     if(player.anims.currentFrame.index >= 5){
                         colideATK.setX(0)
@@ -1333,14 +1402,16 @@ if(player.anims.currentAnim.key === 'attackOne'){
             if(player.anims.currentFrame.index <= 3){
             }
             if(player.anims.currentFrame.index === 4){
-                if(playerFlip === true){colideATK.setX(player.x -75);colideATK.setY(player.y)}
-                if(playerFlip === false){colideATK.setX(player.x +75);colideATK.setY(player.y)}
+                player.data.list.Eject = 2;
+                if(playerFlip === true){colideATK.setX(player.x -50);colideATK.setY(player.y)}
+                if(playerFlip === false){colideATK.setX(player.x +50);colideATK.setY(player.y)}
             }
             if(player.anims.currentFrame.index >= 5){
                 colideATK.setX(0)
-                // colAtk2.destroy()
+                // player.data.list.Eject = 0;
             }
             if(12 === player.anims.currentFrame.index){//reset counterMove : 0
+                player.data.list.Eject = 0;
                 counterMovePlayer = 0;
                 countTest = 0;
                 //colideATK.body.enable = true;
@@ -1442,21 +1513,21 @@ function tornadoSlash(){                                                        
 
             if(player.anims.currentFrame.index === 2 ){
                 //player.anims.stop()
-                if(playerFlip === true){colideATK.setX(player.x -84);colideATK.setY(player.y +10)}
-                if(playerFlip === false){colideATK.setX(player.x +84);colideATK.setY(player.y +10)} 
+                if(playerFlip === true){colideATK.setX(player.x -50);colideATK.setY(player.y +10)}
+                if(playerFlip === false){colideATK.setX(player.x +50);colideATK.setY(player.y +10)} 
             }
             if(player.anims.currentFrame.index >= 3 ){
-                player.data.list.Eject = false;
+                player.data.list.Eject = 0;
                 colideATK.setX(0);
                 //colideATK.body.enable = true;
                 
             }
             if(player.anims.currentFrame.index === 4 ){
                 player.setGravityY(0);
-                player.data.list.Eject = true;
+                player.data.list.Eject = 1;
                 //player.anims.stop()
-                if(playerFlip === true){colideATK.setX(player.x -78);colideATK.setY(player.y -32)}
-                if(playerFlip === false){colideATK.setX(player.x +78);colideATK.setY(player.y -32)} 
+                if(playerFlip === true){colideATK.setX(player.x -60);colideATK.setY(player.y -32)}
+                if(playerFlip === false){colideATK.setX(player.x +60);colideATK.setY(player.y -32)} 
             }
 
             if(player.anims.currentFrame.index === 5 ){
@@ -1468,7 +1539,7 @@ function tornadoSlash(){                                                        
       
                 //player.anims.stop()
                 colideATK.setY(player.y -120)
-                player.data.list.Eject = true;
+                player.data.list.Eject = 1;
                 if(playerFlip === true){colideATK.setX(player.x -30);}
                 if(playerFlip === false){colideATK.setX(player.x +30);} 
             }
@@ -1484,7 +1555,7 @@ function tornadoSlash(){                                                        
             }
 
             if(player.anims.currentFrame.index >= 16){
-                player.data.list.Eject = false;
+                player.data.list.Eject = 0;
 
                 if(player.body.velocity.y != 0){
                     playerCanFall = false
@@ -1499,8 +1570,117 @@ function tornadoSlash(){                                                        
     });
 }
 
+function UltraSlash(){
+    console.log('ultra');
+    player.anims.play('ultra', true);
+    var nameAttack = 'ultra';
+
+    player.on('animationupdate', ()=>{
+
+        if(nameAttack === player.anims.currentAnim.key){
+            if(player.anims.currentFrame.index >= 3 && player.anims.currentFrame.index <= 4 ){
+                player.data.list.Eject = 2;
+                if(playerFlip === true){
+                player.setVelocityX(-playerVelocityX * 6)
+                colideATK.setX(player.x -50);colideATK.setY(player.y +10)
+                }
+                if(playerFlip === false){
+                    player.setVelocityX(playerVelocityX * 6)
+                    colideATK.setX(player.x +50);colideATK.setY(player.y +10)
+                } 
+            }
+            if(player.anims.currentFrame.index < 61 ){
+                player.setGravityY(-1000);
+                if(playerFlip === true){player.setVelocityX(-playerVelocityX + 10)}
+                if(playerFlip === false){player.setVelocityX(playerVelocityX + 10)} 
+            }
+            if(player.anims.currentFrame.index === 5 ){
+                //player.anims.stop()
+                player.data.list.Eject = 0;
+                if(playerFlip === true){colideATK.setX(player.x -75);colideATK.setY(player.y +10)}
+                if(playerFlip === false){colideATK.setX(player.x +75);colideATK.setY(player.y +10)} 
+            }
+            if(player.anims.currentFrame.index === 6){
+                player.data.list.Eject = 2;
+                //player.anims.stop()
+                if(playerFlip === true){colideATK.setX(player.x -60);colideATK.setY(player.y +10)}
+                if(playerFlip === false){colideATK.setX(player.x +60);colideATK.setY(player.y +10)} 
+            }
+            if(player.anims.currentFrame.index === 10){
+                player.data.list.Eject = 0;
+                if(playerFlip === true){colideATK.setX(player.x -75);colideATK.setY(player.y +10)}
+                if(playerFlip === false){colideATK.setX(player.x +75);colideATK.setY(player.y +10)} 
+            }
+            if(player.anims.currentFrame.index === 13){
+                player.data.list.Eject = 2;
+                if(playerFlip === true){colideATK.setX(player.x -60);colideATK.setY(player.y +10)}
+                if(playerFlip === false){colideATK.setX(player.x +60);colideATK.setY(player.y +10)} 
+            }
+            if(player.anims.currentFrame.index === 16){
+                player.data.list.Eject = 0;
+                if(playerFlip === true){colideATK.setX(player.x -75);colideATK.setY(player.y +10)}
+                if(playerFlip === false){colideATK.setX(player.x +75);colideATK.setY(player.y +10)} 
+            }
+            if(player.anims.currentFrame.index === 18){
+                player.data.list.Eject = 2;
+                if(playerFlip === true){colideATK.setX(player.x -60);colideATK.setY(player.y +10)}
+                if(playerFlip === false){colideATK.setX(player.x +60);colideATK.setY(player.y +10)} 
+            }
+            if(player.anims.currentFrame.index === 21){
+                player.data.list.Eject = 0;
+                if(playerFlip === true){colideATK.setX(player.x -75);colideATK.setY(player.y +10)}
+                if(playerFlip === false){colideATK.setX(player.x +75);colideATK.setY(player.y +10)} 
+            }
+            if(player.anims.currentFrame.index === 24){
+                player.data.list.Eject = 2;
+                if(playerFlip === true){colideATK.setX(player.x -70);colideATK.setY(player.y +10)}
+                if(playerFlip === false){colideATK.setX(player.x +70);colideATK.setY(player.y +10)} 
+            }
+            if(player.anims.currentFrame.index === 26){
+                player.data.list.Eject = 0;
+                if(playerFlip === true){colideATK.setX(player.x -80);colideATK.setY(player.y +10)}
+                if(playerFlip === false){colideATK.setX(player.x +80);colideATK.setY(player.y +10)} 
+            }
+            if(player.anims.currentFrame.index === 30){
+                player.data.list.Eject = 2;
+                if(playerFlip === true){colideATK.setX(player.x -70);colideATK.setY(player.y +10)}
+                if(playerFlip === false){colideATK.setX(player.x +70);colideATK.setY(player.y +10)} 
+            }
+            if(player.anims.currentFrame.index === 36){
+                player.data.list.Eject = 0;
+                if(playerFlip === true){colideATK.setX(player.x -65);colideATK.setY(player.y +10)}
+                if(playerFlip === false){colideATK.setX(player.x +65);colideATK.setY(player.y +10)} 
+            }
+            if(player.anims.currentFrame.index === 42){
+                player.data.list.Eject = 2;
+                if(playerFlip === true){colideATK.setX(player.x -80);colideATK.setY(player.y +10)}
+                if(playerFlip === false){colideATK.setX(player.x +80);colideATK.setY(player.y +10)} 
+            }
+            if(player.anims.currentFrame.index === 50){
+                player.data.list.Eject = 0;
+                if(playerFlip === true){colideATK.setX(player.x -70);colideATK.setY(player.y +10)}
+                if(playerFlip === false){colideATK.setX(player.x +70);colideATK.setY(player.y +10)} 
+            }
+            if(player.anims.currentFrame.index === 58){
+                player.data.list.Eject = 1;
+                player.setVelocityX(0);
+                if(playerFlip === true){colideATK.setX(player.x -85);colideATK.setY(player.y +10)}
+                if(playerFlip === false){colideATK.setX(player.x +85);colideATK.setY(player.y +10)} 
+            }
+            if(player.anims.currentFrame.index >= 61){
+                colideATK.setX(0);colideATK.setY(0);
+                playerCanFall = false;
+                player.setGravityY(0);
+                player.data.list.Eject = 0;
+                counterMovePlayer = 0;
+            }
+        }
+    })
+}
+
 function KnockBack(){                                                                                  // Knock Back
-    player.data.list.Eject = false;
+    player.setGravityY(0);
+    player.data.list.Eject = 0;
     playerCanFall = false
     player.anims.play('knockBack', true);
     var nameAction = 'knockBack';
@@ -1550,7 +1730,7 @@ function KnockBack(){                                                           
 
 function GuardKnockBack(){  
     player.data.list.Guard = true                                                                            // Guard
-    player.data.list.Eject = false;
+    player.data.list.Eject = 0;
     playerCanFall = false
     player.anims.play('protectGuard', true);
     var nameAction = 'protectGuard';
@@ -1737,7 +1917,7 @@ function enemyAttack(enemyone, currentArrow){
         }
         if('attackPoleAxe' === enemyone.anims.currentAnim.key){                                              //attack PoleAxe
 
-            if(enemyone.anims.currentFrame.index < 12 ){
+            if(enemyone.anims.currentFrame.index > 5 && enemyone.anims.currentFrame.index <= 12){
                 enemyone.data.list.IsInvulnerable = true
             }
             if(enemyone.anims.currentFrame.index === 12 ){
@@ -1808,8 +1988,7 @@ function createArrow(enemy){                                                    
 
 function enemyKnockBack(enmy){
 //console.log('hello');
-    if(player.data.list.Eject === false){                                                               // knock back enemy
-                                                             
+    if(player.data.list.Eject === 0){  // knock back enemy                                             
         if(enmy.data.list.type != 'box'){
 
             enmy.data.list.EnemyIsAttack = false;
@@ -1832,7 +2011,7 @@ function enemyKnockBack(enmy){
                             if(enmy.flipX === false){enmy.setVelocityX(100)}   
                         }
                         if(enmy.anims.currentFrame.index >= 5 &&
-                            player.data.list.Eject === false){ 
+                            player.data.list.Eject === 0){ 
                                 enmy.data.list.CounterMove = 0
 
                             enmy.data.list.AttackIsFinish = true
@@ -1859,7 +2038,7 @@ function enemyKnockBack(enmy){
             });
         }
 
-    }else{                                                                                                  // eject enemy
+    }else if(player.data.list.Eject === 1){                                                                                 // eject enemy
         enmy.data.list.EnemyIsAttack = false;
         var animsName2 = 'eject'+enmy.data.list.type
         enmy.anims.play(animsName2,true);
@@ -1908,7 +2087,50 @@ function enemyKnockBack(enmy){
                     }
                 }
             });
+    } else if(player.data.list.Eject === 2){
+        console.log('pede');
+        var animsName2 = 'expulse'+enmy.data.list.type
+        enmy.anims.play(animsName2,true);
+
+        enmy.data.list.CounterMove = 77;
+
+        enmy.on('animationupdate', ()=>{
+            if(animsName2 === enmy.anims.currentAnim.key){
+                if(enmy.anims.currentFrame.index <= 3){
+                    if(enmy.flipX === true){enmy.setVelocityX(-80)}
+                    if(enmy.flipX === false){enmy.setVelocityX(80)}  
+                    enmy.setVelocityY(-100)
+                }
+                if(enmy.anims.currentFrame.index >= 6){
+                    enmy.setVelocityX(0)
+                    enmy.setVelocityY(0)
+                    enmy.data.list.CounterMove = 2;
+                }
+            }
+        });
+    } else if(player.data.list.Eject === 3){
+        console.log('pede');
+        var animsName2 = 'expulse'+enmy.data.list.type
+        enmy.anims.play(animsName2,true);
+
+        enmy.data.list.CounterMove = 77;
+
+        enmy.on('animationupdate', ()=>{
+            if(animsName2 === enmy.anims.currentAnim.key){
+                if(enmy.anims.currentFrame.index <= 3){
+                    if(enmy.flipX === true){enmy.setVelocityX(-1000)}
+                    if(enmy.flipX === false){enmy.setVelocityX(1000)}  
+                    enmy.setVelocityY(-100)
+                }
+                if(enmy.anims.currentFrame.index >= 8){
+                    enmy.setVelocityX(0)
+                    enmy.setVelocityY(0)
+                    enmy.data.list.CounterMove = 2;
+                }
+            }
+        });
     }
+    
 }
 
 function enemyDie(enmyOne){
