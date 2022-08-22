@@ -1270,25 +1270,32 @@ function update(time, delta){
     if(player.data.list.special >= 6){
         player.data.list.special = 6;
     }
+    if(player.data.list.special <= 0){
+        player.data.list.special = 0;
+    }
     // CONTROL PLAYER
 
     if((theGamePad.X)){                                                                             //Gamepad Combo
-            if(counterMovePlayer === 0 && gamePadCombo.includes("BDA") || gamePadCombo.includes("BGA")){
+            if(gamePadCombo.includes("BDA") || gamePadCombo.includes("BGA")){
                 if(playerInGround === true){
-                    
+                    if(player.data.list.special >= 1){
+
                         counterMovePlayer = 32;
                         tornadoSlash();
                         //console.log('tornadoSash');
                         gamePadCombo = [];
-                  
+                    }
                 }
             }
-            else if(counterMovePlayer === 0 && gamePadCombo.includes("GDA") || gamePadCombo.includes("DGA")){
+            else if(gamePadCombo.includes("GDA") || gamePadCombo.includes("DGA")){
                 if(playerInGround === true){
-                    console.log('ultra');
-                    counterMovePlayer = 33;
-                    UltraSlash();
-                    gamePadCombo = [];
+                    if(player.data.list.special >= 3){
+                        
+                        console.log('ultra');
+                        counterMovePlayer = 33;
+                        UltraSlash();
+                        gamePadCombo = [];
+                    }
                 }
             }
             else{
@@ -1498,7 +1505,7 @@ function tornadoSlash(){                                                        
 
     var nameAttack = 'shoryuSlash';
     
-    player.data.list.special -= 1;
+    spevalue = player.data.list.special = player.data.list.special - 1;
 
     // 
     // var colAtk = colideATK2.get().setSize(60,60);
@@ -1565,6 +1572,7 @@ function tornadoSlash(){                                                        
             }
             
             if(player.anims.currentFrame.index >= 16){
+                player.data.list.special = spevalue;
                 player.data.list.Eject = 0;
                 if(player.body.velocity.y != 0){
                     playerCanFall = false
@@ -1573,7 +1581,6 @@ function tornadoSlash(){                                                        
                     playerCanFall = true;
                     counterMovePlayer = 0;
                 }
-                console.log(player.data.list.special);
                 
             }
         }
@@ -1584,12 +1591,14 @@ function UltraSlash(){
     console.log('ultra');
     player.anims.play('ultra', true);
     var nameAttack = 'ultra';
-    player.data.list.special = player.data.list.special - 3;
+
+    spevalue = player.data.list.special = player.data.list.special - 3;
 
     player.on('animationupdate', ()=>{
 
         if(nameAttack === player.anims.currentAnim.key){
             if(player.anims.currentFrame.index >= 3 && player.anims.currentFrame.index <= 4 ){
+                player.data.list.special = spevalue;
                 player.data.list.Eject = 2;
                 if(playerFlip === true){
                 player.setVelocityX(-playerVelocityX * 6)
@@ -1679,6 +1688,7 @@ function UltraSlash(){
                 if(playerFlip === false){colideATK.setX(player.x +85);colideATK.setY(player.y +10)} 
             }
             if(player.anims.currentFrame.index >= 63){
+                player.data.list.special = spevalue;
                 colideATK.setX(0);colideATK.setY(0);
                 playerCanFall = false;
                 player.setGravityY(0);
@@ -2175,7 +2185,7 @@ function collisionAtkEnemies(htblObjct,atk){
     atk.setX(0);
     atk.setY(0);
     slashAtk.setY(player.y)
-    player.data.list.special = player.data.list.special + 0.25;
+    player.data.list.special = player.data.list.special + 1;
 
     if(player.flipX === true){slashAtk.setX(player.x -100)}
     if(player.flipX === false){slashAtk.setX(player.x +100)}
