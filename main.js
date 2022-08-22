@@ -91,6 +91,7 @@ var spawnReActivator;
 var spawnCounter = 0;
 var CrossPlatform;
 
+var spebar;
 var countTest = 0;
 
 
@@ -109,6 +110,7 @@ function preload(){
     this.load.image('ATK1','assets/TRlogo.png');
     this.load.image('spawner','assets/ROELprod.png');
     this.load.image('carreau', 'assets/carreau.png');
+    this.load.image('spebar', 'assets/Spebar.png');
     
     this.load.image('forest', 'assets/levelOne/Decor2.png');
     this.load.tilemapTiledJSON('tiles', 'assets/levelOne/forest.json')
@@ -136,7 +138,6 @@ function preload(){
     this.load.spritesheet('theEnemyCrossBow', 'assets/Enemy/arbaletrier.png',{frameWidth: 170, frameHeight: 170});
     this.load.spritesheet('theEnemyPoleAxe', 'assets/Enemy/poleaxegiant.png',{frameWidth: 180, frameHeight: 170});
     this.load.spritesheet('theEnemySpearMan', 'assets/Enemy/spearman.png',{frameWidth: 190, frameHeight: 170});
-
 }
 
 /////////////////////////////////////////////////////////////////////////////////////       CREATE
@@ -156,13 +157,14 @@ function create(){
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// SONG
-    var themeSong = this.sound.add('theme');
-    themeSong.loop = true ;
-    themeSong.play();
+    // var themeSong = this.sound.add('theme');
+    // themeSong.loop = true ;
+    // themeSong.play();
 
    /// OBJECT
 
     skyBg = this.add.tileSprite(0, 0, 404, 482, 'sky').setScale(2); //image ciel
+   
 
     ////////////////////////////////////////////////////////////////////
 
@@ -214,13 +216,15 @@ function create(){
     });            //spawn enemy
 
     
-    healthBar = this.add.rectangle(0,0,100,10,0xB14F37).setStrokeStyle(2, 0xFFFFFF); //healthbar
+    healthBar = this.add.rectangle(0,0,120,10,0xB14F37).setStrokeStyle(2, 0xFFFFFF); //healthbar
     healthBar.setDepth(2);
 
-    specialBar = this.add.rectangle(0,0,100,10,0xFFDF5B).setStrokeStyle(2, 0xFFFFFF); //healthbar
+    specialBar = this.add.rectangle(0,0,120,10,0xFDCA7F);                            //specialbar
     specialBar.setDepth(2);
 
+    spebar = this.add.image(0, 0,'spebar').setScale(2).setDepth(2);
     
+
     Coin = this.physics.add.group({                                                 // Coin
         //key :'piecette',
         setXY:{x: -400, y :30},
@@ -231,9 +235,9 @@ function create(){
 
     Arrow = this.physics.add.group({allowGravity : false})                          // Arrow 
 
-    hittableObject = this.physics.add.group({immovable: true})                                       // enemy and other...
+    hittableObject = this.physics.add.group({immovable: true})                      // enemy and other...
 
-    // box = this.physics.add.group({                                                  // woodBox
+    // box = this.physics.add.group({                                               // woodBox
     //     key : 'box',
     //     name : 'woodBox',
     //     //allowGravity : false,
@@ -248,7 +252,7 @@ function create(){
     player = this.physics.add.sprite(600, 1150,'hero').setScale(2);                  // player
     player.body.setSize(25, 58)                                         
     player.setData('health', 10)
-    player.setData('special', 10)
+    player.setData('special', 6)
     player.setData('Guard', false);
     // player.setData('Atk2', false);
     // player.setData('Expulse', false);
@@ -271,7 +275,7 @@ function create(){
     colideATK.setVisible(false)
     colideATK.body.allowGravity = false;
 
-    slashAtk = this.add.sprite(0,0,'slash').setScale(2);                            // img Slash
+    slashAtk = this.add.sprite(0,0,'slash').setScale(2);                          // img Slash
     slashAtk.setDepth(1);
 
     spawnDetector = this.add.rectangle(1300,1000,50,400,0xB14F37);
@@ -290,7 +294,7 @@ function create(){
 
     // TEXT
 
-    text = this.add.text(0,0, ' << CONTROL >> \n LEFT = press "Q"\n RIGHT = press "D"\n JUMP  = press "Z"\n ATTACK = press "J"\n GUARD = press "I" \n GAMEPAD : disconected\n version : O.16 | 18.08.22' , {fontFamily : 'PixelFont'}); 
+    text = this.add.text(0,0, ' << CONTROL >> \n LEFT = press "Q"\n RIGHT = press "D"\n JUMP  = press "Z"\n ATTACK = press "J"\n GUARD = press "I" \n GAMEPAD : disconected\n version : O.18 | 22.08.22' , {fontFamily : 'PixelFont'}); 
     personalBestText = this.add.text(0,0,'YOUR BEST : 0',{ fontFamily : 'PixelFont'})
     scoreText = this.add.text(0,0, 'SCORE : 0',{ fontFamily : 'PixelFont'})
     gameOverText = this.add.text(0,0, 'GAME OVER \n score : 0 \n press any to restart', { fontFamily : 'PixelFont', fontSize : '60px', color : '#FFF05B'});
@@ -310,6 +314,7 @@ function create(){
 
     // COLLISIONS
 
+    this.physics.add.collider(colideATK, Arrow, function(atk,arrow){arrow.setY(0)})
     // var platform = this.physics.add.staticGroup();// groupe plateforme
     //     platform.add(sol1)//asigne
     //     platform.add(sol2)//asigne
@@ -365,6 +370,7 @@ function create(){
 
         // this.physics.add.collider(Coin, platform)
         this.physics.add.collider(Coin, newPlatform)
+        this.physics.add.collider(Coin, CrossPlatform)
 
         this.physics.add.collider(player, newPlatform, function(plyr,pltfrm){       //collision player + platform tiles
            // playerCanFall = true;
@@ -411,7 +417,7 @@ function create(){
             detector.body.position.x = player.body.position.x +600
             detector.body.position.y = player.body.position.y -140
 
-            console.log(spawnCounter);
+            //console.log(spawnCounter);
             //console.log(spawn);
             // console.log(detector);
             detector.body.checkCollision.none = true
@@ -480,15 +486,13 @@ function create(){
         });
         
         this.physics.add.collider(hittableObject, CrossPlatform, function(enemy,pltfrm){       //collision enemy + CrossPlatform tiles
-            // console.log(pltfrm);
+            //console.log(pltfrm);
             //console.log(enemy.setData('stopMove',true));
-           
             if(enemy.data.list.CounterMove === 1){
-               
                 //console.log(enemy.data.list.randomValue = 0);
-                
             };
         })
+
         this.physics.add.collider(hittableObject, newPlatform, function(htblobjct, Platform){})   //collision Enemy + platform 
 
         // this.physics.add.overlap(hittableObject, newPlatform, function(htblobjct, Platform){      //overlap Enemy + platform
@@ -527,17 +531,22 @@ function create(){
 
     this.input.keyboard.on('keycombomatch', function(combo){ //verification du secialAtk entré
         console.log(combo);
-        if(playerInGround === true && counterMovePlayer === 0){
+        if(playerInGround === true){
             if(combo.keyCodes[0] === 83){
-                counterMovePlayer = 32;
-                tornadoSlash();
+                if(player.data.list.special >= 1){
+                    counterMovePlayer = 32;
+                    tornadoSlash();
+                }
             }
-            if(combo.keyCodes[0] === 68 || combo.keyCodes[0] === 81 ){
-                counterMovePlayer = 33;
-                UltraSlash();
+            if(combo.keyCodes[0] === 68 || combo.keyCodes[0] === 81){
+                if(player.data.list.special >= 3){
+                    counterMovePlayer = 33;
+                    UltraSlash();
+                }
             }
         }
-    }) 
+    });
+
     //////////////////////////////////////////////////////////////////////////////////////////////////
 
     // GAMEPAD
@@ -551,21 +560,19 @@ function create(){
         if(pad._RCBottom.pressed && playerInGround === true && counterMovePlayer === 0){ //jump
             gamepadJump = true;
         }
-        if(pad._RCLeft.pressed){ //Attack
+        if(pad._RCLeft.pressed){    //Attack
             gamePadCombo = gamePadCombo + 'A';
             gamepadAttack = true;
         }
-        if(pad._LCBottom.pressed){//down
+        if(pad._LCBottom.pressed){  //down
             gamePadCombo = gamePadCombo + 'B';
         }
-        if(pad._LCRight.pressed){ //Right
+        if(pad._LCRight.pressed){   //Right
             gamePadCombo = gamePadCombo + 'D';
         }
-        if(pad._LCLeft.pressed){  //Left
+        if(pad._LCLeft.pressed){    //Left
             gamePadCombo = gamePadCombo + 'G';
         }
-        
-        
     }, this);
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -771,7 +778,7 @@ function create(){
     this.anims.create({
         key: 'attackCrossBow',
         frames: this.anims.generateFrameNumbers('theEnemyCrossBow',{frames : [ 10, 10, 10, 10, 0, 0, 0, 0, 1, 2, 3, 3, 3, 3, 3, 4, 5, 5, 5, 6, 7, 7, 7, 7, 8, 8, 9, 9]}),
-        frameRate: 10,
+        frameRate: 6,
     })
     this.anims.create({
         key: 'attackPoleAxe',
@@ -931,41 +938,36 @@ function create(){
     
 }
 
-
-
-
-
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////  
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////    UPDATE 
-
-
-
 
 function update(time, delta){
 
 // if(GameOver === false){
     //BACKGROUND AND TEXT
     
-    skyBg.x = player.body.position.x;                                                               // position du ciel
-    skyBg.y = player.body.position.y;                                                               // position du ciel
+    skyBg.x = player.body.position.x;                                                                // position du ciel
+    skyBg.y = player.body.position.y;                                                                // position du ciel
     skyBg.tilePositionX += 0.5;
-    text.x = player.body.position.x - 345;                                                          // position text
+    text.x = player.body.position.x - 345;                                                           // position text
     text.y = player.body.position.y + 120;
-    healthBar.x = player.body.position.x - 270;                                                     // position healthbar
+    healthBar.x = player.body.position.x - 270;                                                      // position healthbar
     healthBar.y = player.body.position.y - 140;
     specialBar.x = player.body.position.x - 270;                                                     // position healthbar
     specialBar.y = player.body.position.y - 120;
-    scoreText.x = player.body.position.x + 260;                                                     // position Score
-    personalBestText.x = player.body.position.x + 60;                                                     // position Score
+    spebar.x = player.body.position.x - 260;
+    spebar.y = player.body.position.y - 120;
+    scoreText.x = player.body.position.x + 260;                                                      // position Score
+    personalBestText.x = player.body.position.x + 60;                                                // position Score
     scoreText.y = player.body.position.y -160;
     personalBestText.y = player.body.position.y -160;
 
-    healthBar.width = player.data.list.health * 10;
-    specialBar.width = player.data.list.special * 10;
+    healthBar.width = player.data.list.health * 12;
+    specialBar.width = player.data.list.special * 22;
 
-    scoreText.setText('SCORE : '+ Score);                                                           // maj score
+    scoreText.setText('SCORE : '+ Score);                                                            // maj score
     gameOverText.setText('   GAME OVER \n   score : '+ Score + '\npress "J" to restart');                                                           // maj score
-    personalBestText.setText('YOUR BEST : '+ personalBest);                                               // maj score
+    personalBestText.setText('YOUR BEST : '+ personalBest);                                          // maj score
     gameOverText.x = player.body.position.x - 260
     gameOverText.y = player.body.position.y
     spawnDetector.body.velocity.x = player.body.velocity.x ;
@@ -1003,6 +1005,7 @@ function update(time, delta){
                 
                 if(htblobjct.data.list.AtkCollide === true){                                        // collision Player Guard                     
                     if(plyr.data.list.Guard === true){
+                        player.data.list.special = player.data.list.special - 1;
                         // htblobjct.data.list.AtkCollide = false;
                         if(plyr.flipX === false && htblobjct.flipX === false){
                             counterMovePlayer = 14;
@@ -1262,19 +1265,22 @@ function update(time, delta){
                 
             }
         },5000)
-        
-        // if(Phaser.Input.Keyboard.JustDown(touchesAttack) || gamepadAttack === true){
-            
+    }
+
+    if(player.data.list.special >= 6){
+        player.data.list.special = 6;
     }
     // CONTROL PLAYER
 
     if((theGamePad.X)){                                                                             //Gamepad Combo
             if(counterMovePlayer === 0 && gamePadCombo.includes("BDA") || gamePadCombo.includes("BGA")){
                 if(playerInGround === true){
-                    counterMovePlayer = 32;
-                    tornadoSlash();
-                    //console.log('tornadoSash');
-                    gamePadCombo = [];
+                    
+                        counterMovePlayer = 32;
+                        tornadoSlash();
+                        //console.log('tornadoSash');
+                        gamePadCombo = [];
+                  
                 }
             }
             else if(counterMovePlayer === 0 && gamePadCombo.includes("GDA") || gamePadCombo.includes("DGA")){
@@ -1491,6 +1497,10 @@ function tornadoSlash(){                                                        
     player.anims.play('shoryuSlash', true);
 
     var nameAttack = 'shoryuSlash';
+    
+    player.data.list.special -= 1;
+
+    // 
     // var colAtk = colideATK2.get().setSize(60,60);
     // var colAtkTwo = colideATK2.get().setSize(80,60);
     // var colAtkThree = colideATK2.get().setSize(60,60);
@@ -1553,17 +1563,17 @@ function tornadoSlash(){                                                        
                 player.anims.currentFrame.index <= 6){
                 player.setVelocityY(-320)
             }
-
+            
             if(player.anims.currentFrame.index >= 16){
                 player.data.list.Eject = 0;
-
                 if(player.body.velocity.y != 0){
                     playerCanFall = false
-
+                    
                 }else{
                     playerCanFall = true;
                     counterMovePlayer = 0;
                 }
+                console.log(player.data.list.special);
                 
             }
         }
@@ -1574,6 +1584,7 @@ function UltraSlash(){
     console.log('ultra');
     player.anims.play('ultra', true);
     var nameAttack = 'ultra';
+    player.data.list.special = player.data.list.special - 3;
 
     player.on('animationupdate', ()=>{
 
@@ -1667,7 +1678,7 @@ function UltraSlash(){
                 if(playerFlip === true){colideATK.setX(player.x -85);colideATK.setY(player.y +10)}
                 if(playerFlip === false){colideATK.setX(player.x +85);colideATK.setY(player.y +10)} 
             }
-            if(player.anims.currentFrame.index >= 61){
+            if(player.anims.currentFrame.index >= 63){
                 colideATK.setX(0);colideATK.setY(0);
                 playerCanFall = false;
                 player.setGravityY(0);
@@ -1969,7 +1980,7 @@ function createArrow(enemy){                                                    
 
     if(currentArrow != null)
     {
-        currentArrow.setY(enemy.y - 25)  
+        currentArrow.setY(enemy.y - 24)  
 
         if(enemy.flipX === true)
         {
@@ -1988,7 +1999,7 @@ function createArrow(enemy){                                                    
 
 function enemyKnockBack(enmy){
 //console.log('hello');
-    if(player.data.list.Eject === 0){  // knock back enemy                                             
+    if(player.data.list.Eject === 0){                                                                           // knock back enemy                                             
         if(enmy.data.list.type != 'box'){
 
             enmy.data.list.EnemyIsAttack = false;
@@ -1998,17 +2009,11 @@ function enemyKnockBack(enmy){
             //console.log(animsName);
                 enmy.on('animationupdate', ()=>{
                     if(animsName === enmy.anims.currentAnim.key){
-                    
-                        if(enmy.anims.currentFrame.index <= 2){
 
-                            if(enmy.flipX === true){enmy.setVelocityX(1200)}
-                            if(enmy.flipX === false){enmy.setVelocityX(-1200)}
-                            
-                        }
                         if(enmy.anims.currentFrame.index <= 3){
                             
-                            if(enmy.flipX === true){enmy.setVelocityX(-100)}
-                            if(enmy.flipX === false){enmy.setVelocityX(100)}   
+                            if(enmy.flipX === true){enmy.setVelocityX(-60)}
+                            if(enmy.flipX === false){enmy.setVelocityX(60)}   
                         }
                         if(enmy.anims.currentFrame.index >= 5 &&
                             player.data.list.Eject === 0){ 
@@ -2169,12 +2174,12 @@ function enemyDie(enmyOne){
 function collisionAtkEnemies(htblObjct,atk){
     atk.setX(0);
     atk.setY(0);
-    //console.log(htblObjct.data.list.CounterMove);
-    //createSlash();
-    //atk.body.enable = false;
     slashAtk.setY(player.y)
+    player.data.list.special = player.data.list.special + 0.25;
+
     if(player.flipX === true){slashAtk.setX(player.x -100)}
     if(player.flipX === false){slashAtk.setX(player.x +100)}
+
     slashAtk.anims.play('slashed', true)
     slashAtk.rotation = Phaser.Math.Between(0,2);
 
