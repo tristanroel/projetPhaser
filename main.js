@@ -2045,8 +2045,8 @@ function enemyKnockBack(enmy){
 
                         if(enmy.anims.currentFrame.index <= 3){
                             
-                            // if(enmy.flipX === true){enmy.setVelocityX(-60)}
-                            // if(enmy.flipX === false){enmy.setVelocityX(60)}   
+                            if(enmy.flipX === true){enmy.setVelocityX(0)}
+                            if(enmy.flipX === false){enmy.setVelocityX(0)}   
                         }
                         if(enmy.anims.currentFrame.index >= 5 &&
                             player.data.list.Eject === 0){ 
@@ -2134,8 +2134,8 @@ function enemyKnockBack(enmy){
         enmy.on('animationupdate', ()=>{
             if(animsName2 === enmy.anims.currentAnim.key){
                 if(enmy.anims.currentFrame.index <= 3){
-                    // if(enmy.flipX === true){enmy.setVelocityX(-80)}
-                    // if(enmy.flipX === false){enmy.setVelocityX(80)}  
+                    if(enmy.flipX === true){enmy.setVelocityX(0)}
+                    if(enmy.flipX === false){enmy.setVelocityX(0)}  
                     enmy.setVelocityY(-100)
                 }
                 if(enmy.anims.currentFrame.index >= 6){
@@ -2155,8 +2155,8 @@ function enemyKnockBack(enmy){
         enmy.on('animationupdate', ()=>{
             if(animsName2 === enmy.anims.currentAnim.key){
                 if(enmy.anims.currentFrame.index <= 3){
-                    if(enmy.flipX === true){enmy.setVelocityX(-1000)}
-                    if(enmy.flipX === false){enmy.setVelocityX(1000)}  
+                    if(enmy.flipX === true){enmy.setVelocityX(0)}
+                    if(enmy.flipX === false){enmy.setVelocityX(0)}  
                     enmy.setVelocityY(-100)
                 }
                 if(enmy.anims.currentFrame.index >= 8){
