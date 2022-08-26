@@ -101,6 +101,20 @@ var personalBest = localStorage.getItem('score');                               
 var GameOver = false;
 
 function preload(){
+////////////////////////////////////////////////////// LOADING
+
+    this.load.on('progress', function (value) {
+        console.log(value);
+    });
+                
+    this.load.on('fileprogress', function (file) {
+        console.log(file.src);
+    });
+    this.load.on('complete', function () {
+        console.log('complete');
+    });
+
+//////////////////////////////////////////////////////////////
     this.load.audio('theme', [
         'assets/audio/gamesong.wav'
     ]);
@@ -142,6 +156,8 @@ function preload(){
 
 /////////////////////////////////////////////////////////////////////////////////////       CREATE
 function create(){
+
+    //	You can listen for each of these events from Phaser.Loader
 
     /// SET VARIABLE    
     attackintheair = false;
@@ -526,8 +542,8 @@ function create(){
     var tornadoSlashLeft = this.input.keyboard.createCombo([83, 68, 74], {resetOnMatch:true, maxKeyDelay:700}); //300ms pour taper le combo, sinon se reinitialise
     var tornadoSlashRight = this.input.keyboard.createCombo([83, 81, 74], {resetOnMatch:true, maxKeyDelay:700}); 
 
-    var UltraSlashLeft = this.input.keyboard.createCombo([81, 68, 74], {resetOnMatch:true, maxKeyDelay:700}); //300ms pour taper le combo, sinon se reinitialise
-    var UltraSlashRight = this.input.keyboard.createCombo([68, 81, 74], {resetOnMatch:true, maxKeyDelay:700}); 
+    var UltraSlashLeft = this.input.keyboard.createCombo([81, 83, 68, 74], {resetOnMatch:true, maxKeyDelay:700}); //300ms pour taper le combo, sinon se reinitialise
+    var UltraSlashRight = this.input.keyboard.createCombo([68, 83, 81, 74], {resetOnMatch:true, maxKeyDelay:700}); 
 
     this.input.keyboard.on('keycombomatch', function(combo){ //verification du secialAtk entré
         console.log(combo);
@@ -597,20 +613,19 @@ function create(){
         frames: this.anims.generateFrameNumbers('herorun',{frames: [0, 1, 2, 3, 4, 5, 6, 7]}),
         frameRate: 10,
         //repeat: -1
-    })
+    });
     firstAtk = this.anims.create({
         key: 'attackOne',
         frames: this.anims.generateFrameNumbers('heroAttack',{frames: [ 0, 1, 2, 3, 4, 5, 6, 6, 6, 6, 6, 6, 6]}),
         frameRate: 27,
         //repeat: -1
-    })
-
+    });
     this.anims.create({
         key: 'attackTwo',
         frames: this.anims.generateFrameNumbers('heroAttack',{frames: [7, 8, 9, 10, 11, 12, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13]}),
         frameRate: 24,
         //repeat: -1
-    })
+    });
     this.anims.create({
         key: 'attackThree',
         frames: this.anims.generateFrameNumbers('heroAttack',{frames: [0, 1, 2, 3, 4, 5, 6, 6, 6, 6]}),
@@ -1149,9 +1164,13 @@ function update(time, delta){
                         //do nothing
                         break;
                 }
-
+                
                 if(currentEnemy.data.list.EnemyIsDie === true)                                              // Delete Enemies 
                 {
+                    //console.log(currentEnemy.data.list.randomValue);
+                    for(let i = 0;i < currentEnemy.data.list.randomValue / 3; i++){
+                        createCoin(currentEnemy)
+                    }
                     // Delete arrow for the crossbow enemy
                     if(currentEnemy.data.list.type == "CrossBow")
                     {
@@ -1261,7 +1280,7 @@ function update(time, delta){
                 GameOver = false;
                 this.anims.resumeAll();
                 counterMovePlayer = 0;
-                console.log(gamePadCombo.includes);
+                //console.log(gamePadCombo.includes);
                 
             }
         },5000)
@@ -1287,16 +1306,18 @@ function update(time, delta){
                     }
                 }
             }
-            else if(gamePadCombo.includes("GDA") || gamePadCombo.includes("DGA")){
+            else if(gamePadCombo.includes("BGDA") || gamePadCombo.includes("BDGA")){
+
                 if(playerInGround === true){
                     if(player.data.list.special >= 3){
-                        
-                        console.log('ultra');
+                            
+                        //console.log('ultra');
                         counterMovePlayer = 33;
                         UltraSlash();
                         gamePadCombo = [];
                     }
                 }
+                gamePadCombo = [];
             }
             else{
                 gamePadCombo = [];
@@ -1588,7 +1609,7 @@ function tornadoSlash(){                                                        
 }
 
 function UltraSlash(){
-    console.log('ultra');
+   // console.log('ultra');
     player.anims.play('ultra', true);
     var nameAttack = 'ultra';
 
@@ -1611,8 +1632,8 @@ function UltraSlash(){
             }
             if(player.anims.currentFrame.index < 61 ){
                 player.setGravityY(-1000);
-                if(playerFlip === true){player.setVelocityX(-playerVelocityX + 10)}
-                if(playerFlip === false){player.setVelocityX(playerVelocityX + 10)} 
+                // if(playerFlip === true){player.setVelocityX(-playerVelocityX + 10)}
+                // if(playerFlip === false){player.setVelocityX(playerVelocityX + 10)} 
             }
             if(player.anims.currentFrame.index === 5 ){
                 //player.anims.stop()
@@ -1780,8 +1801,10 @@ function createCoin(thebox){                                                    
     piece.anims.play('turnPiecette',true)
     piece.setBounce(1);
     piece.setVelocityX(Phaser.Math.Between(-110, 110))
-   
-    //setTimeout(()=>{piece.setVelocityX(0);},1000)
+    // setTimeout(()=>{
+    //     piece.setBounce(0.95);
+    //     piece.setVelocityX(0);
+    // },1600)
 }
 
 function createSlash(){
@@ -2022,8 +2045,8 @@ function enemyKnockBack(enmy){
 
                         if(enmy.anims.currentFrame.index <= 3){
                             
-                            if(enmy.flipX === true){enmy.setVelocityX(-60)}
-                            if(enmy.flipX === false){enmy.setVelocityX(60)}   
+                            // if(enmy.flipX === true){enmy.setVelocityX(-60)}
+                            // if(enmy.flipX === false){enmy.setVelocityX(60)}   
                         }
                         if(enmy.anims.currentFrame.index >= 5 &&
                             player.data.list.Eject === 0){ 
@@ -2103,7 +2126,6 @@ function enemyKnockBack(enmy){
                 }
             });
     } else if(player.data.list.Eject === 2){
-        console.log('pede');
         var animsName2 = 'expulse'+enmy.data.list.type
         enmy.anims.play(animsName2,true);
 
@@ -2112,13 +2134,13 @@ function enemyKnockBack(enmy){
         enmy.on('animationupdate', ()=>{
             if(animsName2 === enmy.anims.currentAnim.key){
                 if(enmy.anims.currentFrame.index <= 3){
-                    if(enmy.flipX === true){enmy.setVelocityX(-80)}
-                    if(enmy.flipX === false){enmy.setVelocityX(80)}  
+                    // if(enmy.flipX === true){enmy.setVelocityX(-80)}
+                    // if(enmy.flipX === false){enmy.setVelocityX(80)}  
                     enmy.setVelocityY(-100)
                 }
                 if(enmy.anims.currentFrame.index >= 6){
-                    enmy.setVelocityX(0)
-                    enmy.setVelocityY(0)
+                    // enmy.setVelocityX(0)
+                    // enmy.setVelocityY(0)
                     enmy.data.list.CounterMove = 2;
                 }
             }
@@ -2150,6 +2172,7 @@ function enemyKnockBack(enmy){
 
 function enemyDie(enmyOne){
     enmyOne.setBounce(0,0) 
+
     var animsName = 'fall'+enmyOne.data.list.type
     enmyOne.anims.play(animsName, true);
     enmyOne.on('animationupdate', ()=>{
@@ -2169,11 +2192,15 @@ function enemyDie(enmyOne){
                 if(enmyOne.anims.currentFrame.index === 10 &&
                     enmyOne.data.list.type === 'box'){
                     enmyOne.data.list.EnemyIsDie = true;
-                    createCoin(enmyOne)
+                    //createCoin(enmyOne)
                     enmyOne.body.destroy();
                     }
+                // if(enmyOne.anims.currentFrame.index === 14){
+                //     setTimeout(()=>{createCoin(enmyOne)},0);
+                //  }
                 if(enmyOne.anims.currentFrame.index >= 14){ 
                     enmyOne.data.list.EnemyIsDie = true;
+                    
                     // enmyOne.body.destroy(); 
                 }
             }
