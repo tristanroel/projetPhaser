@@ -412,7 +412,7 @@ function create(){
 
         this.physics.add.collider(ResetTile, player, function(theplayer, reset){   // collision reset et joueur 
             hittableObject.children.entries.length = 0
-            //console.log(reset);
+            //console.log('reset');
 
             reset.collideDown = false
             reset.collideLeft = false
@@ -423,10 +423,10 @@ function create(){
 
         this.physics.add.collider(Spawner, spawnDetector, function(detector, spawn){    // spawn collider
             
-            // console.log(spawn.pixelX);
-            // console.log(spawn.pixelY);
-            // // console.log(spawn.body.checkCollision.none);
-            // console.log('spawnCounter :' +spawnCounter);
+            spawn.collideDown = false
+            spawn.collideLeft = false
+            spawn.collideRight = false
+            spawn.collideUp = false
 
             spawnCounter ++;
 
@@ -502,11 +502,8 @@ function create(){
         });
         
         this.physics.add.collider(hittableObject, CrossPlatform, function(enemy,pltfrm){       //collision enemy + CrossPlatform tiles
-            //console.log(pltfrm);
-            //console.log(enemy.setData('stopMove',true));
-            if(enemy.data.list.CounterMove === 1){
-                //console.log(enemy.data.list.randomValue = 0);
-            };
+           enemy.data.list.stopMove = true
+           console.log(enemy.data.list.stopMove);
         })
 
         this.physics.add.collider(hittableObject, newPlatform, function(htblobjct, Platform){})   //collision Enemy + platform 
@@ -546,7 +543,7 @@ function create(){
     var UltraSlashRight = this.input.keyboard.createCombo([68, 83, 81, 74], {resetOnMatch:true, maxKeyDelay:700}); 
 
     this.input.keyboard.on('keycombomatch', function(combo){ //verification du secialAtk entré
-        console.log(combo);
+        //console.log(combo);
         if(playerInGround === true){
             if(combo.keyCodes[0] === 83){
                 if(player.data.list.special >= 1){
@@ -1110,18 +1107,18 @@ function update(time, delta){
             //////////////////////////////////////////////////////////////////////////////////////////////
 
             if(currentEnemy.data.list.stopMove === false){
-                if(Phaser.Math.Distance.BetweenPoints(currentEnemy,player) >= 200 &&                        // walk enemies
+                if(Phaser.Math.Distance.BetweenPoints(currentEnemy,player) >= 146 &&                        // walk enemies
                 currentEnemy.data.list.AttackIsFinish === true){
                     currentEnemy.data.list.CounterMove = 1; 
                     currentEnemy.data.list.EnemyIsAttack = true; 
                 }
             }else{
-                currentEnemy.data.list.CounterMove = 0; 
-                console.log('eh beh');
+                currentEnemy.data.list.EnemyIsAttack = true; 
+                //console.log('eh beh'+ currentEnemy.data.list.CounterMove);
             }
 
             if(Phaser.Math.Distance.BetweenPoints(currentEnemy,player) < 300 &&                         // attack CrossBow
-            Phaser.Math.Distance.BetweenPoints(currentEnemy,player) > 149 &&
+            Phaser.Math.Distance.BetweenPoints(currentEnemy,player) > 146 &&
             currentEnemy.data.list.AttackIsFinish === true &&
             currentEnemy.data.list.type === 'CrossBow'){
                 currentEnemy.data.list.CounterMove = 2; 
@@ -1213,6 +1210,7 @@ function update(time, delta){
 
         else{hittableObject.children.entries[i] = [];} 
     }
+
     //console.log(player.data.list.Eject);
     //console.log(currentEnemy);
     //console.log(Arrow);
@@ -1271,7 +1269,7 @@ function update(time, delta){
             gameOverText.setDepth(3);
         });
         setTimeout(()=>{
-            if(touchesAttack._justDown === true  && GameOver === true){                                                   // Restart Game
+            if(touchesAttack._justDown === true  && GameOver === true){                             // Restart Game
                 this.registry.destroy(); //destroy registry
                 this.events.off(); // disable all active events
                 this.scene.start(); // restart current scene
@@ -1621,14 +1619,15 @@ function UltraSlash(){
             if(player.anims.currentFrame.index >= 3 && player.anims.currentFrame.index <= 4 ){
                 player.data.list.special = spevalue;
                 player.data.list.Eject = 2;
+
                 if(playerFlip === true){
-                player.setVelocityX(-playerVelocityX * 6)
-                colideATK.setX(player.x -50);colideATK.setY(player.y +10)
+                    player.setVelocityX(-playerVelocityX * 3)
+                    colideATK.setX(player.x -50);colideATK.setY(player.y +10)
                 }
                 if(playerFlip === false){
-                    player.setVelocityX(playerVelocityX * 6)
+                    player.setVelocityX(playerVelocityX * 3)
                     colideATK.setX(player.x +50);colideATK.setY(player.y +10)
-                } 
+                }
             }
             if(player.anims.currentFrame.index < 61 ){
                 player.setGravityY(-1000);
@@ -2076,7 +2075,7 @@ function enemyKnockBack(enmy){
             });
         }
 
-    }else if(player.data.list.Eject === 1){                                                                                 // eject enemy
+    }else if(player.data.list.Eject === 1){                                                                    // eject enemy
         enmy.data.list.EnemyIsAttack = false;
         var animsName2 = 'eject'+enmy.data.list.type
         enmy.anims.play(animsName2,true);
@@ -2116,7 +2115,8 @@ function enemyKnockBack(enmy){
                     if(enmy.anims.currentFrame.index >= 20 &&
                         enmy.body.velocity.y === 0){ 
                         enmy.data.list.AttackIsFinish = true
-                            enmy.setVelocityX(0)
+                        enmy.setVelocityX(0)
+                        
                             if(enmy.data.list.type === 'CrossBow'){
                                 enmy.data.list.CounterMove = 2
                             }else{
