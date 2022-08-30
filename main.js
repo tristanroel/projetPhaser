@@ -94,8 +94,13 @@ var CrossPlatform;
 var spebar;
 var countTest = 0;
 
+//song
+var themeSong;
+var swordImpact;
+var coinImpact;
 
 var currentEnemy;
+var enemyCanDie = false;
 
 var personalBest = localStorage.getItem('score');                                               //best score in localStorage
 var GameOver = false;
@@ -115,10 +120,11 @@ function preload(){
     });
 
 //////////////////////////////////////////////////////////////
-    this.load.audio('theme', [
-        'assets/audio/gamesong.wav'
-    ]);
+    this.load.audio('theme', ['assets/audio/gamesong.wav']);
+    this.load.audio('swordImpact', ['assets/audio/swordImpact5.wav']);
+    this.load.audio('coinImpact', ['assets/audio/coinImpact.wav']);
 
+    this.load.scenePlugin('AnimatedTiles', 'https://raw.githubusercontent.com/nkholski/phaser-animated-tiles/master/dist/AnimatedTiles.js', 'animatedTiles', 'animatedTiles');   
     this.load.image('sky','assets/Thesky.png');
     this.load.image('ground','assets/solPave.png');
     this.load.image('ATK1','assets/TRlogo.png');
@@ -143,6 +149,7 @@ function preload(){
     this.load.spritesheet('shoryu', 'assets/Sprites/shoryu.png',{frameWidth: 170, frameHeight: 170});
     this.load.spritesheet('ultimate', 'assets/Sprites/SuperAttack.png',{frameWidth: 170, frameHeight: 170});
     this.load.spritesheet('pushBox', 'assets/Sprites/pousse.png',{frameWidth: 170, frameHeight: 170});
+    this.load.spritesheet('heroClimb', 'assets/Sprites/escalade.png',{frameWidth: 170, frameHeight: 170});
     //this.load.spritesheet('carreau', 'assets/carreau.png',{frameWidth: 20, frameHeight: 4});
 
     // this.load.spritesheet('powerSlash', 'assets/PowerSlash.png',{frameWidth: 100, frameHeight: 100});
@@ -173,9 +180,13 @@ function create(){
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// SONG
-    // var themeSong = this.sound.add('theme');
+    themeSong = this.sound.add('theme');
+    coinImpact = this.sound.add('coinImpact');
+    swordImpact = this.sound.add('swordImpact');
     // themeSong.loop = true ;
     // themeSong.play();
+
+
 
    /// OBJECT
 
@@ -185,10 +196,11 @@ function create(){
     ////////////////////////////////////////////////////////////////////
 
     // LEVEL
-
+    
     const map = this.make.tilemap({ key : 'tiles'})                                                    // TILED level
     const tileset = map.addTilesetImage('map','forest');
 
+    const ClimbTile = map.createLayer('VerticalClimb', tileset, -200, 0)
     const ResetTile = map.createLayer('Reset', tileset, -200, 0)
     const DieTile = map.createLayer('DieTiles', tileset, -200, 0)
     const Spawner = map.createLayer('Spawners', tileset, -200, 0)
@@ -197,12 +209,17 @@ function create(){
     CrossPlatform = map.createLayer('CrossGround', tileset, -200, 0)
     const Decor = map.createLayer('Decors', tileset, -200, 0)
     
+    this.sys.animatedTiles.init(map);
+
+    ClimbTile.setCollisionByProperty({collides : true})
     ResetTile.setCollisionByProperty({collides : true})
     DieTile.setCollisionByProperty({collides : true})
     Spawner.setCollisionByProperty({collides : true})
     newPlatform.setCollisionByProperty({collides : true})
     CrossPlatform.setCollisionByProperty({collides : true})
 
+    ClimbTile.setScale(2);
+    ClimbTile.setVisible(false);
     ResetTile.setScale(2);
     DieTile.setScale(2);
     Spawner.setScale(2);
@@ -212,8 +229,14 @@ function create(){
     CrossPlatform.setScale(2);
     Decor.setScale(2);
     Decor.setDepth(1);
+    
+    CrossPlatform.faceLeft = false;
+    CrossPlatform.faceRight = false;
+    CrossPlatform.faceBottom = false;
 
     Spawner.setData('Activate', false);
+
+
     // Fond.setScale(1.5)
 
     // console.log(CrossPlatform);
@@ -231,7 +254,6 @@ function create(){
         visible : false,
     });            //spawn enemy
 
-    
     healthBar = this.add.rectangle(0,0,120,10,0xB14F37).setStrokeStyle(2, 0xFFFFFF); //healthbar
     healthBar.setDepth(2);
 
@@ -264,17 +286,6 @@ function create(){
     // box.children.iterateLocal('setData', 'pv', 4)
     // box.children.iterateLocal('setSize', 35,35)
     // box.setVelocityY(600)
-    
-    player = this.physics.add.sprite(600, 1150,'hero').setScale(2);                  // player
-    player.body.setSize(25, 58)                                         
-    player.setData('health', 10)
-    player.setData('special', 6)
-    player.setData('Guard', false);
-    // player.setData('Atk2', false);
-    // player.setData('Expulse', false);
-    player.setData('Eject', 0);
-    player.body.checkCollision.up = false;
-    //console.log(player.body);
 
     // colideATK2 = this.physics.add.group({                                           // collision attack
     //     key : 'ATK1',
@@ -285,6 +296,17 @@ function create(){
     //     //size : {x : 20, y : 20},
     //     setXY : {x : 1199, y :1199}
     // })
+
+    player = this.physics.add.sprite(600, 1150,'hero').setScale(2);                  // player
+    player.body.setSize(25, 58)                                         
+    player.setData('health', 10)
+    player.setData('special', 6)
+    player.setData('Guard', false);
+    player.setData('Climb', false);
+    // player.setData('Expulse', false);
+    player.setData('Eject', 0);
+    player.body.checkCollision.up = false;
+    //console.log(player.body);
 
     colideATK = this.add.rectangle(0,0,100,100,0xB14F37)                         // collision attack final
     this.physics.add.existing(colideATK);
@@ -310,7 +332,7 @@ function create(){
 
     // TEXT
 
-    text = this.add.text(0,0, ' << CONTROL >> \n LEFT = press "Q"\n RIGHT = press "D"\n JUMP  = press "Z"\n ATTACK = press "J"\n GUARD = press "I" \n GAMEPAD : disconected\n version : O.19 | 26.08.22' , {fontFamily : 'PixelFont'}); 
+    text = this.add.text(0,0, ' << CONTROL >> \n LEFT = press "Q"\n RIGHT = press "D"\n JUMP  = press "Z"\n ATTACK = press "J"\n GUARD = press "I" \n GAMEPAD : disconected\n version : O.20 | 30.08.22' , {fontFamily : 'PixelFont'}); 
     personalBestText = this.add.text(0,0,'YOUR BEST : 0',{ fontFamily : 'PixelFont'})
     scoreText = this.add.text(0,0, 'SCORE : 0',{ fontFamily : 'PixelFont'})
     gameOverText = this.add.text(0,0, 'GAME OVER \n score : 0 \n press any to restart', { fontFamily : 'PixelFont', fontSize : '60px', color : '#FFF05B'});
@@ -356,6 +378,8 @@ function create(){
         //     //console.log(box1.body.blocked.left);
         // })
         this.physics.add.overlap(Coin, player, function(theplayer, piepiece){   // collision pieces et joueur 
+            coinImpact.play();
+
             Score++;
             piepiece.destroy();
             //console.log('Score : '+Score);
@@ -390,6 +414,8 @@ function create(){
 
         this.physics.add.collider(player, newPlatform, function(plyr,pltfrm){       //collision player + platform tiles
            // playerCanFall = true;
+           player.data.list.Climb = false;
+
             if(pltfrm.faceLeft && plyr.body.velocity.y != 0|| 
                 pltfrm.faceRight && plyr.body.velocity.y != 0){
                     playerInGround = false;
@@ -399,16 +425,19 @@ function create(){
                 playerInGround = true;
             }
         })
-
-        this.physics.add.collider(player, CrossPlatform, function(plyr,pltfrm){       //collision player + CrossPlatform tiles
-            // console.log(pltfrm);
+        this.physics.add.overlap(player, CrossPlatform, function(plyr,pltfrm){       //overlap player + CrossPlatform tiles
             pltfrm.faceLeft = false;
             pltfrm.faceRight = false;
             pltfrm.faceBottom = false;
+        })
 
+
+        this.physics.add.collider(player, CrossPlatform, function(plyr,pltfrm){       //collision player + CrossPlatform tiles
             attackintheair = false;
             playerInGround = true;
-        })
+            player.data.list.Climb = false;
+        });
+        
 
         this.physics.add.collider(ResetTile, player, function(theplayer, reset){   // collision reset et joueur 
             hittableObject.children.entries.length = 0
@@ -494,24 +523,42 @@ function create(){
         //     }
         // })
 
-        this.physics.add.overlap(hittableObject, CrossPlatform, function(enemy, pltfrm){     // collision entre attaque et boites 
-            pltfrm.faceLeft = false;
-            pltfrm.faceRight = false;
-            pltfrm.faceBottom = false;
-            pltfrm.faceUp = true;
-        });
+        // this.physics.add.overlap(hittableObject, CrossPlatform, function(enemy, pltfrm){     // collision entre attaque et boites 
+        //     pltfrm.faceLeft = false;
+        //     pltfrm.faceRight = false;
+        //     pltfrm.faceBottom = false;
+        //     pltfrm.faceUp = true;
+        // });
         
         this.physics.add.collider(hittableObject, CrossPlatform, function(enemy,pltfrm){       //collision enemy + CrossPlatform tiles
            enemy.data.list.stopMove = true
-           console.log(enemy.data.list.stopMove);
+           //console.log('enemy.data.list.stopMove');
         })
 
         this.physics.add.collider(hittableObject, newPlatform, function(htblobjct, Platform){})   //collision Enemy + platform 
 
-        // this.physics.add.overlap(hittableObject, newPlatform, function(htblobjct, Platform){      //overlap Enemy + platform
-        //     //htblobjct.body.velocity.y = -75
-        //     //console.log('ho');
-        // })
+        this.physics.add.overlap(                                                                 //overlap player climbTile
+            player,
+            ClimbTile,
+            function onOverlap(player, tile) {
+                //console.log("overlap", tile.x, tile.y);
+            
+                if(player.data.list.Climb === true){
+
+                    counterMovePlayer = 53
+                    player.anims.play('climb', true)
+                    player.setVelocityY(-200)
+
+                    setTimeout(()=>{
+                    counterMovePlayer = 0
+                    ,0})
+                }
+            },
+            function process(player, tile) {
+              return tile.collides;
+            }
+          );
+
 
         this.physics.add.collider(DieTile, hittableObject, function(enemy, die){
             enemy.data.list.health = 0;
@@ -576,6 +623,9 @@ function create(){
         if(pad._RCLeft.pressed){    //Attack
             gamePadCombo = gamePadCombo + 'A';
             gamepadAttack = true;
+        }
+        if(pad._LCTop.pressed){  //down
+            gamePadCombo = gamePadCombo + 'H';
         }
         if(pad._LCBottom.pressed){  //down
             gamePadCombo = gamePadCombo + 'B';
@@ -678,11 +728,16 @@ function create(){
     this.anims.create({
         key: 'ultra',
         frames: this.anims.generateFrameNumbers('ultimate',{frames: [1, 2, 3, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 59, 59, 59, 59]}),
-        frameRate: 15,
+        frameRate: 20,
     });
     this.anims.create({
         key: 'pushBox',
         frames: this.anims.generateFrameNumbers('pushBox',{frames: [0, 1, 2, 3, 4, 5]}),
+        frameRate: 8,
+    });
+    this.anims.create({
+        key: 'climb',
+        frames: this.anims.generateFrameNumbers('heroClimb',{frames: [0, 1, 2, 3, 4, 5, 5, 5, 5]}),
         frameRate: 8,
     });
 
@@ -1013,7 +1068,7 @@ function update(time, delta){
 
             //OVERLAP player + enemy
 
-            this.physics.add.overlap(currentEnemy, player, function(htblobjct, plyr){                   // overlap player + enemies
+            this.physics.add.overlap(currentEnemy, player, function(htblobjct, plyr){               // overlap player + enemies
                 
                 if(htblobjct.data.list.AtkCollide === true){                                        // collision Player Guard                     
                     if(plyr.data.list.Guard === true){
@@ -1113,7 +1168,8 @@ function update(time, delta){
                     currentEnemy.data.list.EnemyIsAttack = true; 
                 }
             }else{
-                currentEnemy.data.list.EnemyIsAttack = true; 
+                currentEnemy.data.list.EnemyIsAttack = true;
+                //currentEnemy.anims.play('stance'+ currentEnemy.data.list.type, true)
                 //console.log('eh beh'+ currentEnemy.data.list.CounterMove);
             }
 
@@ -1140,8 +1196,12 @@ function update(time, delta){
             }
 
             if(currentEnemy.data.list.CounterMove != 28){        // action enemies
-                if(currentEnemy.data.list.health <= 0){
-                    currentEnemy.data.list.CounterMove = 4
+                if(currentEnemy.data.list.health <= 0 ){
+                    if(enemyCanDie === true){
+                        currentEnemy.data.list.CounterMove = 4
+                    }else{
+                        // currentEnemy.data.list.health = 0
+                    }
                 }
                 switch(currentEnemy.data.list.CounterMove){
                     case 0: enemyStand(currentEnemy); break;
@@ -1217,7 +1277,7 @@ function update(time, delta){
     //console.log(Phaser.Math.Distance.BetweenPoints(hittableObject.children.entries[0],player));
     //console.log(enemyMoveDetection.children.entries[0]);
     //enemyMoveDetection.children.entries[0].body.destroy()
-    //console.log(counterMove);
+   //console.log(counterMovePlayer);
     //console.log(Arrow);
     //console.log(PlayerTouchEnemy);
     //console.log(colideATK2);
@@ -1228,7 +1288,7 @@ function update(time, delta){
     //console.log(box.children.entries);
     //console.log(playerInGround);
     //console.log(-26 * 6);
-    //console.log(player.data.list.Eject);
+    //console.log(player.data.list.Climb);
     //console.log(hittableObject.children.entries);
     //console.log(hittableObject.children.entries[0].data.list.CounterMove);
     //console.log(currentEnemy);
@@ -1239,10 +1299,12 @@ function update(time, delta){
     //console.log(attackinground);
     //console.log(EnemyIsDie);
     //console.log(player.body.velocity.y);
+    //console.log(enemyCanDie);
     //console.log(playerCanFall);
     //theGamePad.left = true
     //console.log(theGamePad);
     //console.log(theGamePad.gamepads);
+    console.log(gamePadCombo);
     //console.log(this.input.gamepad.total);
     //console.log(this.input.gamepad.gamepads.length);
     //if(player.flipX === true && player.body.velocity.x === 0){console.log('flip');}
@@ -1269,7 +1331,8 @@ function update(time, delta){
             gameOverText.setDepth(3);
         });
         setTimeout(()=>{
-            if(touchesAttack._justDown === true  && GameOver === true){                             // Restart Game
+            if(touchesAttack._justDown === true  && GameOver === true                             // Restart Game
+            || theGamePad.X && GameOver === true){
                 this.registry.destroy(); //destroy registry
                 this.events.off(); // disable all active events
                 this.scene.start(); // restart current scene
@@ -1278,6 +1341,7 @@ function update(time, delta){
                 GameOver = false;
                 this.anims.resumeAll();
                 counterMovePlayer = 0;
+                console.log(theGamePad);
                 //console.log(gamePadCombo.includes);
                 
             }
@@ -1305,7 +1369,6 @@ function update(time, delta){
                 }
             }
             else if(gamePadCombo.includes("BGDA") || gamePadCombo.includes("BDGA")){
-
                 if(playerInGround === true){
                     if(player.data.list.special >= 3){
                             
@@ -1317,6 +1380,10 @@ function update(time, delta){
                 }
                 gamePadCombo = [];
             }
+            // else if(gamePadCombo.includes("H")){
+            //     console.log('uh');
+            //     gamePadCombo = [];
+            // }
             else{
                 gamePadCombo = [];
             }
@@ -1349,22 +1416,29 @@ function update(time, delta){
             }
 
         
-        if (Phaser.Input.Keyboard.JustDown(upkey) && playerInGround === true && counterMovePlayer === 0       //jump
-        || gamepadJump === true && playerInGround === true && counterMovePlayer === 0){ //gamepad
-            gamepadJump = false
-            player.setVelocityY(-450);
-            playerInGround = false;
-            jumpAction();
-        }
-        if(player.body.velocity.y > 0 &&                                                                //fall
+        if(Phaser.Input.Keyboard.JustDown(upkey) && counterMovePlayer === 0 
+        || gamepadJump === true && counterMovePlayer === 0){                                                //jump                                                //jump
+            if(playerInGround === true){ 
+                //gamepadJump = false
+                player.setVelocityY(-450);
+                playerInGround = false;
+                jumpAction();
+            }else{
+                player.data.list.Climb = true
+            }
+        }     
+
+        if(player.body.velocity.y > 0 &&                                                                    //fall
             attackintheair === false &&                                    
             counterMovePlayer != 28 && 
             counterMovePlayer != 14 && 
             playerCanFall === true &&
-            attackinground === false){               
+            attackinground === false){   
+
             fallAction()
             playerInGround = false
-        }     
+            gamepadJump = false
+        }
         
         if (touchesGuard.isDown && playerInGround === true && counterMovePlayer === 0 ||
             theGamePad.Y && playerInGround === true && counterMovePlayer === 0 ){                             //guard
@@ -1489,7 +1563,9 @@ function jumpAction(){                                                          
         player.anims.play('jump', true);
 }
 function fallAction(){                                                                                      // Fall
-        player.anims.play('fall', true)   
+        player.anims.play('fall', true) 
+        player.data.list.Climb = false;
+
 }
 
 function attackJump(){                                                                                      //attack jump
@@ -1499,6 +1575,7 @@ function attackJump(){                                                          
     // colAtk5.setScale(2)
     // colAtk5.setSize(60,60)
     // colAtk5.visible = false;
+    gamepadJump = false
     attackintheair = true;
     player.on('animationupdate', ()=>{
         if(nameAttack4 === player.anims.currentAnim.key){
@@ -1868,7 +1945,7 @@ function createEnemies(enemySpawner, typeOfEnemy){                              
     }
     if(typeOfEnemy === 'box'){                                                                          //create box
         enemyone.setSize(35, 35);
-        enemyone.body.checkCollision.up = true;
+        enemyone.body.checkCollision.up = false;
         enemyone.body.checkCollision.left = false;
         enemyone.body.checkCollision.right = false;
         enemyone.setData('health', 3);
@@ -2031,9 +2108,9 @@ function createArrow(enemy){                                                    
 
 function enemyKnockBack(enmy){
 //console.log('hello');
+if(enmy.data.list.type != 'box'){
     if(player.data.list.Eject === 0){                                                                           // knock back enemy                                             
-        if(enmy.data.list.type != 'box'){
-
+       
             enmy.data.list.EnemyIsAttack = false;
             var animsName = 'knockback'+enmy.data.list.type
             enmy.anims.play(animsName,true);
@@ -2055,25 +2132,6 @@ function enemyKnockBack(enmy){
                         }
                     }
                 });
-        }else{                                                                                              //knock box
-            if(enmy.data.list.health === 2){
-                enmy.anims.play({key : 'damageOne', startFrame : 0},true);
-            }
-            if(enmy.data.list.health === 1){
-                enmy.anims.play({key : 'damageTwo', startFrame : 0},true);
-            }
-            enmy.on('animationupdate', ()=>{
-                
-                if(enmy.anims.currentFrame.index === 8){
-                    //enmy.data.list.CounterMove = 0
-                    enmy.data.list.AttackIsFinish = true
-                }
-                if(enmy.anims.currentFrame.index === 5){
-                    //enmy.data.list.CounterMove = 0
-                    enmy.data.list.AttackIsFinish = true
-                }
-            });
-        }
 
     }else if(player.data.list.Eject === 1){                                                                    // eject enemy
         enmy.data.list.EnemyIsAttack = false;
@@ -2167,6 +2225,9 @@ function enemyKnockBack(enmy){
             }
         });
     }
+}else{                                                                                              //knock box
+    knockBox(enmy);
+}
     
 }
 
@@ -2209,6 +2270,7 @@ function enemyDie(enmyOne){
 }
 
 function collisionAtkEnemies(htblObjct,atk){
+    //swordImpact.play();
     atk.setX(0);
     atk.setY(0);
     slashAtk.setY(player.y)
@@ -2220,13 +2282,20 @@ function collisionAtkEnemies(htblObjct,atk){
     slashAtk.anims.play('slashed', true)
     slashAtk.rotation = Phaser.Math.Between(0,2);
 
-    htblObjct.data.list.health = htblObjct.data.list.health - 1;   
-    
+    htblObjct.data.list.health = htblObjct.data.list.health - 1;
+
+    if(htblObjct.data.list.type != 'box'){
+        enemyCanDie = false
+        setTimeout(()=>{
+            enemyCanDie = true
+        },3000)   
+    }
     if(htblObjct.data.list.IsInvulnerable === false)
     {
         htblObjct.data.list.CounterMove = 3;
         PlayerTouchEnemy = true;
         player.anims.pause();
+
         setTimeout(()=>{
             player.anims.resume()
             slashAtk.setX(0);
@@ -2240,6 +2309,28 @@ function collisionAtkEnemies(htblObjct,atk){
     //console.log('kikou');
 }
 
+function knockBox(enmy){
+    if(enmy.data.list.health === 2){
+        enmy.anims.play({key : 'damageOne', startFrame : 0},true);
+    }
+    if(enmy.data.list.health === 1){
+        enmy.anims.play({key : 'damageTwo', startFrame : 0},true);
+    }
+    enmy.on('animationupdate', ()=>{
+        
+        if(enmy.anims.currentFrame.index === 8){
+            enmy.data.list.CounterMove = 0
+            enmy.data.list.AttackIsFinish = true
+            //enmy.anims.stop();
+        }
+        if(enmy.anims.currentFrame.index === 5){
+            enmy.data.list.CounterMove = 0
+            enmy.data.list.AttackIsFinish = true
+            //enmy.anims.stop();
+        }
+    });
+
+}
 // function stopEnemies(enemy){
 //     enemy.data.list.stopMove = true
 //     // enemy.data.list.CounterMove = 74;
