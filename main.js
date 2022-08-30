@@ -313,7 +313,7 @@ function create(){
     colideATK.setVisible(false)
     colideATK.body.allowGravity = false;
 
-    slashAtk = this.add.sprite(0,0,'slash').setScale(2);                          // img Slash
+    slashAtk = this.add.sprite(0,0,'slash').setScale(4);                          // img Slash
     slashAtk.setDepth(1);
 
     spawnDetector = this.add.rectangle(1300,1000,50,400,0xB14F37);
@@ -1302,9 +1302,9 @@ function update(time, delta){
     //console.log(enemyCanDie);
     //console.log(playerCanFall);
     //theGamePad.left = true
-    //console.log(theGamePad);
-    //console.log(theGamePad.gamepads);
-    console.log(gamePadCombo);
+    // console.log(theGamePad);
+    console.log(theGamePad.gamepads);
+    //console.log(gamePadCombo);
     //console.log(this.input.gamepad.total);
     //console.log(this.input.gamepad.gamepads.length);
     //if(player.flipX === true && player.body.velocity.x === 0){console.log('flip');}
@@ -1706,11 +1706,11 @@ function UltraSlash(){
                     colideATK.setX(player.x +50);colideATK.setY(player.y +10)
                 }
             }
-            if(player.anims.currentFrame.index < 61 ){
-                player.setGravityY(-1000);
-                // if(playerFlip === true){player.setVelocityX(-playerVelocityX + 10)}
-                // if(playerFlip === false){player.setVelocityX(playerVelocityX + 10)} 
-            }
+            // if(player.anims.currentFrame.index < 61 ){
+            //     player.setGravityY(-1000);
+            //     // if(playerFlip === true){player.setVelocityX(-playerVelocityX + 10)}
+            //     // if(playerFlip === false){player.setVelocityX(playerVelocityX + 10)} 
+            // }
             if(player.anims.currentFrame.index === 5 ){
                 //player.anims.stop()
                 player.data.list.Eject = 0;
@@ -1887,7 +1887,7 @@ function createSlash(){
     var slash = hittableObject.create(0,0,'slash',0,true);
     slash.anims.play('slashed', true)
     slash.rotation = Phaser.Math.Between(0,2);
-    slash.setScale(2);
+    //slash.setScale(5);
     slash.setData('name', 'slash');
     slash.on('animationcomplete', ()=>{
         slash.destroy();
