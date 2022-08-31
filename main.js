@@ -15,6 +15,7 @@ var configuration = {
     scale:{
        mode : Phaser.Scale.FIT,
        autoCenter: true,
+       orientation: Phaser.Scale.Orientation.PORTRAIT,
     //    width : 720,
     //    height : 420,
     },
@@ -49,8 +50,11 @@ var touchesAttack; // touche d'attaque
 var theGamePad;
 var gamepadJump; // : boolean
 var gamepadAttack; // : boolean
+var gamepadLeft; // : boolean
 /////////////////////////////////
 var gamePadCombo;
+
+var TouchLeft;
 
 var player;
 var playerVelocityX;
@@ -246,6 +250,37 @@ function create(){
     // var sol1 = this.add.sprite(300, 400, 'ground');//image sol
     // var sol2 = this.add.sprite(511, 550, 'ground');//image sol
     // var sol3 = this.add.sprite(900, 600, 'ground');//image sol
+    
+    TouchLeft = this.add.rectangle(0,0,60,60,0xB14F37).setStrokeStyle(2, 0xFFFFFF).setDepth(3).setInteractive();
+    TouchRight = this.add.rectangle(0,0,60,60,0xB14F37).setStrokeStyle(2, 0xFFFFFF).setDepth(3).setInteractive();
+    TouchJump = this.add.rectangle(0,0,60,60,0xB14F37).setStrokeStyle(2, 0xFFFFFF).setDepth(3).setInteractive();
+    
+    // TouchLeft.setDepth(3);
+    // TouchLeft.setInteractive();
+    TouchJump.on('pointerdown', function (){                                                            //jump
+        jumpAction();
+        console.log('tap');
+    },this);
+    TouchLeft.on('pointerdown', function (){
+        console.log(TouchLeft.input);
+        theGamePad.left = true
+        console.log('tap');
+    },this);
+    TouchRight.on('pointerdown', function (){
+        console.log(TouchLeft.input);
+        theGamePad.right = true
+        console.log('tap');
+    },this);
+    TouchLeft.on('pointerout', function (){
+        theGamePad.left = false
+        console.log(TouchLeft.input);
+        console.log('up');
+    },this);
+    TouchRight.on('pointerout', function (){
+        theGamePad.right = false
+        console.log(TouchLeft.input);
+        console.log('up');
+    },this);
 
     enemy1Spawn = this.add.image(1000, 1100, 'spawner').setVisible(false);         //spawn enemy
     enemyCrossBowSpawn = this.add.image(700, 300, 'spawner').setVisible(false);  //spawn enemy
@@ -523,12 +558,12 @@ function create(){
         //     }
         // })
 
-        // this.physics.add.overlap(hittableObject, CrossPlatform, function(enemy, pltfrm){     // collision entre attaque et boites 
-        //     pltfrm.faceLeft = false;
-        //     pltfrm.faceRight = false;
-        //     pltfrm.faceBottom = false;
-        //     pltfrm.faceUp = true;
-        // });
+        this.physics.add.overlap(hittableObject, CrossPlatform, function(enemy, pltfrm){     // collision entre attaque et boites 
+            pltfrm.faceLeft = false;
+            pltfrm.faceRight = false;
+            pltfrm.faceBottom = false;
+            pltfrm.faceUp = true;
+        });
         
         this.physics.add.collider(hittableObject, CrossPlatform, function(enemy,pltfrm){       //collision enemy + CrossPlatform tiles
            enemy.data.list.stopMove = true
@@ -616,7 +651,7 @@ function create(){
     theGamePad = this.input.gamepad.on('down', function(pad, button, index){
         theGamePad = pad
         text.setText('Playing with : ' + pad.id);
-        //console.log(pad.id);
+
         if(pad._RCBottom.pressed && playerInGround === true && counterMovePlayer === 0){ //jump
             gamepadJump = true;
         }
@@ -728,7 +763,7 @@ function create(){
     this.anims.create({
         key: 'ultra',
         frames: this.anims.generateFrameNumbers('ultimate',{frames: [1, 2, 3, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 59, 59, 59, 59]}),
-        frameRate: 20,
+        frameRate: 25,
     });
     this.anims.create({
         key: 'pushBox',
@@ -737,8 +772,8 @@ function create(){
     });
     this.anims.create({
         key: 'climb',
-        frames: this.anims.generateFrameNumbers('heroClimb',{frames: [0, 1, 2, 3, 4, 5, 5, 5, 5]}),
-        frameRate: 8,
+        frames: this.anims.generateFrameNumbers('heroClimb',{frames: [0, 1, 2, 3, 4, 5, 5, 5]}),
+        frameRate: 6,
     });
 
     ///// animation box
@@ -1039,6 +1074,13 @@ function update(time, delta){
     gameOverText.y = player.body.position.y
     spawnDetector.body.velocity.x = player.body.velocity.x ;
     spawnDetector.body.velocity.y = player.body.velocity.y ;
+
+    TouchLeft.x = player.body.position.x - 300;                                                           // position touch
+    TouchLeft.y = player.body.position.y + 160;
+    TouchRight.x = player.body.position.x - 200;                                                           // position touch
+    TouchRight.y = player.body.position.y + 160;
+    TouchJump.x = player.body.position.x + 300;                                                           // position touch
+    TouchJump.y = player.body.position.y + 160;
     // spawnReActivator.body.velocity.x = player.body.velocity.x ;
     // spawnReActivator.body.velocity.y = player.body.velocity.y ;
     // spawnDetector.y = player.body.position.y;
@@ -1301,9 +1343,9 @@ function update(time, delta){
     //console.log(player.body.velocity.y);
     //console.log(enemyCanDie);
     //console.log(playerCanFall);
-    //theGamePad.left = true
+    // theGamePad.left = true
     // console.log(theGamePad);
-    console.log(theGamePad.gamepads);
+    //console.log(theGamePad.gamepads);
     //console.log(gamePadCombo);
     //console.log(this.input.gamepad.total);
     //console.log(this.input.gamepad.gamepads.length);
@@ -1380,22 +1422,27 @@ function update(time, delta){
                 }
                 gamePadCombo = [];
             }
-            // else if(gamePadCombo.includes("H")){
-            //     console.log('uh');
-            //     gamePadCombo = [];
-            // }
             else{
                 gamePadCombo = [];
             }
     }
-   
-        if (leftkey.isDown && counterMovePlayer === 0 || theGamePad.left  && counterMovePlayer === 0){              //left
-                player.setVelocityX(-playerVelocityX);
-                playerFlip = player.flipX=true;
+        if(theGamePad.up && counterMovePlayer === 0){                                                               //up (climb pad)
+            console.log('haut');
+            if(playerInGround === false){
+                player.data.list.Climb = true
+                
+            }
+        }
+       
 
-                if(playerInGround === true){
-                    player.anims.play('runLeft', true);
-                }
+        if (leftkey.isDown && counterMovePlayer === 0 || theGamePad.left  && counterMovePlayer === 0){              //left
+                // player.setVelocityX(-playerVelocityX);
+                // playerFlip = player.flipX=true;
+
+                // if(playerInGround === true){
+                //     player.anims.play('runLeft', true);
+                // }
+                heroLeft();
             }
         else if (rightkey.isDown && counterMovePlayer === 0 || theGamePad.right && counterMovePlayer === 0){       //right
                 player.setVelocityX(playerVelocityX);
@@ -1417,15 +1464,9 @@ function update(time, delta){
 
         
         if(Phaser.Input.Keyboard.JustDown(upkey) && counterMovePlayer === 0 
-        || gamepadJump === true && counterMovePlayer === 0){                                                //jump                                                //jump
-            if(playerInGround === true){ 
-                //gamepadJump = false
-                player.setVelocityY(-450);
-                playerInGround = false;
-                jumpAction();
-            }else{
-                player.data.list.Climb = true
-            }
+        || gamepadJump === true && counterMovePlayer === 0){                                                //jump        
+                                                    
+           jumpAction();
         }     
 
         if(player.body.velocity.y > 0 &&                                                                    //fall
@@ -1559,9 +1600,28 @@ function attackComboThree(){
         }
     });
 }
-function jumpAction(){                                                                                      // Jump
-        player.anims.play('jump', true);
+function heroLeft(){                                                                                        //left
+    player.setVelocityX(-playerVelocityX);
+    playerFlip = player.flipX=true;
+
+    if(playerInGround === true){
+        player.anims.play('runLeft', true);
+    }
 }
+
+function jumpAction(){                                                                                      // Jump
+    if(playerInGround === true){ 
+        player.anims.play('jump', true);
+        gamepadJump = false
+        player.setVelocityY(-450);
+        playerInGround = false;
+       
+    }
+    else{
+        player.data.list.Climb = true
+    }
+}
+
 function fallAction(){                                                                                      // Fall
         player.anims.play('fall', true) 
         player.data.list.Climb = false;
