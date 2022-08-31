@@ -15,7 +15,6 @@ var configuration = {
     scale:{
        mode : Phaser.Scale.FIT,
        autoCenter: true,
-       orientation: Phaser.Scale.Orientation.PORTRAIT,
     //    width : 720,
     //    height : 420,
     },
@@ -55,6 +54,12 @@ var gamepadLeft; // : boolean
 var gamePadCombo;
 
 var TouchLeft;
+var TouchRight;
+var TouchUp;
+var TouchDown;
+var TouchJump;
+var TouchAttack;
+
 
 var player;
 var playerVelocityX;
@@ -250,38 +255,6 @@ function create(){
     // var sol1 = this.add.sprite(300, 400, 'ground');//image sol
     // var sol2 = this.add.sprite(511, 550, 'ground');//image sol
     // var sol3 = this.add.sprite(900, 600, 'ground');//image sol
-    
-    TouchLeft = this.add.rectangle(0,0,60,60,0xB14F37).setStrokeStyle(2, 0xFFFFFF).setDepth(3).setInteractive();
-    TouchRight = this.add.rectangle(0,0,60,60,0xB14F37).setStrokeStyle(2, 0xFFFFFF).setDepth(3).setInteractive();
-    TouchJump = this.add.rectangle(0,0,60,60,0xB14F37).setStrokeStyle(2, 0xFFFFFF).setDepth(3).setInteractive();
-    
-    // TouchLeft.setDepth(3);
-    // TouchLeft.setInteractive();
-    TouchJump.on('pointerdown', function (){                                                            //jump
-        //jumpAction();
-        gamepadJump = true;
-        console.log('tap');
-    },this);
-    TouchLeft.on('pointerdown', function (){
-        console.log(TouchLeft.input);
-        theGamePad.left = true
-        console.log('tap');
-    },this);
-    TouchRight.on('pointerdown', function (){
-        console.log(TouchLeft.input);
-        theGamePad.right = true
-        console.log('tap');
-    },this);
-    TouchLeft.on('pointerout', function (){
-        theGamePad.left = false
-        console.log(TouchLeft.input);
-        console.log('up');
-    },this);
-    TouchRight.on('pointerout', function (){
-        theGamePad.right = false
-        console.log(TouchLeft.input);
-        console.log('up');
-    },this);
 
     enemy1Spawn = this.add.image(1000, 1100, 'spawner').setVisible(false);         //spawn enemy
     enemyCrossBowSpawn = this.add.image(700, 300, 'spawner').setVisible(false);  //spawn enemy
@@ -660,7 +633,7 @@ function create(){
             gamePadCombo = gamePadCombo + 'A';
             gamepadAttack = true;
         }
-        if(pad._LCTop.pressed){  //down
+        if(pad._LCTop.pressed){  //up
             gamePadCombo = gamePadCombo + 'H';
         }
         if(pad._LCBottom.pressed){  //down
@@ -673,6 +646,74 @@ function create(){
             gamePadCombo = gamePadCombo + 'G';
         }
     }, this);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    //TOUCH SCREEN
+
+    TouchLeft = this.add.rectangle(0,0,60,60,0xB14F37).setStrokeStyle(2, 0xFFFFFF).setDepth(3).setInteractive();
+    TouchRight = this.add.rectangle(0,0,60,60,0xB14F37).setStrokeStyle(2, 0xFFFFFF).setDepth(3).setInteractive();
+    TouchUp = this.add.rectangle(0,0,60,60,0xB14F37).setStrokeStyle(2, 0xFFFFFF).setDepth(3).setInteractive();
+    TouchDown = this.add.rectangle(0,0,60,60,0xB14F37).setStrokeStyle(2, 0xFFFFFF).setDepth(3).setInteractive();
+    TouchJump = this.add.rectangle(0,0,60,60,0xB14F37).setStrokeStyle(2, 0xFFFFFF).setDepth(3).setInteractive();
+    TouchAttack = this.add.rectangle(0,0,60,60,0xB14F37).setStrokeStyle(2, 0xFFFFFF).setDepth(3).setInteractive();
+    
+    // TouchLeft.setDepth(3);
+    // TouchLeft.setInteractive();
+    TouchJump.on('pointerover', function (){                                                            //jump
+        //jumpAction();
+        gamepadJump = true;
+        console.log('tap');
+    },this);
+    TouchRight.on('pointerdown', function (){                                                       //right
+        console.log(TouchLeft.input);
+        theGamePad.right = true
+        theGamePad.left = false
+        gamePadCombo = gamePadCombo + 'D';
+
+        console.log('tap');
+    },this);
+
+    TouchLeft.on('pointerdown', function (){                                                        //left
+        console.log(TouchLeft.input);
+        theGamePad.left = true
+        theGamePad.right = false
+        gamePadCombo = gamePadCombo + 'G';
+
+        console.log('tap');
+    },this);
+
+    TouchUp.on('pointerdown', function (){                                                          //up
+        gamePadCombo = gamePadCombo + 'H';
+    },this);
+
+    TouchDown.on('pointerdown', function (){                                                        //down
+        
+        gamePadCombo = gamePadCombo + 'B';
+    },this);
+
+    TouchAttack.on('pointerover', function (){                                                      //atk
+        console.log(TouchLeft.input);
+        gamepadAttack = true
+        console.log('tap');
+        gamePadCombo = gamePadCombo + 'A';
+    },this);
+
+    // TouchRight.on('pointerover', function (){
+    //     console.log(TouchLeft.input);
+    //     theGamePad.right = true
+    //     console.log('tap');
+    // },this);
+    TouchLeft.on('pointerout', function (){
+        theGamePad.left = false
+        // console.log(TouchLeft.input);
+        console.log('up');
+    },this);
+    TouchRight.on('pointerout', function (){
+        theGamePad.right = false
+        // console.log(TouchLeft.input);
+        
+        console.log('up');
+    },this);
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -1078,10 +1119,16 @@ function update(time, delta){
 
     TouchLeft.x = player.body.position.x - 300;                                                           // position touch
     TouchLeft.y = player.body.position.y + 160;
-    TouchRight.x = player.body.position.x - 200;                                                           // position touch
+    TouchRight.x = player.body.position.x - 180;                                                           // position touch
     TouchRight.y = player.body.position.y + 160;
+    TouchUp.x = player.body.position.x - 240;                                                           // position touch
+    TouchUp.y = player.body.position.y + 100;
+    TouchDown.x = player.body.position.x - 240;                                                           // position touch
+    TouchDown.y = player.body.position.y + 220;
     TouchJump.x = player.body.position.x + 300;                                                           // position touch
-    TouchJump.y = player.body.position.y + 160;
+    TouchJump.y = player.body.position.y + 220;
+    TouchAttack.x = player.body.position.x + 200;                                                           // position touch
+    TouchAttack.y = player.body.position.y + 160;
     // spawnReActivator.body.velocity.x = player.body.velocity.x ;
     // spawnReActivator.body.velocity.y = player.body.velocity.y ;
     // spawnDetector.y = player.body.position.y;
@@ -1446,12 +1493,13 @@ function update(time, delta){
                 heroLeft();
             }
         else if (rightkey.isDown && counterMovePlayer === 0 || theGamePad.right && counterMovePlayer === 0){       //right
-                player.setVelocityX(playerVelocityX);
-                playerFlip = player.flipX=false;
+                // player.setVelocityX(playerVelocityX);
+                // playerFlip = player.flipX=false;
             
-                if(playerInGround === true){
-                    player.anims.play('runRight', true);
-                }
+                // if(playerInGround === true){
+                //     player.anims.play('runRight', true);
+                // }
+                heroRight();
             }
         else if (player.setVelocityX(0)){                                                               //idle
                 if(playerInGround === true && counterMovePlayer === 0){
@@ -1607,6 +1655,14 @@ function heroLeft(){                                                            
 
     if(playerInGround === true){
         player.anims.play('runLeft', true);
+    }
+}
+function heroRight(){
+    player.setVelocityX(playerVelocityX);
+        playerFlip = player.flipX=false;
+            
+    if(playerInGround === true){
+        player.anims.play('runRight', true);
     }
 }
 
