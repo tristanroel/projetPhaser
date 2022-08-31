@@ -341,7 +341,7 @@ function create(){
 
     // TEXT
 
-    text = this.add.text(0,0, ' << CONTROL >> \n LEFT = press "Q"\n RIGHT = press "D"\n JUMP  = press "Z"\n ATTACK = press "J"\n GUARD = press "I" \n GAMEPAD : disconected\n version : O.21.0 | 31.08.22' , {fontFamily : 'PixelFont'}); 
+    text = this.add.text(0,0, ' << CONTROL >> \n LEFT = press "Q"\n RIGHT = press "D"\n JUMP  = press "Z"\n ATTACK = press "J"\n GUARD = press "I" \n GAMEPAD : disconected\n version : O.21.1 | 31.08.22' , {fontFamily : 'PixelFont'}); 
     personalBestText = this.add.text(0,0,'YOUR BEST : 0',{ fontFamily : 'PixelFont'})
     scoreText = this.add.text(0,0, 'SCORE : 0',{ fontFamily : 'PixelFont'})
     gameOverText = this.add.text(0,0, 'GAME OVER \n score : 0 \n press any to restart', { fontFamily : 'PixelFont', fontSize : '60px', color : '#FFF05B'});
@@ -659,12 +659,12 @@ function create(){
     
     // TouchLeft.setDepth(3);
     // TouchLeft.setInteractive();
-    TouchJump.on('pointerover', function (){                                                        //jump
+    TouchJump.on('pointerdown', function (){                                                        //jump
         //jumpAction();
         gamepadJump = true;
         console.log('tap');
     },this);
-    TouchRight.on('pointerover', function (){                                                       //right
+    TouchRight.on('pointerdown', function (){                                                       //right
         console.log(TouchLeft.input);
         theGamePad.right = true
         theGamePad.left = false
@@ -673,7 +673,7 @@ function create(){
         console.log('tap');
     },this);
 
-    TouchLeft.on('pointerover', function (){                                                        //left
+    TouchLeft.on('pointerdown', function (){                                                        //left
         console.log(TouchLeft.input);
         gamepadLeft = true
         theGamePad.right = false
@@ -682,18 +682,18 @@ function create(){
         console.log('tap');
     },this);
 
-    TouchUp.on('pointerover', function (){                                                          //up
+    TouchUp.on('pointerdown', function (){                                                          //up
         gamePadCombo = gamePadCombo + 'H';
         console.log('up');
     },this);
 
-    TouchDown.on('pointerover', function (){                                                        //down
+    TouchDown.on('pointerdown', function (){                                                        //down
         
         gamePadCombo = gamePadCombo + 'B';
         console.log('down');
     },this);
 
-    TouchAttack.on('pointerover', function (){                                                      //atk
+    TouchAttack.on('pointerdown', function (){                                                      //atk
         console.log(TouchLeft.input);
         gamepadAttack = true
         console.log('tap');
