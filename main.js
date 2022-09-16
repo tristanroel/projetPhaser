@@ -149,7 +149,7 @@ function preload(){
     this.load.spritesheet('piecette','assets/Coin.png', {frameWidth : 8, frameHeight : 8});
     this.load.spritesheet('hero', 'assets/Sprites/stancearmed.png',{frameWidth: 170, frameHeight: 170});
     this.load.spritesheet('heroAttack', 'assets/Sprites/sword_attack_move.png',{frameWidth: 170, frameHeight: 170});
-    this.load.spritesheet('herorun', 'assets/Sprites/walkarmed_old.png',{frameWidth: 170, frameHeight: 170});
+    this.load.spritesheet('herorun', 'assets/Sprites/walkarmed.png',{frameWidth: 170, frameHeight: 170});
     this.load.spritesheet('herojump', 'assets/Sprites/jumparmed.png',{frameWidth: 170, frameHeight: 170});
     this.load.spritesheet('herojumpAtk', 'assets/Sprites/jump_sword_attack.png',{frameWidth: 170, frameHeight: 170});
     this.load.spritesheet('heroGuard', 'assets/Sprites/guard.png',{frameWidth: 170, frameHeight: 170});
@@ -325,7 +325,7 @@ function create(){
     slashAtk = this.add.sprite(0,0,'slash').setScale(4);                          // img Slash
     slashAtk.setDepth(1);
 
-    spawnDetector = this.add.rectangle(1300,1000,50,400,0xB14F37);
+    spawnDetector = this.add.rectangle(1300,1000,50,200,0xB14F37);                // Spawn Detector
     this.physics.add.existing(spawnDetector);
     //spawnDetector.setData('Active', false)
     //spawnDetector.setVisible(false)
@@ -468,8 +468,8 @@ function create(){
 
             spawnCounter ++;
 
-            detector.body.position.x = player.body.position.x +600
-            detector.body.position.y = player.body.position.y -140
+            detector.body.position.x = player.body.position.x +700
+            detector.body.position.y = player.body.position.y -100
 
             //console.log(spawnCounter);
             //console.log(spawn);
@@ -650,72 +650,72 @@ function create(){
 
     //TOUCH SCREEN
 
-    TouchLeft = this.add.rectangle(0,0,60,60,0xB14F37).setStrokeStyle(2, 0xFFFFFF).setDepth(3).setInteractive();
-    TouchRight = this.add.rectangle(0,0,60,60,0xB14F37).setStrokeStyle(2, 0xFFFFFF).setDepth(3).setInteractive();
-    TouchUp = this.add.rectangle(0,0,60,60,0xB14F37).setStrokeStyle(2, 0xFFFFFF).setDepth(3).setInteractive();
-    TouchDown = this.add.rectangle(0,0,60,60,0xB14F37).setStrokeStyle(2, 0xFFFFFF).setDepth(3).setInteractive();
-    TouchJump = this.add.rectangle(0,0,60,60,0xB14F37).setStrokeStyle(2, 0xFFFFFF).setDepth(3).setInteractive();
-    TouchAttack = this.add.rectangle(0,0,60,60,0xB14F37).setStrokeStyle(2, 0xFFFFFF).setDepth(3).setInteractive();
+    // TouchLeft = this.add.rectangle(0,0,60,60,0xB14F37).setStrokeStyle(2, 0xFFFFFF).setDepth(3).setInteractive();
+    // TouchRight = this.add.rectangle(0,0,60,60,0xB14F37).setStrokeStyle(2, 0xFFFFFF).setDepth(3).setInteractive();
+    // TouchUp = this.add.rectangle(0,0,60,60,0xB14F37).setStrokeStyle(2, 0xFFFFFF).setDepth(3).setInteractive();
+    // TouchDown = this.add.rectangle(0,0,60,60,0xB14F37).setStrokeStyle(2, 0xFFFFFF).setDepth(3).setInteractive();
+    // TouchJump = this.add.rectangle(0,0,60,60,0xB14F37).setStrokeStyle(2, 0xFFFFFF).setDepth(3).setInteractive();
+    // TouchAttack = this.add.rectangle(0,0,60,60,0xB14F37).setStrokeStyle(2, 0xFFFFFF).setDepth(3).setInteractive();
     
-    // TouchLeft.setDepth(3);
-    // TouchLeft.setInteractive();
-    TouchJump.on('pointerdown', function (){                                                        //jump
-        //jumpAction();
-        gamepadJump = true;
-        console.log('tap');
-    },this);
-    TouchRight.on('pointerdown', function (){                                                       //right
-        console.log(TouchLeft.input);
-        theGamePad.right = true
-        theGamePad.left = false
-        gamePadCombo = gamePadCombo + 'D';
-
-        console.log('tap');
-    },this);
-
-    TouchLeft.on('pointerdown', function (){                                                        //left
-        console.log(TouchLeft.input);
-        gamepadLeft = true
-        theGamePad.right = false
-        gamePadCombo = gamePadCombo + 'G';
-
-        console.log('tap');
-    },this);
-
-    TouchUp.on('pointerdown', function (){                                                          //up
-        gamePadCombo = gamePadCombo + 'H';
-        console.log('up');
-    },this);
-
-    TouchDown.on('pointerdown', function (){                                                        //down
-        
-        gamePadCombo = gamePadCombo + 'B';
-        console.log('down');
-    },this);
-
-    TouchAttack.on('pointerdown', function (){                                                      //atk
-        console.log(TouchLeft.input);
-        gamepadAttack = true
-        console.log('tap');
-        gamePadCombo = gamePadCombo + 'A';
-    },this);
-
-    // TouchRight.on('pointerover', function (){
-    //     console.log(TouchLeft.input);
-    //     theGamePad.right = true
+    // // TouchLeft.setDepth(3);
+    // // TouchLeft.setInteractive();
+    // TouchJump.on('pointerdown', function (){                                                        //jump
+    //     //jumpAction();
+    //     gamepadJump = true;
     //     console.log('tap');
     // },this);
-    TouchLeft.on('pointerout', function (){
-        gamepadLeft = false;
-        // console.log(TouchLeft.input);
-        console.log('up');
-    },this);
-    TouchRight.on('pointerout', function (){
-        theGamePad.right = false
-        // console.log(TouchLeft.input);
+    // TouchRight.on('pointerdown', function (){                                                       //right
+    //     console.log(TouchLeft.input);
+    //     theGamePad.right = true
+    //     theGamePad.left = false
+    //     gamePadCombo = gamePadCombo + 'D';
+
+    //     console.log('tap');
+    // },this);
+
+    // TouchLeft.on('pointerdown', function (){                                                        //left
+    //     console.log(TouchLeft.input);
+    //     gamepadLeft = true
+    //     theGamePad.right = false
+    //     gamePadCombo = gamePadCombo + 'G';
+
+    //     console.log('tap');
+    // },this);
+
+    // TouchUp.on('pointerdown', function (){                                                          //up
+    //     gamePadCombo = gamePadCombo + 'H';
+    //     console.log('up');
+    // },this);
+
+    // TouchDown.on('pointerdown', function (){                                                        //down
         
-        console.log('up');
-    },this);
+    //     gamePadCombo = gamePadCombo + 'B';
+    //     console.log('down');
+    // },this);
+
+    // TouchAttack.on('pointerdown', function (){                                                      //atk
+    //     console.log(TouchLeft.input);
+    //     gamepadAttack = true
+    //     console.log('tap');
+    //     gamePadCombo = gamePadCombo + 'A';
+    // },this);
+
+    // // TouchRight.on('pointerover', function (){
+    // //     console.log(TouchLeft.input);
+    // //     theGamePad.right = true
+    // //     console.log('tap');
+    // // },this);
+    // TouchLeft.on('pointerout', function (){
+    //     gamepadLeft = false;
+    //     // console.log(TouchLeft.input);
+    //     console.log('up');
+    // },this);
+    // TouchRight.on('pointerout', function (){
+    //     theGamePad.right = false
+    //     // console.log(TouchLeft.input);
+        
+    //     console.log('up');
+    // },this);
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -1119,18 +1119,20 @@ function update(time, delta){
     spawnDetector.body.velocity.x = player.body.velocity.x ;
     spawnDetector.body.velocity.y = player.body.velocity.y ;
 
-    TouchLeft.x = player.body.position.x - 300;                                                           // position touch
-    TouchLeft.y = player.body.position.y + 160;
-    TouchRight.x = player.body.position.x - 180;                                                           // position touch
-    TouchRight.y = player.body.position.y + 160;
-    TouchUp.x = player.body.position.x - 240;                                                           // position touch
-    TouchUp.y = player.body.position.y + 100;
-    TouchDown.x = player.body.position.x - 240;                                                           // position touch
-    TouchDown.y = player.body.position.y + 220;
-    TouchJump.x = player.body.position.x + 300;                                                           // position touch
-    TouchJump.y = player.body.position.y + 220;
-    TouchAttack.x = player.body.position.x + 200;                                                           // position touch
-    TouchAttack.y = player.body.position.y + 160;
+    // TouchLeft.x = player.body.position.x - 300;                                                           // position touch
+    // TouchLeft.y = player.body.position.y + 160;
+    // TouchRight.x = player.body.position.x - 180;                                                           // position touch
+    // TouchRight.y = player.body.position.y + 160;
+    // TouchUp.x = player.body.position.x - 240;                                                           // position touch
+    // TouchUp.y = player.body.position.y + 100;
+    // TouchDown.x = player.body.position.x - 240;                                                           // position touch
+    // TouchDown.y = player.body.position.y + 220;
+    // TouchJump.x = player.body.position.x + 300;                                                           // position touch
+    // TouchJump.y = player.body.position.y + 220;
+    // TouchAttack.x = player.body.position.x + 200;                                                           // position touch
+    // TouchAttack.y = player.body.position.y + 160;
+
+    
     // spawnReActivator.body.velocity.x = player.body.velocity.x ;
     // spawnReActivator.body.velocity.y = player.body.velocity.y ;
     // spawnDetector.y = player.body.position.y;
@@ -1369,7 +1371,7 @@ function update(time, delta){
     //console.log(Phaser.Math.Distance.BetweenPoints(hittableObject.children.entries[0],player));
     //console.log(enemyMoveDetection.children.entries[0]);
     //enemyMoveDetection.children.entries[0].body.destroy()
-   //console.log(counterMovePlayer);
+    //console.log(counterMovePlayer);
     //console.log(Arrow);
     //console.log(PlayerTouchEnemy);
     //console.log(colideATK2);
