@@ -168,6 +168,7 @@ function preload(){
     this.load.spritesheet('theEnemyCrossBow', 'assets/Enemy/arbaletrier.png',{frameWidth: 170, frameHeight: 170});
     this.load.spritesheet('theEnemyPoleAxe', 'assets/Enemy/poleaxegiant.png',{frameWidth: 180, frameHeight: 170});
     this.load.spritesheet('theEnemySpearMan', 'assets/Enemy/spearman.png',{frameWidth: 190, frameHeight: 170});
+    this.load.spritesheet('theEnemyAssassin', 'assets/Enemy/assassin.png',{frameWidth: 170, frameHeight: 170});
 }
 
 /////////////////////////////////////////////////////////////////////////////////////       CREATE
@@ -256,7 +257,7 @@ function create(){
     // var sol2 = this.add.sprite(511, 550, 'ground');//image sol
     // var sol3 = this.add.sprite(900, 600, 'ground');//image sol
 
-    enemy1Spawn = this.add.image(1000, 1100, 'spawner').setVisible(false);         //spawn enemy
+    enemy1Spawn = this.add.image(1600, 1100, 'spawner').setVisible(true);         //spawn enemy
     enemyCrossBowSpawn = this.add.image(700, 300, 'spawner').setVisible(false);  //spawn enemy
     boxSpawn = this.add.group({
         key : 'box',
@@ -540,7 +541,7 @@ function create(){
         });
         
         this.physics.add.collider(hittableObject, CrossPlatform, function(enemy,pltfrm){       //collision enemy + CrossPlatform tiles
-           enemy.data.list.stopMove = true
+           //enemy.data.list.stopMove = true
            //console.log('enemy.data.list.stopMove');
         })
 
@@ -869,6 +870,11 @@ function create(){
         frameRate: 6,
     });
     this.anims.create({
+        key: 'stanceAssassin',
+        frames: this.anims.generateFrameNumbers('theEnemyAssassin',{frames : [0]}),
+        frameRate: 6,
+    });
+    this.anims.create({
         key: 'walkEnemy1',
         frames: this.anims.generateFrameNumbers('theEnemy',{frames : [1, 2, 3, 4]}),
         frameRate: 4,
@@ -889,6 +895,12 @@ function create(){
     this.anims.create({
         key: 'walkSpearMan',
         frames: this.anims.generateFrameNumbers('theEnemySpearMan',{frames : [1, 2, 3, 4]}),
+        frameRate: 4,
+        repeat : -1,
+    });
+    this.anims.create({
+        key: 'walkAssassin',
+        frames: this.anims.generateFrameNumbers('theEnemyAssassin',{frames : [1, 2, 3, 4]}),
         frameRate: 4,
         repeat : -1,
     });
@@ -937,6 +949,16 @@ function create(){
         frameRate: 10,
     })
     this.anims.create({
+        key: 'attackAssassin',
+        frames: this.anims.generateFrameNumbers('theEnemyAssassin',{frames : [ 5, 11, 11, 11, 12, 13, 5, 5, 5, 5, 5, 0, 0, 0]}),
+        frameRate: 10,
+    })
+    this.anims.create({
+        key: 'attackTwoAssassin',
+        frames: this.anims.generateFrameNumbers('theEnemyAssassin',{frames : [ 15, 16, 16, 16, 17, 17, 17, 18, 19, 19, 15]}),
+        frameRate: 8,
+    })
+    this.anims.create({
         key: 'knockbackEnemy1',
         frames: this.anims.generateFrameNumbers('theEnemy',{frames : [ 10, 11, 11, 11, 11, 11, 11, 11, 0]}),
         frameRate: 9,
@@ -954,6 +976,11 @@ function create(){
     this.anims.create({
         key: 'knockbackSpearMan',
         frames: this.anims.generateFrameNumbers('theEnemySpearMan',{frames : [9, 10, 10, 10, 10, 10, 10, 10, 0]}),
+        frameRate: 9,
+    });
+    this.anims.create({
+        key: 'knockbackAssassin',
+        frames: this.anims.generateFrameNumbers('theEnemyAssassin',{frames : [20, 21, 21, 21, 21, 21, 21, 21, 0]}),
         frameRate: 9,
     });
     // this.anims.create({
@@ -982,6 +1009,11 @@ function create(){
         frameRate: 8,
     })
     this.anims.create({
+        key: 'fallAssassin',
+        frames: this.anims.generateFrameNumbers('theEnemyAssassin',{frames : [21, 22, 23, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24]}),
+        frameRate: 8,
+    })
+    this.anims.create({
         key: 'fallbox',
         frames: this.anims.generateFrameNumbers('box',{frames : [15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 24, 24, 24, 24, 24]}),
         frameRate: 15,
@@ -1007,6 +1039,11 @@ function create(){
         frameRate: 8,
     })
     this.anims.create({
+        key: 'ejectAssassin',
+        frames: this.anims.generateFrameNumbers('theEnemyAssassin',{frames : [21, 21, 21, 21, 21, 21, 22, 22, 22, 22, 22, 22, 23, 23, 23, 23, 23, 23, 23, 23]}),
+        frameRate: 8,
+    })
+    this.anims.create({
         key: 'expulseEnemy1',
         frames: this.anims.generateFrameNumbers('theEnemy',{frames : [15 ,16, 16,16, 16,16, 16, 15, 15]}),
         frameRate: 8,
@@ -1024,6 +1061,11 @@ function create(){
     this.anims.create({
         key: 'expulseSpearMan',
         frames: this.anims.generateFrameNumbers('theEnemySpearMan',{frames : [14, 15, 15, 15, 15, 15, 15, 14, 14]}),
+        frameRate: 8,
+    })
+    this.anims.create({
+        key: 'expulseAssassin',
+        frames: this.anims.generateFrameNumbers('theEnemyAssassin',{frames : [25, 26, 26, 26, 26, 26, 26, 25, 25]}),
         frameRate: 8,
     })
 
@@ -1049,7 +1091,7 @@ function create(){
 
 // CREATE ENEMIES
 
-    // createEnemies(enemy1Spawn,'box');
+     createEnemies(enemy1Spawn,'Assassin');
     // createEnemies(enemy1Spawn,'Enemy1');
     // createEnemies(enemyCrossBowSpawn,'Enemy1');
     // createEnemies(enemyCrossBowSpawn,'Enemy1');
@@ -1256,7 +1298,7 @@ function update(time, delta){
             //////////////////////////////////////////////////////////////////////////////////////////////
 
             if(currentEnemy.data.list.stopMove === false){
-                if(Phaser.Math.Distance.BetweenPoints(currentEnemy,player) >= 146 &&                        // walk enemies
+                if(Phaser.Math.Distance.BetweenPoints(currentEnemy,player) >= 126 &&                        // walk enemies
                 currentEnemy.data.list.AttackIsFinish === true){
                     currentEnemy.data.list.CounterMove = 1; 
                     currentEnemy.data.list.EnemyIsAttack = true; 
@@ -1267,14 +1309,24 @@ function update(time, delta){
                 //console.log('eh beh'+ currentEnemy.data.list.CounterMove);
             }
 
-            if(Phaser.Math.Distance.BetweenPoints(currentEnemy,player) < 300 &&                         // attack CrossBow
-            Phaser.Math.Distance.BetweenPoints(currentEnemy,player) > 146 &&
+            if(Phaser.Math.Distance.BetweenPoints(currentEnemy,player) < 350 &&                         // attack CrossBow
+            Phaser.Math.Distance.BetweenPoints(currentEnemy,player) > 126 &&
             currentEnemy.data.list.AttackIsFinish === true &&
             currentEnemy.data.list.type === 'CrossBow'){
                 currentEnemy.data.list.CounterMove = 2; 
             }
 
-            if(Phaser.Math.Distance.BetweenPoints(currentEnemy,player) <= 145 &&                        // action enemies
+            if(Phaser.Math.Distance.BetweenPoints(currentEnemy,player) < 200 &&                         // attack 1 Assassin
+            Phaser.Math.Distance.BetweenPoints(currentEnemy,player) > 190 &&
+            currentEnemy.data.list.AttackIsFinish === true &&
+            currentEnemy.data.list.EnemyIsAttack === true && 
+            currentEnemy.data.list.type === 'Assassin'){
+                currentEnemy.data.list.AttackIsFinish = false
+                currentEnemy.data.list.EnemyIsAttack = false
+                currentEnemy.data.list.CounterMove = 6;
+            }
+
+            if(Phaser.Math.Distance.BetweenPoints(currentEnemy,player) <= 125 &&                        // action enemies
             currentEnemy.data.list.type != 'box' &&
             currentEnemy.data.list.EnemyIsAttack === true && 
             currentEnemy.data.list.AttackIsFinish === true){
@@ -1309,7 +1361,7 @@ function update(time, delta){
                         }
                         break;
                     case 5: enemyWalkBack(currentEnemy,player,this); break;
-                    case 6:
+                    case 6: enemyAttackTwo(currentEnemy); break;
                     case 7:
                     default:
                         //do nothing
@@ -2106,7 +2158,7 @@ enemy1.setBounce(0, 0)
 
 function enemyWalkBack(enemy1,target,game){                                                             // enemy walkBack
     enemy1.setBounce(0, 0)
-    var animsName = 'walkback'+enemy1.data.list.type;
+    var animsName = 'walk'+enemy1.data.list.type;
     enemy1.anims.play(animsName, true)
 
     game.physics.moveToObject(enemy1, target, - (enemy1.data.list.randomValue));
@@ -2194,7 +2246,61 @@ function enemyAttack(enemyone, currentArrow){
                     createArrow(enemyone);
                 }
         }
+        if('attackAssassin' === enemyone.anims.currentAnim.key){                                              //attack Assassin
+            if(enemyone.anims.currentFrame.index < 10)
+                {
+                    if(enemyone.flipX === true){enemyone.setVelocityX(200)}
+                    if(enemyone.flipX === false){enemyone.setVelocityX(-200)}
+                }
+            if(enemyone.anims.currentFrame.index >= 12){ 
+                enemyone.data.list.CounterMove = 0
+                enemyone.data.list.AttackIsFinish = true
+            }
+        }
+
     });
+}
+function enemyAttackTwo(enemyone){
+    console.log("kikou");
+    enemyone.setVelocityX(0);
+    var animsName = 'attackTwo'+enemyone.data.list.type;
+
+    enemyone.anims.play(animsName,true)
+    
+    enemyone.on('animationupdate', ()=>{                                                                
+        if('attackTwoAssassin' === enemyone.anims.currentAnim.key){
+            if(enemyone.anims.currentFrame.index <= 5){
+                enemyone.setVelocityY(-400); 
+            }
+            if(enemyone.anims.currentFrame.index >= 8 ){
+                enemyone.setVelocityY(800); 
+            }
+            if(enemyone.anims.currentFrame.index >= 6 &&
+            enemyone.anims.currentFrame.index <= 7 ){
+                
+                enemyone.setVelocityY(0); 
+            }
+            if(enemyone.anims.currentFrame.index == 8 ){
+                enemyone.data.list.AtkCollide = true
+
+                enemyone.setSize(100,56)
+                setTimeout(()=>{
+                    enemyone.setSize(24,56)
+                    enemyone.data.list.AtkCollide = false
+                },50)
+            }
+            if(enemyone.anims.currentFrame.index <= 10 ){
+                    if(enemyone.flipX === true){enemyone.setVelocityX(800)}
+                    if(enemyone.flipX === false){enemyone.setVelocityX(-800)}
+            }
+            if(enemyone.anims.currentFrame.index >= 11){ 
+                enemyone.data.list.CounterMove = 0
+                enemyone.data.list.AttackIsFinish = true
+            }
+
+        }
+    });
+
 }
 
 function createArrow(enemy){                                                                             // call Arrow 
