@@ -1040,7 +1040,7 @@ function create(){
     })
     this.anims.create({
         key: 'ejectAssassin',
-        frames: this.anims.generateFrameNumbers('theEnemyAssassin',{frames : [21, 21, 21, 21, 21, 21, 22, 22, 22, 22, 22, 22, 23, 23, 23, 23, 23, 23, 23, 23]}),
+        frames: this.anims.generateFrameNumbers('theEnemyAssassin',{frames : [21, 21, 21, 21, 21, 21, 22, 22, 22, 22, 23, 23, 24, 24, 24, 24, 24, 24, 24, 24]}),
         frameRate: 8,
     })
     this.anims.create({
