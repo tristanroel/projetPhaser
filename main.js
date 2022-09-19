@@ -155,7 +155,7 @@ function preload(){
     this.load.spritesheet('heroGuard', 'assets/Sprites/guard.png',{frameWidth: 170, frameHeight: 170});
     this.load.spritesheet('heroProtectGuard', 'assets/Sprites/Playerkbtest.png',{frameWidth: 170, frameHeight: 170});
     this.load.spritesheet('heroKnockBack', 'assets/Sprites/KnockBack.png',{frameWidth: 170, frameHeight: 170});
-    this.load.spritesheet('shoryu', 'assets/Sprites/shoryu.png',{frameWidth: 170, frameHeight: 170});
+    this.load.spritesheet('shoryu', 'assets/Sprites/shoryurev2.png',{frameWidth: 170, frameHeight: 170});
     this.load.spritesheet('ultimate', 'assets/Sprites/SuperAttack.png',{frameWidth: 170, frameHeight: 170});
     this.load.spritesheet('pushBox', 'assets/Sprites/pousse.png',{frameWidth: 170, frameHeight: 170});
     this.load.spritesheet('heroClimb', 'assets/Sprites/escalade.png',{frameWidth: 170, frameHeight: 170});
@@ -257,7 +257,7 @@ function create(){
     // var sol2 = this.add.sprite(511, 550, 'ground');//image sol
     // var sol3 = this.add.sprite(900, 600, 'ground');//image sol
 
-    enemy1Spawn = this.add.image(1600, 1100, 'spawner').setVisible(true);         //spawn enemy
+    enemy1Spawn = this.add.image(1600, 1100, 'spawner').setVisible(false);         //spawn enemy
     enemyCrossBowSpawn = this.add.image(700, 300, 'spawner').setVisible(false);  //spawn enemy
     boxSpawn = this.add.group({
         key : 'box',
@@ -326,7 +326,7 @@ function create(){
     slashAtk = this.add.sprite(0,0,'slash').setScale(4);                          // img Slash
     slashAtk.setDepth(1);
 
-    spawnDetector = this.add.rectangle(1300,1000,50,200,0xB14F37);                // Spawn Detector
+    spawnDetector = this.add.rectangle(1300,1000,50,350,0xB14F37);                // Spawn Detector
     this.physics.add.existing(spawnDetector);
     //spawnDetector.setData('Active', false)
     //spawnDetector.setVisible(false)
@@ -342,7 +342,7 @@ function create(){
 
     // TEXT
 
-    text = this.add.text(0,0, ' << CONTROL >> \n LEFT = press "Q"\n RIGHT = press "D"\n JUMP  = press "Z"\n ATTACK = press "J"\n GUARD = press "I" \n GAMEPAD : disconected\n version : O.21.1 | 31.08.22' , {fontFamily : 'PixelFont'}); 
+    text = this.add.text(0,0, ' << CONTROL >> \n LEFT = press "Q"\n RIGHT = press "D"\n JUMP  = press "Z"\n ATTACK = press "J"\n GUARD = press "I" \n GAMEPAD : disconected\n version : O.22 | 19.09.22' , {fontFamily : 'PixelFont'}); 
     personalBestText = this.add.text(0,0,'YOUR BEST : 0',{ fontFamily : 'PixelFont'})
     scoreText = this.add.text(0,0, 'SCORE : 0',{ fontFamily : 'PixelFont'})
     gameOverText = this.add.text(0,0, 'GAME OVER \n score : 0 \n press any to restart', { fontFamily : 'PixelFont', fontSize : '60px', color : '#FFF05B'});
@@ -469,8 +469,8 @@ function create(){
 
             spawnCounter ++;
 
-            detector.body.position.x = player.body.position.x +700
-            detector.body.position.y = player.body.position.y -100
+            detector.body.position.x = player.body.position.x +600
+            detector.body.position.y = player.body.position.y -150
 
             //console.log(spawnCounter);
             //console.log(spawn);
@@ -801,7 +801,8 @@ function create(){
     });
     this.anims.create({
         key: 'shoryuSlash',
-        frames: this.anims.generateFrameNumbers('shoryu',{frames: [0, 2, 3, 4, 5, 6, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7]}),
+        // frames: this.anims.generateFrameNumbers('shoryu',{frames: [0, 2, 3, 4, 5, 6, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7]}),
+        frames: this.anims.generateFrameNumbers('shoryu',{frames: [0, 1, 2, 2, 3, 4, 5, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6]}),
         frameRate: 12,
         repeat : -1,
     });
@@ -931,22 +932,22 @@ function create(){
     this.anims.create({
         key: 'attackEnemy1',
         frames: this.anims.generateFrameNumbers('theEnemy',{frames : [4, 5, 5, 6, 7, 8, 9, 9, 9, 0, 0, 0, 0, 0, 0, 0, 0]}),
-        frameRate: 10,
+        frameRate: 15,
     });
     this.anims.create({
         key: 'attackCrossBow',
         frames: this.anims.generateFrameNumbers('theEnemyCrossBow',{frames : [ 10, 10, 10, 10, 0, 0, 0, 0, 1, 2, 3, 3, 3, 3, 3, 4, 5, 5, 5, 6, 7, 7, 7, 7, 8, 8, 9, 9]}),
-        frameRate: 6,
+        frameRate: 8,
     })
     this.anims.create({
         key: 'attackPoleAxe',
         frames: this.anims.generateFrameNumbers('theEnemyPoleAxe',{frames : [ 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 7, 8, 9, 10, 11, 11, 11, 11, 12, 13, 14, 15, 16, 17, 17, 0, 0, 0]}),
-        frameRate: 10,
+        frameRate: 15,
     })
     this.anims.create({
         key: 'attackSpearMan',
         frames: this.anims.generateFrameNumbers('theEnemySpearMan',{frames : [ 0, 5, 5, 5, 6, 7, 8, 0, 0, 0, 0, 0, 0, 0, 0]}),
-        frameRate: 10,
+        frameRate: 15,
     })
     this.anims.create({
         key: 'attackAssassin',
@@ -1297,9 +1298,12 @@ function update(time, delta){
 
             //////////////////////////////////////////////////////////////////////////////////////////////
 
+        let rdmNbr = currentEnemy.data.list.randomValue / 2;
+
             if(currentEnemy.data.list.stopMove === false){
-                if(Phaser.Math.Distance.BetweenPoints(currentEnemy,player) >= 126 &&                        // walk enemies
+                if(Phaser.Math.Distance.BetweenPoints(currentEnemy,player) >= 100 + rdmNbr &&                        // walk enemies
                 currentEnemy.data.list.AttackIsFinish === true){
+
                     currentEnemy.data.list.CounterMove = 1; 
                     currentEnemy.data.list.EnemyIsAttack = true; 
                 }
@@ -1309,27 +1313,30 @@ function update(time, delta){
                 //console.log('eh beh'+ currentEnemy.data.list.CounterMove);
             }
 
-            if(Phaser.Math.Distance.BetweenPoints(currentEnemy,player) < 350 &&                         // attack CrossBow
+            if(Phaser.Math.Distance.BetweenPoints(currentEnemy,player) < 400 &&                         // attack CrossBow
             Phaser.Math.Distance.BetweenPoints(currentEnemy,player) > 126 &&
             currentEnemy.data.list.AttackIsFinish === true &&
             currentEnemy.data.list.type === 'CrossBow'){
+
                 currentEnemy.data.list.CounterMove = 2; 
             }
 
-            if(Phaser.Math.Distance.BetweenPoints(currentEnemy,player) < 200 &&                         // attack 1 Assassin
+            if(Phaser.Math.Distance.BetweenPoints(currentEnemy,player) < 200 &&                         // attack 2 Assassin
             Phaser.Math.Distance.BetweenPoints(currentEnemy,player) > 190 &&
             currentEnemy.data.list.AttackIsFinish === true &&
             currentEnemy.data.list.EnemyIsAttack === true && 
             currentEnemy.data.list.type === 'Assassin'){
+
                 currentEnemy.data.list.AttackIsFinish = false
                 currentEnemy.data.list.EnemyIsAttack = false
                 currentEnemy.data.list.CounterMove = 6;
             }
 
-            if(Phaser.Math.Distance.BetweenPoints(currentEnemy,player) <= 125 &&                        // action enemies
+            if(Phaser.Math.Distance.BetweenPoints(currentEnemy,player) <= 90 + rdmNbr &&                        // action enemies
             currentEnemy.data.list.type != 'box' &&
             currentEnemy.data.list.EnemyIsAttack === true && 
             currentEnemy.data.list.AttackIsFinish === true){
+
                 currentEnemy.data.list.AttackIsFinish = false
                 currentEnemy.data.list.EnemyIsAttack = false
                 if(currentEnemy.data.list.randomValue % 2 === 1){
@@ -2188,8 +2195,7 @@ function enemyAttack(enemyone, currentArrow){
     enemyone.anims.play(animsName,true)
     
     enemyone.on('animationupdate', ()=>{                                                                // attack enemy1
-        if('attackEnemy1' === enemyone.anims.currentAnim.key ||
-        'attackSpearMan' === enemyone.anims.currentAnim.key){
+        if('attackEnemy1' === enemyone.anims.currentAnim.key){
             if(enemyone.anims.currentFrame.index >= 4 &&
                 enemyone.anims.currentFrame.index <= 6){
                     if(enemyone.flipX === true){enemyone.setVelocityX(200)}
@@ -2199,6 +2205,26 @@ function enemyAttack(enemyone, currentArrow){
                 enemyone.data.list.AtkCollide = true
                 
                 enemyone.setSize(100,56)
+                setTimeout(()=>{
+                    enemyone.setSize(24,56)
+                    enemyone.data.list.AtkCollide = false
+                },50)
+            }
+            if(enemyone.anims.currentFrame.index >= 12){ 
+                enemyone.data.list.CounterMove = 0
+                enemyone.data.list.AttackIsFinish = true
+            }
+        }
+        if('attackSpearMan' === enemyone.anims.currentAnim.key){
+            // if(enemyone.anims.currentFrame.index >= 4 &&
+            //     enemyone.anims.currentFrame.index <= 6){
+            //         if(enemyone.flipX === true){enemyone.setVelocityX(200)}
+            //         if(enemyone.flipX === false){enemyone.setVelocityX(-200)}
+            // }
+            if(enemyone.anims.currentFrame.index === 5){
+                enemyone.data.list.AtkCollide = true
+                
+                enemyone.setSize(165,56)
                 setTimeout(()=>{
                     enemyone.setSize(24,56)
                     enemyone.data.list.AtkCollide = false
@@ -2252,6 +2278,15 @@ function enemyAttack(enemyone, currentArrow){
                     if(enemyone.flipX === true){enemyone.setVelocityX(200)}
                     if(enemyone.flipX === false){enemyone.setVelocityX(-200)}
                 }
+            if(enemyone.anims.currentFrame.index === 4){
+                enemyone.data.list.AtkCollide = true
+
+                enemyone.setSize(100,56)
+                setTimeout(()=>{
+                    enemyone.setSize(24,56)
+                    enemyone.data.list.AtkCollide = false
+                },50)
+            }
             if(enemyone.anims.currentFrame.index >= 12){ 
                 enemyone.data.list.CounterMove = 0
                 enemyone.data.list.AttackIsFinish = true
@@ -2396,12 +2431,17 @@ if(enmy.data.list.type != 'box'){
                         }
                     if(enmy.anims.currentFrame.index >= 11){
                         enmy.setVelocityX(0)
-                        enmy.setBounce(0,0)                
+                        enmy.setBounce(0,0)   
+                        enmy.body.checkCollision.left = false;
+                        enmy.body.checkCollision.right = false;             
                     }
                     if(enmy.anims.currentFrame.index >= 20 &&
                         enmy.body.velocity.y === 0){ 
+
                         enmy.data.list.AttackIsFinish = true
                         enmy.setVelocityX(0)
+                        enmy.body.checkCollision.left = true;
+                        enmy.body.checkCollision.right = true;
                         
                             if(enmy.data.list.type === 'CrossBow'){
                                 enmy.data.list.CounterMove = 2
