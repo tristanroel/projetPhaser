@@ -38,6 +38,7 @@ var configuration = {
 
 var game = new Phaser.Game(configuration);
 
+var controlHelp;
 //var touchesClavier; //touches de direction
 var leftkey;
 var rightkey;
@@ -144,6 +145,7 @@ function preload(){
     this.load.image('forest', 'assets/levelOne/Decor2.png');
     this.load.tilemapTiledJSON('tiles', 'assets/levelOne/forest.json')
 
+    this.load.spritesheet('controlHelp','assets/controlHelp.png', {frameWidth : 170, frameHeight : 149});
     this.load.spritesheet('slash','assets/Slash.png', {frameWidth : 65, frameHeight : 65});
     this.load.spritesheet('slashGuard','assets/SlashGuard.png', {frameWidth : 8, frameHeight : 23});
     this.load.spritesheet('piecette','assets/Coin.png', {frameWidth : 8, frameHeight : 8});
@@ -285,27 +287,7 @@ function create(){
 
     hittableObject = this.physics.add.group({immovable: true})                      // enemy and other...
 
-    // box = this.physics.add.group({                                               // woodBox
-    //     key : 'box',
-    //     name : 'woodBox',
-    //     //allowGravity : false,
-    //     repeat : 2,
-    //     setXY:{x: -100, y :90, stepX: 800},
-    //     setScale : {x : 3},
-    // });
-    // box.children.iterateLocal('setData', 'pv', 4)
-    // box.children.iterateLocal('setSize', 35,35)
-    // box.setVelocityY(600)
-
-    // colideATK2 = this.physics.add.group({                                           // collision attack
-    //     key : 'ATK1',
-    //     allowGravity : false,
-    //     // disableBody : true,
-    //     // visible : false,
-    //     //data : {'Eject': false},
-    //     //size : {x : 20, y : 20},
-    //     setXY : {x : 1199, y :1199}
-    // })
+    controlHelp = this.add.sprite(360,1260,'controlHelp').setScale(1.5).setDepth(2);
 
     player = this.physics.add.sprite(600, 1150,'hero').setScale(2);                  // player
     player.body.setSize(25, 58)                                         
@@ -342,7 +324,7 @@ function create(){
 
     // TEXT
 
-    text = this.add.text(0,0, ' << CONTROL >> \n LEFT = press "Q"\n RIGHT = press "D"\n JUMP  = press "Z"\n ATTACK = press "J"\n GUARD = press "I" \n GAMEPAD : disconected\n version : O.22 | 19.09.22' , {fontFamily : 'PixelFont'}); 
+    text = this.add.text(0,0, 'version : O.22 | 19.09.22' , {fontFamily : 'PixelFont'}); 
     personalBestText = this.add.text(0,0,'YOUR BEST : 0',{ fontFamily : 'PixelFont'})
     scoreText = this.add.text(0,0, 'SCORE : 0',{ fontFamily : 'PixelFont'})
     gameOverText = this.add.text(0,0, 'GAME OVER \n score : 0 \n press any to restart', { fontFamily : 'PixelFont', fontSize : '60px', color : '#FFF05B'});
@@ -441,13 +423,11 @@ function create(){
             pltfrm.faceBottom = false;
         })
 
-
         this.physics.add.collider(player, CrossPlatform, function(plyr,pltfrm){       //collision player + CrossPlatform tiles
             attackintheair = false;
             playerInGround = true;
             player.data.list.Climb = false;
         });
-        
 
         this.physics.add.collider(ResetTile, player, function(theplayer, reset){   // collision reset et joueur 
             hittableObject.children.entries.length = 0
@@ -457,7 +437,6 @@ function create(){
             reset.collideLeft = false
             reset.collideRight = false
             reset.collideUp = false
-
         });
 
         this.physics.add.collider(Spawner, spawnDetector, function(detector, spawn){    // spawn collider
@@ -1139,7 +1118,7 @@ function update(time, delta){
     skyBg.y = player.body.position.y;                                                                // position du ciel
     skyBg.tilePositionX += 0.5;
     text.x = player.body.position.x - 345;                                                           // position text
-    text.y = player.body.position.y + 120;
+    text.y = player.body.position.y + 260;
     healthBar.x = player.body.position.x - 270;                                                      // position healthbar
     healthBar.y = player.body.position.y - 140;
     specialBar.x = player.body.position.x - 270;                                                     // position healthbar
@@ -1150,6 +1129,12 @@ function update(time, delta){
     personalBestText.x = player.body.position.x + 60;                                                // position Score
     scoreText.y = player.body.position.y -160;
     personalBestText.y = player.body.position.y -160;
+
+    controlHelp.x = player.body.position.x - 215
+    controlHelp.y = player.body.position.y + 150
+    controlHelp.alpha = 2.150 - ((player.body.position.x / 1000) * 2)                                                // opacity // control help
+    // console.log((player.body.position.x / 1000)-(player.body.position.x - 1));
+    console.log(player.body.position.x / 1000);
 
     healthBar.width = player.data.list.health * 12;
     specialBar.width = player.data.list.special * 22;
@@ -1162,6 +1147,7 @@ function update(time, delta){
     spawnDetector.body.velocity.x = player.body.velocity.x ;
     spawnDetector.body.velocity.y = player.body.velocity.y ;
 
+    
     // TouchLeft.x = player.body.position.x - 300;                                                           // position touch
     // TouchLeft.y = player.body.position.y + 160;
     // TouchRight.x = player.body.position.x - 180;                                                           // position touch
@@ -2432,16 +2418,16 @@ if(enmy.data.list.type != 'box'){
                     if(enmy.anims.currentFrame.index >= 11){
                         enmy.setVelocityX(0)
                         enmy.setBounce(0,0)   
-                        enmy.body.checkCollision.left = false;
-                        enmy.body.checkCollision.right = false;             
+                        // enmy.body.checkCollision.left = false;
+                        // enmy.body.checkCollision.right = false;             
                     }
                     if(enmy.anims.currentFrame.index >= 20 &&
                         enmy.body.velocity.y === 0){ 
 
                         enmy.data.list.AttackIsFinish = true
                         enmy.setVelocityX(0)
-                        enmy.body.checkCollision.left = true;
-                        enmy.body.checkCollision.right = true;
+                        // enmy.body.checkCollision.left = true;
+                        // enmy.body.checkCollision.right = true;
                         
                             if(enmy.data.list.type === 'CrossBow'){
                                 enmy.data.list.CounterMove = 2
