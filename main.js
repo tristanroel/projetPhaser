@@ -259,37 +259,37 @@ function create(){
     // var sol2 = this.add.sprite(511, 550, 'ground');//image sol
     // var sol3 = this.add.sprite(900, 600, 'ground');//image sol
 
-    enemy1Spawn = this.add.image(1600, 1100, 'spawner').setVisible(false);         //spawn enemy
-    enemyCrossBowSpawn = this.add.image(700, 300, 'spawner').setVisible(false);  //spawn enemy
+    enemy1Spawn = this.add.image(1600, 1100, 'spawner').setVisible(false);              //spawn enemy
+    enemyCrossBowSpawn = this.add.image(700, 300, 'spawner').setVisible(false);         //spawn enemy
     boxSpawn = this.add.group({
         key : 'box',
         visible : false,
-    });            //spawn enemy
+    });           
 
-    healthBar = this.add.rectangle(0,0,120,10,0xB14F37).setStrokeStyle(2, 0xFFFFFF); //healthbar
+    healthBar = this.add.rectangle(0,0,120,10,0xB14F37).setStrokeStyle(2, 0xFFFFFF);    //healthbar
     healthBar.setDepth(2);
 
-    specialBar = this.add.rectangle(0,0,120,10,0xFDCA7F);                            //specialbar
+    specialBar = this.add.rectangle(0,0,120,10,0xFDCA7F);                               //specialbar
     specialBar.setDepth(2);
 
     spebar = this.add.image(0, 0,'spebar').setScale(2).setDepth(2);
     
 
-    Coin = this.physics.add.group({                                                 // Coin
+    Coin = this.physics.add.group({                                                     // Coin
         //key :'piecette',
         setXY:{x: -400, y :30},
         visible : false,
     });
 
-    colideATKEnemy = this.physics.add.group({allowGravity : false})                 // collide attack enemies
+    colideATKEnemy = this.physics.add.group({allowGravity : false})                     // collide attack enemies
 
-    Arrow = this.physics.add.group({allowGravity : false})                          // Arrow 
+    Arrow = this.physics.add.group({allowGravity : false})                              // Arrow 
 
-    hittableObject = this.physics.add.group({immovable: true})                      // enemy and other...
+    hittableObject = this.physics.add.group({immovable: true})                          // enemy and other...
 
-    controlHelp = this.add.sprite(360,1260,'controlHelp').setScale(1.5).setDepth(2);
+    controlHelp = this.add.sprite(360,1260,'controlHelp').setScale(1.5).setDepth(2);    // controlHelp
 
-    player = this.physics.add.sprite(600, 1150,'hero').setScale(2);                  // player
+    player = this.physics.add.sprite(600, 1150,'hero').setScale(2);                     // player
     player.body.setSize(25, 58)                                         
     player.setData('health', 10)
     player.setData('special', 6)
@@ -300,15 +300,15 @@ function create(){
     player.body.checkCollision.up = false;
     //console.log(player.body);
 
-    colideATK = this.add.rectangle(0,0,100,100,0xB14F37)                         // collision attack final
+    colideATK = this.add.rectangle(0,0,100,100,0xB14F37)                                // collision attack final
     this.physics.add.existing(colideATK);
     colideATK.setVisible(false)
     colideATK.body.allowGravity = false;
 
-    slashAtk = this.add.sprite(0,0,'slash').setScale(4);                          // img Slash
+    slashAtk = this.add.sprite(0,0,'slash').setScale(4);                                // img Slash
     slashAtk.setDepth(1);
 
-    spawnDetector = this.add.rectangle(1300,1000,50,350,0xB14F37);                // Spawn Detector
+    spawnDetector = this.add.rectangle(1300,1000,50,350,0xB14F37);                      // Spawn Detector
     this.physics.add.existing(spawnDetector);
     //spawnDetector.setData('Active', false)
     //spawnDetector.setVisible(false)
@@ -1130,11 +1130,11 @@ function update(time, delta){
     scoreText.y = player.body.position.y -160;
     personalBestText.y = player.body.position.y -160;
 
-    controlHelp.x = player.body.position.x - 215
+    controlHelp.x = player.body.position.x - 215                                                      // position controlHelp
     controlHelp.y = player.body.position.y + 150
-    controlHelp.alpha = 2.150 - ((player.body.position.x / 1000) * 2)                                                // opacity // control help
+    //controlHelp.alpha = 2.150 - ((player.body.position.x / 1000) * 2)                                                // opacity // control help
     // console.log((player.body.position.x / 1000)-(player.body.position.x - 1));
-    console.log(player.body.position.x / 1000);
+    console.log(player.body.position.x);
 
     healthBar.width = player.data.list.health * 12;
     specialBar.width = player.data.list.special * 22;
@@ -1165,6 +1165,34 @@ function update(time, delta){
     // spawnReActivator.body.velocity.x = player.body.velocity.x ;
     // spawnReActivator.body.velocity.y = player.body.velocity.y ;
     // spawnDetector.y = player.body.position.y;
+     if(player.body.position.x < 950){
+        controlHelp.alpha = 2.150 - ((player.body.position.x / 1000) * 2)                                                // opacity // control help
+        controlHelp.setVisible(true)
+        controlHelp.setFrame(0);
+     }
+     else if(player.body.position.x > 1050 && player.body.position.x < 1300){
+        controlHelp.alpha = 1;
+        controlHelp.setVisible(true)
+        controlHelp.setFrame(3);
+     }
+     else if(player.body.position.x > 1301 && player.body.position.x < 1600){
+        controlHelp.setVisible(true)
+        controlHelp.setFrame(4);
+     }
+     else if(player.body.position.x > 1601 && player.body.position.x < 2000){
+        controlHelp.setVisible(true)
+        controlHelp.setFrame(5);
+     }
+     else if(player.body.position.x > 2001 && player.body.position.x < 2800){
+        controlHelp.setVisible(true)
+        controlHelp.setFrame(1);
+     }
+     else if(player.body.position.x > 6150 && player.body.position.x < 6374){
+        controlHelp.setVisible(true)
+        controlHelp.setFrame(2);
+     }
+     else{controlHelp.setVisible(false)}
+
 
     //ENEMY UPDATE
     for(var i = 0; i < hittableObject.children.entries.length; i++){
