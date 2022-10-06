@@ -50,7 +50,6 @@ var touchesAttack; // touche d'attaque
 var theGamePad;
 var gamepadJump; // : boolean
 var gamepadAttack; // : boolean
-var gamepadLeft; // : boolean
 /////////////////////////////////
 var gamePadCombo;
 
@@ -204,7 +203,6 @@ function create(){
 
     skyBg = this.add.tileSprite(0, 0, 404, 482, 'sky').setScale(2); //image ciel
    
-
     ////////////////////////////////////////////////////////////////////
 
     // LEVEL
@@ -324,7 +322,7 @@ function create(){
 
     // TEXT
 
-    text = this.add.text(0,0, 'version : O.22 | 19.09.22' , {fontFamily : 'PixelFont'}); 
+    text = this.add.text(0,0, 'version : O.23 | 5.10.22' , {fontFamily : 'PixelFont'}); 
     personalBestText = this.add.text(0,0,'YOUR BEST : 0',{ fontFamily : 'PixelFont'})
     scoreText = this.add.text(0,0, 'SCORE : 0',{ fontFamily : 'PixelFont'})
     gameOverText = this.add.text(0,0, 'GAME OVER \n score : 0 \n press any to restart', { fontFamily : 'PixelFont', fontSize : '60px', color : '#FFF05B'});
@@ -578,7 +576,7 @@ function create(){
     var UltraSlashLeft = this.input.keyboard.createCombo([81, 83, 68, 74], {resetOnMatch:true, maxKeyDelay:700}); //300ms pour taper le combo, sinon se reinitialise
     var UltraSlashRight = this.input.keyboard.createCombo([68, 83, 81, 74], {resetOnMatch:true, maxKeyDelay:700}); 
 
-    this.input.keyboard.on('keycombomatch', function(combo){ //verification du secialAtk entré
+    this.input.keyboard.on('keycombomatch', function(combo){ //verification du secialAtk entrée
         //console.log(combo);
         if(playerInGround === true){
             if(combo.keyCodes[0] === 83){
@@ -797,7 +795,7 @@ function create(){
     });
     this.anims.create({
         key: 'climb',
-        frames: this.anims.generateFrameNumbers('heroClimb',{frames: [0, 1, 2, 3, 4, 5, 5, 5]}),
+        frames: this.anims.generateFrameNumbers('heroClimb',{frames: [0, 1, 2, 3, 4, 5, 6, 6]}),
         frameRate: 6,
     });
 
@@ -1170,26 +1168,30 @@ function update(time, delta){
         controlHelp.setVisible(true)
         controlHelp.setFrame(0);
      }
-     else if(player.body.position.x > 1050 && player.body.position.x < 1300){
+     else if(player.body.position.x > 1050 && player.body.position.x < 2030){
         controlHelp.alpha = 1;
-        controlHelp.setVisible(true)
-        controlHelp.setFrame(3);
-     }
-     else if(player.body.position.x > 1301 && player.body.position.x < 1600){
-        controlHelp.setVisible(true)
-        controlHelp.setFrame(4);
-     }
-     else if(player.body.position.x > 1601 && player.body.position.x < 2000){
-        controlHelp.setVisible(true)
-        controlHelp.setFrame(5);
-     }
-     else if(player.body.position.x > 2001 && player.body.position.x < 2800){
         controlHelp.setVisible(true)
         controlHelp.setFrame(1);
      }
-     else if(player.body.position.x > 6150 && player.body.position.x < 6374){
+     else if(player.body.position.x > 2040 && player.body.position.x < 2600){
+        controlHelp.setVisible(true)
+        controlHelp.setFrame(3);
+     }
+     else if(player.body.position.x > 2601 && player.body.position.x < 3000){
+        controlHelp.setVisible(true)
+        controlHelp.setFrame(4);
+     }
+     else if(player.body.position.x > 3100 && player.body.position.x < 4000){
         controlHelp.setVisible(true)
         controlHelp.setFrame(2);
+     }
+     else if(player.body.position.x > 4150 && player.body.position.x < 5374){
+        controlHelp.setVisible(true)
+        controlHelp.setFrame(5);
+     }
+     else if(player.body.position.x > 5600 && player.body.position.x < 6374){
+        controlHelp.setVisible(true)
+        controlHelp.setFrame(7);
      }
      else{controlHelp.setVisible(false)}
 
@@ -1525,27 +1527,34 @@ function update(time, delta){
 
     if((theGamePad.X)){                                                                             //Gamepad Combo
             if(gamePadCombo.includes("BDA") || gamePadCombo.includes("BGA")){
-                if(playerInGround === true){
-                    if(player.data.list.special >= 1){
-
-                        counterMovePlayer = 32;
-                        tornadoSlash();
-                        //console.log('tornadoSash');
-                        gamePadCombo = [];
+                // if(gamePadCombo[0] === "B"){
+                    if(playerInGround === true){
+                        if(player.data.list.special >= 1){
+    
+                            counterMovePlayer = 32;
+                            tornadoSlash();
+                            console.log(gamePadCombo[0]);
+                            gamePadCombo = [];
+                        }
                     }
-                }
+                    gamePadCombo = [];
+
+                // }
             }
             else if(gamePadCombo.includes("BGDA") || gamePadCombo.includes("BDGA")){
-                if(playerInGround === true){
-                    if(player.data.list.special >= 3){
-                            
-                        //console.log('ultra');
-                        counterMovePlayer = 33;
-                        UltraSlash();
-                        gamePadCombo = [];
+                // if(gamePadCombo[0] === "G"){
+                    if(playerInGround === true){
+                        if(player.data.list.special >= 3){
+                                
+                            //console.log('ultra');
+                            counterMovePlayer = 33;
+                            UltraSlash();
+                            gamePadCombo = [];
+                        }
                     }
-                }
-                gamePadCombo = [];
+                    gamePadCombo = [];
+
+                // }
             }
             else{
                 gamePadCombo = [];
@@ -1560,8 +1569,8 @@ function update(time, delta){
         }
        
 
-        //if (leftkey.isDown && counterMovePlayer === 0 || theGamePad.left  && counterMovePlayer === 0){              //left
-        if (leftkey.isDown && counterMovePlayer === 0 || gamepadLeft === true  && counterMovePlayer === 0){              //left
+        if (leftkey.isDown && counterMovePlayer === 0 || theGamePad.left  && counterMovePlayer === 0){              //left
+        // if (leftkey.isDown && counterMovePlayer === 0 || gamepadLeft === true  && counterMovePlayer === 0){              //left
                 // player.setVelocityX(-playerVelocityX);
                 // playerFlip = player.flipX=true;
 
@@ -2310,7 +2319,6 @@ function enemyAttack(enemyone, currentArrow){
     });
 }
 function enemyAttackTwo(enemyone){
-    console.log("kikou");
     enemyone.setVelocityX(0);
     var animsName = 'attackTwo'+enemyone.data.list.type;
 
@@ -2342,8 +2350,8 @@ function enemyAttackTwo(enemyone){
                     if(enemyone.flipX === true){enemyone.setVelocityX(800)}
                     if(enemyone.flipX === false){enemyone.setVelocityX(-800)}
             }
-            if(enemyone.anims.currentFrame.index >= 11){ 
-                enemyone.data.list.CounterMove = 0
+            if(enemyone.anims.currentFrame.index >= 11 ){ 
+                enemyone.data.list.CounterMove = 0 
                 enemyone.data.list.AttackIsFinish = true
             }
 
