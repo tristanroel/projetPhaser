@@ -464,7 +464,8 @@ function create(){
                 case 7: createEnemies(detector,'Enemy1'); break;
                 case 8: createEnemies(detector,'box'); break;
                 case 9: createEnemies(detector,'PoleAxe'); break;
-                case 10: spawnCounter = 0; detector.body.checkCollision.none = true; break;
+                case 10: createEnemies(detector,'Assassin'); break;
+                case 11: spawnCounter = 0; detector.body.checkCollision.none = true; break;
             }
         })
 
