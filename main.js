@@ -130,8 +130,9 @@ function preload(){
 
 //////////////////////////////////////////////////////////////
     this.load.audio('theme', ['assets/audio/gamesong.wav']);
-    this.load.audio('swordImpact', ['assets/audio/swordImpact5.wav']);
+    this.load.audio('swordImpact', ['assets/audio/Impact5.mp3']);
     this.load.audio('coinImpact', ['assets/audio/coinImpact.wav']);
+    this.load.audio('air', ['assets/audio/Air.mp3']);
 
     this.load.scenePlugin('AnimatedTiles', 'https://raw.githubusercontent.com/nkholski/phaser-animated-tiles/master/dist/AnimatedTiles.js', 'animatedTiles', 'animatedTiles');   
     this.load.image('sky','assets/Thesky.png');
@@ -192,9 +193,10 @@ function create(){
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// SONG
-    themeSong = this.sound.add('theme');
+    themeSong = this.sound.add('theme',{volume: 0.3});
     coinImpact = this.sound.add('coinImpact');
-    swordImpact = this.sound.add('swordImpact');
+    swordImpact = this.sound.add('swordImpact',{volume: 0.06});
+    swordAir = this.sound.add('air',{volume: 0.1});
     // themeSong.loop = true ;
     // themeSong.play();
 
@@ -787,7 +789,7 @@ function create(){
     });
     this.anims.create({
         key: 'ultra',
-        frames: this.anims.generateFrameNumbers('ultimate',{frames: [0, 1, 2, 3, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 59, 59, 59, 59]}),
+        frames: this.anims.generateFrameNumbers('ultimate',{frames: [0, 1, 23, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 59, 59, 59, 59, 59]}),
         frameRate: 25,
     });
     this.anims.create({
@@ -1663,6 +1665,7 @@ function attackComboOne(){                                                      
         attackinground = true;
         var nameAttack = 'attackOne'
         player.anims.play(nameAttack, true);
+        swordAir.play();
         //var colAtk2 = colideATK2.get(); 
         //colAtk2.setScale(2)
         //colAtk2.visible = false;
@@ -1701,6 +1704,8 @@ if(player.anims.currentAnim.key === 'attackOne'){
     // colAtk2.setScale(2)
     // colAtk2.setSize(60,60)
     // colAtk2.visible = false;
+    swordAir.play();
+
 
     player.on('animationupdate', ()=>{
         if(nameAttack2 === player.anims.currentAnim.key){
@@ -1739,6 +1744,7 @@ function attackComboThree(){
     var nameAttack = 'attackThree'
     // var colAtk2 = colideATK2.get();
     // colAtk2.visible = false;
+    swordAir.play();
 
 
     player.on('animationupdate', ()=>{
@@ -1807,6 +1813,7 @@ function fallAction(){                                                          
 function attackJump(){                                                                                      //attack jump
     player.anims.play('jumpAtk', true);
     var nameAttack4 = 'jumpAtk';
+    swordAir.play();
     // var colAtk5 = colideATK2.get();
     // colAtk5.setScale(2)
     // colAtk5.setSize(60,60)
@@ -1836,6 +1843,7 @@ function tornadoSlash(){                                                        
     player.anims.play('shoryuSlash', true);
 
     var nameAttack = 'shoryuSlash';
+    swordAir.play();
     
     spevalue = player.data.list.special = player.data.list.special - 1;
 
@@ -1883,6 +1891,7 @@ function tornadoSlash(){                                                        
                 //colideATK.body.enable = true;
                 colideATK.setX(0)
                 colideATK.setY(0)
+                swordAir.play();
             }
                 if(player.anims.currentFrame.index === 6 ){
       
@@ -1896,6 +1905,7 @@ function tornadoSlash(){                                                        
             if(player.anims.currentFrame.index === 7 ){
                 colideATK.setX(0);
                 colideATK.setY(0);
+
             }
 
             if(player.anims.currentFrame.index >= 4 &&
@@ -1923,15 +1933,19 @@ function UltraSlash(){
    // console.log('ultra');
     player.anims.play('ultra', true);
     var nameAttack = 'ultra';
+    swordAir.play();
+    
 
     spevalue = player.data.list.special = player.data.list.special - 3;
 
     player.on('animationupdate', ()=>{
 
         if(nameAttack === player.anims.currentAnim.key){
-            if(player.anims.currentFrame.index >= 3 && player.anims.currentFrame.index <= 4 ){
+            if(player.anims.currentFrame.index >= 2 && player.anims.currentFrame.index <= 3 ){
                 player.data.list.special = spevalue;
                 player.data.list.Eject = 2;
+                swordAir.play();
+                
 
                 if(playerFlip === true){
                     player.setVelocityX(-playerVelocityX * 3)
@@ -1947,80 +1961,107 @@ function UltraSlash(){
             //     // if(playerFlip === true){player.setVelocityX(-playerVelocityX + 10)}
             //     // if(playerFlip === false){player.setVelocityX(playerVelocityX + 10)} 
             // }
-            if(player.anims.currentFrame.index === 5 ){
+            if(player.anims.currentFrame.index === 4 ){
+            swordAir.play();
+
                 //player.anims.stop()
                 player.data.list.Eject = 0;
                 if(playerFlip === true){colideATK.setX(player.x -75);colideATK.setY(player.y +10)}
                 if(playerFlip === false){colideATK.setX(player.x +75);colideATK.setY(player.y +10)} 
             }
             if(player.anims.currentFrame.index === 6){
+            swordAir.play();
+            
                 player.data.list.Eject = 2;
                 //player.anims.stop()
                 if(playerFlip === true){colideATK.setX(player.x -60);colideATK.setY(player.y +10)}
                 if(playerFlip === false){colideATK.setX(player.x +60);colideATK.setY(player.y +10)} 
             }
             if(player.anims.currentFrame.index === 10){
+            swordAir.play();
+
                 player.data.list.Eject = 0;
                 if(playerFlip === true){colideATK.setX(player.x -75);colideATK.setY(player.y +10)}
                 if(playerFlip === false){colideATK.setX(player.x +75);colideATK.setY(player.y +10)} 
             }
-            if(player.anims.currentFrame.index === 13){
+            if(player.anims.currentFrame.index === 14){
+            swordAir.play();
+
                 player.data.list.Eject = 2;
                 if(playerFlip === true){colideATK.setX(player.x -60);colideATK.setY(player.y +10)}
                 if(playerFlip === false){colideATK.setX(player.x +60);colideATK.setY(player.y +10)} 
             }
-            if(player.anims.currentFrame.index === 16){
+            if(player.anims.currentFrame.index === 17){
+            swordAir.play();
+
                 player.data.list.Eject = 0;
                 if(playerFlip === true){colideATK.setX(player.x -75);colideATK.setY(player.y +10)}
                 if(playerFlip === false){colideATK.setX(player.x +75);colideATK.setY(player.y +10)} 
             }
-            if(player.anims.currentFrame.index === 18){
-                player.data.list.Eject = 2;
-                if(playerFlip === true){colideATK.setX(player.x -60);colideATK.setY(player.y +10)}
-                if(playerFlip === false){colideATK.setX(player.x +60);colideATK.setY(player.y +10)} 
-            }
+            // if(player.anims.currentFrame.index === 18){
+            //     player.data.list.Eject = 2;
+            //     if(playerFlip === true){colideATK.setX(player.x -60);colideATK.setY(player.y +10)}
+            //     if(playerFlip === false){colideATK.setX(player.x +60);colideATK.setY(player.y +10)} 
+            // }
             if(player.anims.currentFrame.index === 21){
+            swordAir.play();
+
                 player.data.list.Eject = 0;
                 if(playerFlip === true){colideATK.setX(player.x -75);colideATK.setY(player.y +10)}
                 if(playerFlip === false){colideATK.setX(player.x +75);colideATK.setY(player.y +10)} 
             }
             if(player.anims.currentFrame.index === 24){
+            swordAir.play();
+
                 player.data.list.Eject = 2;
                 if(playerFlip === true){colideATK.setX(player.x -70);colideATK.setY(player.y +10)}
                 if(playerFlip === false){colideATK.setX(player.x +70);colideATK.setY(player.y +10)} 
             }
             if(player.anims.currentFrame.index === 26){
+            swordAir.play();
+
                 player.data.list.Eject = 0;
                 if(playerFlip === true){colideATK.setX(player.x -80);colideATK.setY(player.y +10)}
                 if(playerFlip === false){colideATK.setX(player.x +80);colideATK.setY(player.y +10)} 
             }
             if(player.anims.currentFrame.index === 30){
+            swordAir.play();
+
                 player.data.list.Eject = 2;
                 if(playerFlip === true){colideATK.setX(player.x -70);colideATK.setY(player.y +10)}
                 if(playerFlip === false){colideATK.setX(player.x +70);colideATK.setY(player.y +10)} 
             }
             if(player.anims.currentFrame.index === 36){
+            swordAir.play();
+
                 player.data.list.Eject = 0;
                 if(playerFlip === true){colideATK.setX(player.x -65);colideATK.setY(player.y +10)}
                 if(playerFlip === false){colideATK.setX(player.x +65);colideATK.setY(player.y +10)} 
             }
             if(player.anims.currentFrame.index === 42){
+            swordAir.play();
+
                 player.data.list.Eject = 2;
                 if(playerFlip === true){colideATK.setX(player.x -80);colideATK.setY(player.y +10)}
                 if(playerFlip === false){colideATK.setX(player.x +80);colideATK.setY(player.y +10)} 
             }
             if(player.anims.currentFrame.index === 50){
+            swordAir.play();
+
                 player.data.list.Eject = 1;
                 if(playerFlip === true){colideATK.setX(player.x -70);colideATK.setY(player.y +10)}
                 if(playerFlip === false){colideATK.setX(player.x +70);colideATK.setY(player.y +10)} 
             }
             if(player.anims.currentFrame.index === 58){
+            swordAir.play();
+
                 player.data.list.Eject = 1;
                 player.setVelocityX(0);
                 if(playerFlip === true){colideATK.setX(player.x -85);colideATK.setY(player.y +10)}
                 if(playerFlip === false){colideATK.setX(player.x +85);colideATK.setY(player.y +10)} 
             }
-            if(player.anims.currentFrame.index >= 63){
+            if(player.anims.currentFrame.index >= 64){
+
                 player.data.list.special = spevalue;
                 colideATK.setX(0);colideATK.setY(0);
                 playerCanFall = false;
@@ -2608,7 +2649,7 @@ function enemyDie(enmyOne){
 }
 
 function collisionAtkEnemies(htblObjct,atk){
-    //swordImpact.play();
+    swordImpact.play();
     atk.setX(0);
     atk.setY(0);
     slashAtk.setY(player.y)
