@@ -2052,6 +2052,12 @@ function UltraSlash(){
                 if(playerFlip === true){colideATK.setX(player.x -70);colideATK.setY(player.y +10)}
                 if(playerFlip === false){colideATK.setX(player.x +70);colideATK.setY(player.y +10)} 
             }
+            if(player.anims.currentFrame.index === 54){
+                swordAir.play();
+                player.data.list.Eject = 2;
+                if(playerFlip === true){colideATK.setX(player.x -60);colideATK.setY(player.y +10)}
+                if(playerFlip === false){colideATK.setX(player.x +60);colideATK.setY(player.y +10)} 
+            }
             if(player.anims.currentFrame.index === 58){
             swordAir.play();
 
