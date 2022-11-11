@@ -107,6 +107,7 @@ var countTest = 0;
 //song
 var themeSong;
 var swordImpact;
+var swordImpact2;
 var coinImpact;
 
 var currentEnemy;
@@ -132,8 +133,10 @@ function preload(){
 //////////////////////////////////////////////////////////////
     this.load.audio('theme', ['assets/audio/gamesong.wav']);
     this.load.audio('swordImpact', ['assets/audio/Impact5.mp3']);
+    this.load.audio('swordImpact2', ['assets/audio/swordImpact4.wav']);
     this.load.audio('coinImpact', ['assets/audio/coinImpact.wav']);
     this.load.audio('air', ['assets/audio/Air.mp3']);
+    this.load.audio('ImpactEnemies', ['assets/audio/Poutchack.mp3']);
 
     this.load.scenePlugin('AnimatedTiles', 'https://raw.githubusercontent.com/nkholski/phaser-animated-tiles/master/dist/AnimatedTiles.js', 'animatedTiles', 'animatedTiles');   
     this.load.image('sky','assets/Thesky.png');
@@ -175,6 +178,7 @@ function preload(){
     this.load.spritesheet('theEnemyPoleAxe', 'assets/Enemy/poleaxegiant.png',{frameWidth: 180, frameHeight: 170});
     this.load.spritesheet('theEnemySpearMan', 'assets/Enemy/spearman.png',{frameWidth: 190, frameHeight: 170});
     this.load.spritesheet('theEnemyAssassin', 'assets/Enemy/assassin.png',{frameWidth: 170, frameHeight: 170});
+    this.load.spritesheet('theEnemyRunMan', 'assets/Enemy/runman.png',{frameWidth: 170, frameHeight: 170});
 }
 
 /////////////////////////////////////////////////////////////////////////////////////       CREATE
@@ -199,6 +203,8 @@ function create(){
     themeSong = this.sound.add('theme',{volume: 0.6});
     coinImpact = this.sound.add('coinImpact',{volume: 0.12});
     swordImpact = this.sound.add('swordImpact',{volume: 0.24});
+    swordImpact2 = this.sound.add('swordImpact2',{volume: 0.005});
+    swordImpactEnemies = this.sound.add('ImpactEnemies',{volume: 0.24});
     swordAir = this.sound.add('air',{volume: 0.4});
     // themeSong.loop = true ;
     // themeSong.play();
@@ -289,7 +295,7 @@ function create(){
 
     Arrow = this.physics.add.group({allowGravity : false})                              // Arrow 
 
-    DestroyArrow = this.add.sprite(0,0,'arrowbreack').setScale(2);
+    DestroyArrow = this.add.sprite(0,0,'arrowbreack').setScale(2);                      // Destroy Arrow
     
 
     hittableObject = this.physics.add.group({immovable: true})                          // enemy and other...
@@ -314,6 +320,7 @@ function create(){
 
     slashAtk = this.add.sprite(-1000,-1000,'slash').setScale(4);                                // img Slash
     slashAtk.setDepth(1);
+
 
     spawnDetector = this.add.rectangle(1300,1000,50,350,0xB14F37);                      // Spawn Detector
     this.physics.add.existing(spawnDetector);
@@ -473,7 +480,7 @@ function create(){
             setTimeout(()=>{detector.body.checkCollision.none = false},400)
             switch(spawnCounter){
                 case 1: createEnemies(detector,'SpearMan'); break;
-                case 2: createEnemies(detector,'box'); break;
+                case 2: createEnemies(detector,'RunMan'); break;
                 case 3: createEnemies(detector,'Enemy1'); break;
                 case 4: createEnemies(detector,'box'); break;
                 case 5: createEnemies(detector,'CrossBow'); break;
@@ -883,6 +890,11 @@ function create(){
         frameRate: 6,
     });
     this.anims.create({
+        key: 'stanceRunMan',
+        frames: this.anims.generateFrameNumbers('theEnemyRunMan',{frames : [0]}),
+        frameRate: 6,
+    });
+    this.anims.create({
         key: 'walkEnemy1',
         frames: this.anims.generateFrameNumbers('theEnemy',{frames : [1, 2, 3, 4]}),
         frameRate: 4,
@@ -909,6 +921,12 @@ function create(){
     this.anims.create({
         key: 'walkAssassin',
         frames: this.anims.generateFrameNumbers('theEnemyAssassin',{frames : [1, 2, 3, 4]}),
+        frameRate: 4,
+        repeat : -1,
+    });
+    this.anims.create({
+        key: 'walkRunMan',
+        frames: this.anims.generateFrameNumbers('theEnemyRunMan',{frames : [1, 2, 3, 4]}),
         frameRate: 4,
         repeat : -1,
     });
@@ -967,6 +985,11 @@ function create(){
         frameRate: 8,
     })
     this.anims.create({
+        key: 'attackRunMan',
+        frames: this.anims.generateFrameNumbers('theEnemyRunMan',{frames : [ 5, 6, 6, 7, 8, 9, 10, 10, 10, 0, 0, 0]}),
+        frameRate: 10,
+    })
+    this.anims.create({
         key: 'knockbackEnemy1',
         frames: this.anims.generateFrameNumbers('theEnemy',{frames : [ 10, 11, 11, 11, 11, 11, 11, 11, 0]}),
         frameRate: 9,
@@ -989,6 +1012,11 @@ function create(){
     this.anims.create({
         key: 'knockbackAssassin',
         frames: this.anims.generateFrameNumbers('theEnemyAssassin',{frames : [20, 21, 21, 21, 21, 21, 21, 21, 0]}),
+        frameRate: 9,
+    });
+    this.anims.create({
+        key: 'knockbackRunMan',
+        frames: this.anims.generateFrameNumbers('theEnemyRunMan',{frames : [11, 12, 12, 12, 12, 12, 12, 12, 0]}),
         frameRate: 9,
     });
     // this.anims.create({
@@ -1022,6 +1050,11 @@ function create(){
         frameRate: 8,
     })
     this.anims.create({
+        key: 'fallRunMan',
+        frames: this.anims.generateFrameNumbers('theEnemyRunMan',{frames : [12, 13, 14, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15]}),
+        frameRate: 8,
+    })
+    this.anims.create({
         key: 'fallbox',
         frames: this.anims.generateFrameNumbers('box',{frames : [15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 24, 24, 24, 24, 24]}),
         frameRate: 15,
@@ -1052,6 +1085,11 @@ function create(){
         frameRate: 8,
     })
     this.anims.create({
+        key: 'ejectRunMan',
+        frames: this.anims.generateFrameNumbers('theEnemyRunMan',{frames : [12, 12, 12, 12, 12, 12, 13, 13, 13, 13, 14, 14, 15, 15, 15, 15, 15, 15, 15, 15]}),
+        frameRate: 8,
+    })
+    this.anims.create({
         key: 'expulseEnemy1',
         frames: this.anims.generateFrameNumbers('theEnemy',{frames : [15 ,16, 16,16, 16,16, 16, 15, 15]}),
         frameRate: 8,
@@ -1074,6 +1112,11 @@ function create(){
     this.anims.create({
         key: 'expulseAssassin',
         frames: this.anims.generateFrameNumbers('theEnemyAssassin',{frames : [25, 26, 26, 26, 26, 26, 26, 25, 25]}),
+        frameRate: 8,
+    })
+    this.anims.create({
+        key: 'expulseRunMan',
+        frames: this.anims.generateFrameNumbers('theEnemyRunMan',{frames : [16, 17, 17, 17, 17, 17, 17, 16, 16]}),
         frameRate: 8,
     })
 
@@ -1103,7 +1146,7 @@ function create(){
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // CREATE ENEMIES
 
-    //createEnemies(enemy1Spawn,'CrossBow');
+    //createEnemies(enemy1Spawn,'RunMan');
     // createEnemies(enemy1Spawn,'Enemy1');
     // createEnemies(enemyCrossBowSpawn,'Enemy1');
     // createEnemies(enemyCrossBowSpawn,'Enemy1');
@@ -1259,6 +1302,7 @@ function update(time, delta){
                 
                 if(htblobjct.data.list.AtkCollide === true){                                        // collision Player Guard                     
                     if(plyr.data.list.Guard === true){
+                        swordImpact2.play();
                         player.data.list.special = player.data.list.special - 1;
                         // htblobjct.data.list.AtkCollide = false;
                         if(plyr.flipX === false && htblobjct.flipX === false){
@@ -1281,6 +1325,7 @@ function update(time, delta){
                             counterMovePlayer = 28
                         }
                     }else{                                                                          // collision Player KnockBack
+                        swordImpact.play();
                         counterMovePlayer = 28
                         plyr.data.list.health--;
                         htblobjct.data.list.AtkCollide = false;
@@ -2155,7 +2200,7 @@ function createCoin(thebox){                                                    
     piece.setBounce(1);
     piece.setVelocityX(Phaser.Math.Between(-110, 110))
     setTimeout(()=>{
-        piece.setBounce(0.95);
+        //piece.setBounce(0.95);
         piece.setVelocityX(0);
     },1600)
 }
@@ -2209,7 +2254,9 @@ function createEnemies(enemySpawner, typeOfEnemy){                              
     //enemyone.setMass(22)
     //enemyone.setFriction(1)
     enemyone.setDepth(0);
-
+    if(typeOfEnemy === 'RunMan'){
+        enemyone.setData('randomValue',200);
+    }
     if(typeOfEnemy === 'CrossBow'){                                                                     //create Arrow
         var arrow = Arrow.create(-1000, 0,'carreau',0,true);
         arrow.setSize(20, 4);
@@ -2264,15 +2311,23 @@ enemy1.setBounce(0, 0)
 
 function enemyWalkBack(enemy1,target,game){                                                             // enemy walkBack
     //enemy1.body.setSize(25,56) 
+
+
     enemy1.setBounce(0, 0)
     var animsName = 'walk'+enemy1.data.list.type;
     enemy1.anims.play(animsName, true)
-
+    
     game.physics.moveToObject(enemy1, target, - (enemy1.data.list.randomValue));
     enemy1.data.list.AttackIsFinish = false
     enemy1.setVelocityY(400);
     
     enemy1.on('animationupdate', ()=>{
+        if('walkRunMan' === enemy1.anims.currentAnim.key){
+            //game.physics.moveToObject(enemy1, target,0);
+            if(enemy1.anims.currentFrame.index < 10){
+                enemy1.data.list.CounterMove = 2
+            }
+        }
         if(animsName === enemy1.anims.currentAnim.key){
             if(enemy1.anims.currentFrame.index >= 4){
                 enemy1.data.list.CounterMove = 2
@@ -2366,6 +2421,32 @@ function enemyAttack(enemyone, currentArrow){
                 enemyone.data.list.AttackIsFinish = true
             }
         }
+        if('attackRunMan' === enemyone.anims.currentAnim.key){                                              //attack RunMan
+            if(enemyone.anims.currentFrame.index === 2 ){
+                enemyone.data.list.AtkCollide = true
+                enemyone.setSize(100,56)
+                setTimeout(()=>{
+                    enemyone.setSize(24,56)
+                    enemyone.data.list.AtkCollide = false
+                },150)
+            }
+            if(enemyone.anims.currentFrame.index < 5 ){
+                if(enemyone.flipX === true){enemyone.setVelocityX(600)}
+                if(enemyone.flipX === false){enemyone.setVelocityX(-600)}
+            }
+            if(enemyone.anims.currentFrame.index === 5 ){
+                enemyone.data.list.AtkCollide = true
+                enemyone.setSize(110,56)
+                setTimeout(()=>{
+                    enemyone.setSize(24,56)
+                    enemyone.data.list.AtkCollide = false
+                },150)
+            }
+            if(enemyone.anims.currentFrame.index >= 12){ 
+                enemyone.data.list.CounterMove = 0
+                enemyone.data.list.AttackIsFinish = true
+            }
+        }
         if('attackCrossBow' === enemyone.anims.currentAnim.key){                                              //attack CrossBow
             if(enemyone.anims.currentFrame.index === 9)
                 {
@@ -2392,6 +2473,7 @@ function enemyAttack(enemyone, currentArrow){
                 enemyone.data.list.AttackIsFinish = true
             }
         }
+        
 
     });
 }
