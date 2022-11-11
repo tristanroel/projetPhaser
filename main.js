@@ -87,6 +87,7 @@ var box;    // caisse en bois : sprite
 var skyBg; //ciel
 var Coin;  //pieces
 var Arrow;
+var DestroyArrow;
 var text;  // info command list
 var Score = 0; // Score
 var personalBestText;
@@ -147,18 +148,20 @@ function preload(){
 
     this.load.spritesheet('controlHelp','assets/controlHelp.png', {frameWidth : 170, frameHeight : 149});
     this.load.spritesheet('slash','assets/Slash.png', {frameWidth : 65, frameHeight : 65});
+    this.load.spritesheet('arrowbreack','assets/Sprites/carreaufrappe.png', {frameWidth : 170, frameHeight : 170});
     this.load.spritesheet('slashGuard','assets/SlashGuard.png', {frameWidth : 8, frameHeight : 23});
     this.load.spritesheet('piecette','assets/Coin.png', {frameWidth : 8, frameHeight : 8});
     this.load.spritesheet('hero', 'assets/Sprites/stancearmed.png',{frameWidth: 170, frameHeight: 170});
-    this.load.spritesheet('heroAttack', 'assets/Sprites/sword_attack_move.png',{frameWidth: 170, frameHeight: 170});
+    this.load.spritesheet('heroAttack', 'assets/Sprites/swordattackmove.png',{frameWidth: 170, frameHeight: 170});
     this.load.spritesheet('heroAttacktwo', 'assets/Sprites/3hitcombo.png',{frameWidth: 170, frameHeight: 170});
     this.load.spritesheet('herorun', 'assets/Sprites/walkarmed.png',{frameWidth: 170, frameHeight: 170});
     this.load.spritesheet('herojump', 'assets/Sprites/jumparmed.png',{frameWidth: 170, frameHeight: 170});
     this.load.spritesheet('herojumpAtk', 'assets/Sprites/jump_sword_attack.png',{frameWidth: 170, frameHeight: 170});
+    this.load.spritesheet('specialairslash', 'assets/Sprites/specialairslash.png',{frameWidth: 170, frameHeight: 170});
     this.load.spritesheet('heroGuard', 'assets/Sprites/guard.png',{frameWidth: 170, frameHeight: 170});
     this.load.spritesheet('heroProtectGuard', 'assets/Sprites/Playerkbtest.png',{frameWidth: 170, frameHeight: 170});
     this.load.spritesheet('heroKnockBack', 'assets/Sprites/KnockBack.png',{frameWidth: 170, frameHeight: 170});
-    this.load.spritesheet('shoryu', 'assets/Sprites/shoryurev2.png',{frameWidth: 170, frameHeight: 170});
+    this.load.spritesheet('shoryu', 'assets/Sprites/shoryu.png',{frameWidth: 170, frameHeight: 170});
     this.load.spritesheet('ultimate', 'assets/Sprites/SuperAttack.png',{frameWidth: 170, frameHeight: 170});
     this.load.spritesheet('pushBox', 'assets/Sprites/pousse.png',{frameWidth: 170, frameHeight: 170});
     this.load.spritesheet('heroClimb', 'assets/Sprites/escalade.png',{frameWidth: 170, frameHeight: 170});
@@ -193,10 +196,10 @@ function create(){
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// SONG
-    themeSong = this.sound.add('theme',{volume: 0.3});
-    coinImpact = this.sound.add('coinImpact');
-    swordImpact = this.sound.add('swordImpact',{volume: 0.06});
-    swordAir = this.sound.add('air',{volume: 0.1});
+    themeSong = this.sound.add('theme',{volume: 0.6});
+    coinImpact = this.sound.add('coinImpact',{volume: 0.12});
+    swordImpact = this.sound.add('swordImpact',{volume: 0.24});
+    swordAir = this.sound.add('air',{volume: 0.4});
     // themeSong.loop = true ;
     // themeSong.play();
 
@@ -286,6 +289,9 @@ function create(){
 
     Arrow = this.physics.add.group({allowGravity : false})                              // Arrow 
 
+    DestroyArrow = this.add.sprite(0,0,'arrowbreack').setScale(2);
+    
+
     hittableObject = this.physics.add.group({immovable: true})                          // enemy and other...
 
     controlHelp = this.add.sprite(360,1260,'controlHelp').setScale(1.5).setDepth(2);    // controlHelp
@@ -301,12 +307,12 @@ function create(){
     player.body.checkCollision.up = false;
     //console.log(player.body);
 
-    colideATK = this.add.rectangle(0,0,100,100,0xB14F37)                                // collision attack final
+    colideATK = this.add.rectangle(-800,0,100,100,0xB14F37)                                // collision attack final
     this.physics.add.existing(colideATK);
     colideATK.setVisible(false)
     colideATK.body.allowGravity = false;
 
-    slashAtk = this.add.sprite(0,0,'slash').setScale(4);                                // img Slash
+    slashAtk = this.add.sprite(-1000,-1000,'slash').setScale(4);                                // img Slash
     slashAtk.setDepth(1);
 
     spawnDetector = this.add.rectangle(1300,1000,50,350,0xB14F37);                      // Spawn Detector
@@ -345,7 +351,15 @@ function create(){
 
     // COLLISIONS
 
-    this.physics.add.collider(colideATK, Arrow, function(atk,arrow){arrow.setY(0)})
+    this.physics.add.collider(colideATK, Arrow, function(atk,arrow){
+        console.log('lol');
+        DestroyArrow.setY(player.y);
+        if(player.flipX === true){DestroyArrow.setX(player.x -100)}
+        if(player.flipX === false){DestroyArrow.setX(player.x +100)}
+        DestroyArrow.anims.play('breackArrow', true);
+
+        arrow.setY(0)
+    })
     // var platform = this.physics.add.staticGroup();// groupe plateforme
     //     platform.add(sol1)//asigne
     //     platform.add(sol2)//asigne
@@ -595,6 +609,12 @@ function create(){
                     UltraSlash();
                 }
             }
+        }else{
+            if(combo.keyCodes[0] === 83){
+                //console.log('kikou lol');
+                counterMovePlayer = 34;
+                powerAttackJump();
+            }
         }
     });
 
@@ -783,7 +803,13 @@ function create(){
     this.anims.create({
         key: 'shoryuSlash',
         // frames: this.anims.generateFrameNumbers('shoryu',{frames: [0, 2, 3, 4, 5, 6, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7]}),
-        frames: this.anims.generateFrameNumbers('shoryu',{frames: [0, 1, 2, 2, 3, 4, 5, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6]}),
+        frames: this.anims.generateFrameNumbers('shoryu',{frames: [0, 1, 2, 2, 3, 4, 5, 6, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7]}),
+        frameRate: 12,
+        repeat : -1,
+    });
+    this.anims.create({
+        key: 'specialAirSlash',
+        frames: this.anims.generateFrameNumbers('specialairslash',{frames: [0, 1, 2, 2, 3, 4, 5, 6, 7, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8]}),
         frameRate: 12,
         repeat : -1,
     });
@@ -1064,16 +1090,20 @@ function create(){
         frameRate: 10,
     });
     this.anims.create({
+        key: 'breackArrow',
+        frames: this.anims.generateFrameNumbers('arrowbreack',{frames: [0 ,1, 2, 3, 4, 5, 6, 7]}),
+        frameRate: 10,
+    });
+    this.anims.create({
         key: 'slashedGuard',
         frames: this.anims.generateFrameNumbers('slashGuard',{frames: [0, 1, 2, 3, 4]}),
         frameRate: 30,
     });
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 // CREATE ENEMIES
 
-     //createEnemies(enemy1Spawn,'Assassin');
+    //createEnemies(enemy1Spawn,'CrossBow');
     // createEnemies(enemy1Spawn,'Enemy1');
     // createEnemies(enemyCrossBowSpawn,'Enemy1');
     // createEnemies(enemyCrossBowSpawn,'Enemy1');
@@ -1266,55 +1296,6 @@ function update(time, delta){
             //COLLISION Attack + enemy
 
             this.physics.overlap(currentEnemy, colideATK, collisionAtkEnemies,null,this)
-            // this.physics.add.overlap(currentEnemy, colideATK, function(htblObjct, atk){  
-                
-                // atk.setX(0);
-                // atk.setY(0);
-                
-                
-                // //console.log(htblObjct.data.list.CounterMove);
-                // //createSlash();
-                // //atk.body.enable = false;
-                // slashAtk.setY(player.y)
-                // if(player.flipX === true){slashAtk.setX(player.x -100)}
-                // if(player.flipX === false){slashAtk.setX(player.x +100)}
-                // slashAtk.anims.play('slashed', true)
-                // slashAtk.rotation = Phaser.Math.Between(0,2);
-
-                // //htblObjct.data.list.health = htblObjct.data.list.health - 1;   
-                
-                // if(htblObjct.data.list.IsInvulnerable === false)
-                // {
-                //     htblObjct.data.list.CounterMove = 3;
-                //     PlayerTouchEnemy = true;
-                //     player.anims.pause();
-                //     setTimeout(()=>{
-                //         player.anims.resume()
-                //         slashAtk.setX(0);
-                //         atk.body.enable = true;
-                //     },150)
-                //     // htblObjct.data.list.health = htblObjct.data.list.health - 1; 
-                //     //console.log(htblObjct.data.list.health);
-                //     //console.log(htblObjct.data.list);
-                // }else{
-                // }
-            // })
-
-            // this.physics.add.collider(currentEnemy, CrossPlatform, stopEnemies,null,this)
-
-            // this.physics.add.collider(currentEnemy, CrossPlatform, function(enemy,pltfrm){       //collision enemy + CrossPlatform tiles
-            //     //console.log('yéyo');
-            //     // console.log(pltfrm);
-            //     console.log(enemy.data.list.stopMove);
-               
-            //     enemy.data.list.stopMove = true
-                
-    
-            //     pltfrm.faceLeft = false;
-            //     pltfrm.faceRight = false;
-            //     pltfrm.faceBottom = false;
-            //     pltfrm.faceUp = true;
-            // })
 
             //////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -1430,21 +1411,21 @@ function update(time, delta){
             }
             
         }
-        else if(hittableObject.children.entries[i].data.list.name === 'slash'){                         //img attack slash
-            hittableObject.children.entries[i].body.checkCollision.none = true;
-            if(player.flipX === true){
-                hittableObject.children.entries[i].x = player.x - 90
-                hittableObject.children.entries[i].y = player.y
-            }else{
-                hittableObject.children.entries[i].x = player.x + 90
-                hittableObject.children.entries[i].y = player.y
-            }
-        }
+        // else if(hittableObject.children.entries[i].data.list.name === 'slash'){                         //img attack slash
+        //     hittableObject.children.entries[i].body.checkCollision.none = true;
+        //     if(player.flipX === true){
+        //         hittableObject.children.entries[i].x = player.x - 90
+        //         hittableObject.children.entries[i].y = player.y
+        //     }else{
+        //         hittableObject.children.entries[i].x = player.x + 90
+        //         hittableObject.children.entries[i].y = player.y
+        //     }
+        // }
 
-        else{hittableObject.children.entries[i] = [];} 
+        // else{hittableObject.children.entries[i] = [];} 
     }
 
-    console.log(player.data.list.Eject);
+    //console.log(player.data.list.Eject);
     //console.log(currentEnemy);
     //console.log(Arrow);
     //console.log(Phaser.Math.Distance.BetweenPoints(hittableObject.children.entries[0],player));
@@ -1454,7 +1435,7 @@ function update(time, delta){
     //console.log(Arrow);
     //console.log(PlayerTouchEnemy);
     //console.log(colideATK2);
-    //console.log(playerInGround);
+    console.log(playerCanFall);
     //console.log(returnRandomNumber(10, 20));
     //console.log('AtkCollide : '+ hittableObject.children.entries[0].data.list.AtkCollide);
     //console.log(player.data.list.Eject);
@@ -1542,6 +1523,7 @@ function update(time, delta){
                             gamePadCombo = [];
                         }
                     }
+                    if(playerInGround === false){console.log('kikou');}
                     gamePadCombo = [];
 
                 // }
@@ -1837,6 +1819,14 @@ function attackJump(){                                                          
         }
     });
 }
+function powerAttackJump(){
+    //if(player.anims.currentAnim.key === 'fall'){
+        //player.anims.stop()
+        player.anims.play('specialAirSlash', true);
+
+    //}
+    console.log('ehbeh');
+}
 function tornadoSlash(){                                                                                      // tornado slash
     playerCanFall = false;
     //console.log(player.body.checkCollision);
@@ -1945,6 +1935,7 @@ function UltraSlash(){
                 player.data.list.special = spevalue;
                 player.data.list.Eject = 2;
                 swordAir.play();
+                player.setGravityY(600);
                 
 
                 if(playerFlip === true){
@@ -2163,10 +2154,10 @@ function createCoin(thebox){                                                    
     piece.anims.play('turnPiecette',true)
     piece.setBounce(1);
     piece.setVelocityX(Phaser.Math.Between(-110, 110))
-    // setTimeout(()=>{
-    //     piece.setBounce(0.95);
-    //     piece.setVelocityX(0);
-    // },1600)
+    setTimeout(()=>{
+        piece.setBounce(0.95);
+        piece.setVelocityX(0);
+    },1600)
 }
 
 function createSlash(){
@@ -2220,7 +2211,7 @@ function createEnemies(enemySpawner, typeOfEnemy){                              
     enemyone.setDepth(0);
 
     if(typeOfEnemy === 'CrossBow'){                                                                     //create Arrow
-        var arrow = Arrow.create(0, 0,'carreau',0,true);
+        var arrow = Arrow.create(-1000, 0,'carreau',0,true);
         arrow.setSize(20, 4);
         arrow.setScale(2)
         arrow.setData('id', id);
@@ -2479,6 +2470,7 @@ function createArrow(enemy){                                                    
 
 function enemyKnockBack(enmy){
 //console.log('hello');
+enmy.setVelocityX(0);
 if(enmy.data.list.type != 'box'){
     if(player.data.list.Eject === 0){                                                                           // knock back enemy                                             
        
@@ -2656,7 +2648,7 @@ function enemyDie(enmyOne){
 
 function collisionAtkEnemies(htblObjct,atk){
     swordImpact.play();
-    atk.setX(0);
+    atk.setX(-800);
     atk.setY(0);
     slashAtk.setY(player.y)
     player.data.list.special = player.data.list.special + 1;
