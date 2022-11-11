@@ -106,6 +106,7 @@ var countTest = 0;
 
 //song
 var themeSong;
+var gameoverSong;
 var swordImpact;
 var swordImpact2;
 var coinImpact;
@@ -131,7 +132,8 @@ function preload(){
     });
 
 //////////////////////////////////////////////////////////////
-    this.load.audio('theme', ['assets/audio/gamesong.wav']);
+    this.load.audio('theme', ['assets/audio/gamesong.mp3']);
+    this.load.audio('gameover', ['assets/audio/gameover.mp3']);
     this.load.audio('swordImpact', ['assets/audio/Impact5.mp3']);
     this.load.audio('swordImpact2', ['assets/audio/swordImpact4.wav']);
     this.load.audio('coinImpact', ['assets/audio/coinImpact.wav']);
@@ -200,14 +202,16 @@ function create(){
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// SONG
-    themeSong = this.sound.add('theme',{volume: 0.6});
-    coinImpact = this.sound.add('coinImpact',{volume: 0.12});
+    themeSong = this.sound.add('theme',{volume: 0.08});
+    gameoverSong = this.sound.add('gameover',{volume: 0.08});
+    coinImpact = this.sound.add('coinImpact',{volume: 1});
     swordImpact = this.sound.add('swordImpact',{volume: 0.24});
     swordImpact2 = this.sound.add('swordImpact2',{volume: 0.005});
     swordImpactEnemies = this.sound.add('ImpactEnemies',{volume: 0.24});
     swordAir = this.sound.add('air',{volume: 0.4});
-    // themeSong.loop = true ;
-    // themeSong.play();
+    themeSong.loop = true ;
+    gameoverSong.stop();
+    themeSong.play();
 
 
 
@@ -1480,7 +1484,7 @@ function update(time, delta){
     //console.log(Arrow);
     //console.log(PlayerTouchEnemy);
     //console.log(colideATK2);
-    console.log(playerCanFall);
+    //console.log(playerCanFall);
     //console.log(returnRandomNumber(10, 20));
     //console.log('AtkCollide : '+ hittableObject.children.entries[0].data.list.AtkCollide);
     //console.log(player.data.list.Eject);
@@ -1518,13 +1522,14 @@ function update(time, delta){
         GuardKnockBack()
     }
     if(player.data.list.health <= 0){                                                              //Player Die 
-
+        themeSong.stop();
         counterMovePlayer = 999;
         player.data.list.health = 0;
 
         player.on('animationcomplete', ()=>{                                                        // GAME OVER
             this.anims.pauseAll();
             GameOver = true;
+            gameoverSong.play();
             if(Score > personalBest){
                 localStorage.setItem('score', Score)
             }
@@ -1536,6 +1541,7 @@ function update(time, delta){
                 this.registry.destroy(); //destroy registry
                 this.events.off(); // disable all active events
                 this.scene.start(); // restart current scene
+                gameoverSong.stop();
                 spawnCounter = 0;
                 Score = 0;
                 GameOver = false;
@@ -2200,7 +2206,7 @@ function createCoin(thebox){                                                    
     piece.setBounce(1);
     piece.setVelocityX(Phaser.Math.Between(-110, 110))
     setTimeout(()=>{
-        //piece.setBounce(0.95);
+        piece.setBounce(0.95);
         piece.setVelocityX(0);
     },1600)
 }
