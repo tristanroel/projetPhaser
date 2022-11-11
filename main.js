@@ -474,7 +474,7 @@ function create(){
 
             spawnCounter ++;
 
-            detector.body.position.x = player.body.position.x +600
+            detector.body.position.x = player.body.position.x +800
             detector.body.position.y = player.body.position.y -150
 
             //console.log(spawnCounter);
@@ -1874,6 +1874,12 @@ function powerAttackJump(){
     //if(player.anims.currentAnim.key === 'fall'){
         //player.anims.stop()
         player.anims.play('specialAirSlash', true);
+
+        player.on('animationupdate', ()=>{
+            if('specialAirSlash' === player.anims.currentAnim.key){
+
+            }
+        });
 
     //}
     console.log('ehbeh');
