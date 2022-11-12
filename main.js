@@ -624,6 +624,7 @@ function create(){
             if(combo.keyCodes[0] === 83){
                 //console.log('kikou lol');
                 counterMovePlayer = 34;
+                attackintheair = true;
                 powerAttackJump();
             }
         }
@@ -820,8 +821,8 @@ function create(){
     });
     this.anims.create({
         key: 'specialAirSlash',
-        frames: this.anims.generateFrameNumbers('specialairslash',{frames: [0, 1, 2, 2, 3, 4, 5, 6, 7, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8]}),
-        frameRate: 12,
+        frames: this.anims.generateFrameNumbers('specialairslash',{frames: [0, 1, 2, 2, 3, 4, 5, 6, 7, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8]}),
+        frameRate: 16,
         repeat : -1,
     });
     this.anims.create({
@@ -1499,7 +1500,7 @@ function update(time, delta){
     //console.log(player.anims.currentAnim);
     //console.log(player.anims.currentAnim);
     //console.log('countTest : '+countTest);
-    //console.log(attackintheair);
+    console.log(attackintheair);
     //console.log(attackinground);
     //console.log(EnemyIsDie);
     //console.log(player.body.velocity.y);
@@ -1574,7 +1575,10 @@ function update(time, delta){
                             gamePadCombo = [];
                         }
                     }
-                    if(playerInGround === false){console.log('kikou');}
+                    if(playerInGround === false){
+                        attackintheair = true
+                        console.log('kikou');
+                    }
                     gamePadCombo = [];
 
                 // }
@@ -1877,7 +1881,49 @@ function powerAttackJump(){
 
         player.on('animationupdate', ()=>{
             if('specialAirSlash' === player.anims.currentAnim.key){
-
+                if(player.anims.currentFrame.index == 1){
+                    swordAir.play();
+                    player.data.list.Eject = 3;
+                    colideATK.setX(player.x);colideATK.setY(player.y)
+                }
+                if(player.anims.currentFrame.index == 2){
+                    colideATK.setX(player.x +40);colideATK.setY(player.y)
+                }
+                if(player.anims.currentFrame.index == 3){
+                    player.data.list.Eject = 1;
+                    colideATK.setX(player.x +40);colideATK.setY(player.y)
+                }
+                if(player.anims.currentFrame.index == 4){
+                    colideATK.setX(player.x -40);colideATK.setY(player.y)
+                }
+                if(player.anims.currentFrame.index == 5){
+                    player.data.list.Eject = 3;
+                    colideATK.setX(player.x +40);colideATK.setY(player.y)
+                }
+                if(player.anims.currentFrame.index == 6){
+                    colideATK.setX(player.x -40);colideATK.setY(player.y +40)
+                }
+                if(player.anims.currentFrame.index == 7){
+                    player.data.list.Eject = 1;
+                    colideATK.setX(player.x +60);colideATK.setY(player.y +40)
+                    
+                }
+                if(player.anims.currentFrame.index == 8){
+                    colideATK.setX(player.x +60);colideATK.setY(player.y +40)
+                }
+                if(player.anims.currentFrame.index == 9){
+                    colideATK.setX(player.x -60);colideATK.setY(player.y +40)
+                }
+                if(player.anims.currentFrame.index < 13){
+                    player.setVelocityY(1200)
+                }
+                if(player.anims.currentFrame.index >= 16){
+                    counterMovePlayer = 0; 
+                    player.data.list.Eject = 0;
+                    colideATK.setX(-99)
+                    //colideATK.body.enable = true;
+                    // colAtk5.destroy();
+                ;}
             }
         });
 
