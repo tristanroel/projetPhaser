@@ -38,6 +38,7 @@ var configuration = {
 
 var game = new Phaser.Game(configuration);
 
+var startGame; //Boolean
 var controlHelp;
 //var touchesClavier; //touches de direction
 var leftkey;
@@ -113,6 +114,8 @@ var swordImpact;
 var swordImpact2;
 var coinImpact;
 
+var soundVolume = 0;
+
 var currentEnemy;
 var enemyCanDie = false;
 
@@ -153,7 +156,7 @@ function preload(){
     this.load.image('forest', 'assets/levelOne/Decor2.png');
     this.load.tilemapTiledJSON('tiles', 'assets/levelOne/forest.json')
 
-    this.load.spritesheet('controlHelp','assets/controlHelp.png', {frameWidth : 170, frameHeight : 149});
+    this.load.spritesheet('controlHelp','assets/controlHelp.png', {frameWidth : 501, frameHeight : 318});
     this.load.spritesheet('slash','assets/Slash.png', {frameWidth : 65, frameHeight : 65});
     this.load.spritesheet('arrowbreack','assets/Sprites/carreaufrappe.png', {frameWidth : 170, frameHeight : 170});
     this.load.spritesheet('slashGuard','assets/SlashGuard.png', {frameWidth : 8, frameHeight : 23});
@@ -183,6 +186,7 @@ function preload(){
     this.load.spritesheet('theEnemySpearMan', 'assets/Enemy/spearman.png',{frameWidth: 190, frameHeight: 170});
     this.load.spritesheet('theEnemyAssassin', 'assets/Enemy/assassin.png',{frameWidth: 170, frameHeight: 170});
     this.load.spritesheet('theEnemyRunMan', 'assets/Enemy/runman.png',{frameWidth: 170, frameHeight: 170});
+
 }
 
 /////////////////////////////////////////////////////////////////////////////////////       CREATE
@@ -191,6 +195,7 @@ function create(){
     //	You can listen for each of these events from Phaser.Loader
 
     /// SET VARIABLE    
+    startGame = true;
     attackintheair = false;
     counterMovePlayer = 0;
     playerVelocityX = 270;
@@ -210,10 +215,10 @@ function create(){
     swordImpact = this.sound.add('swordImpact',{volume: 0.24});
     swordImpact2 = this.sound.add('swordImpact2',{volume: 0.005});
     swordImpactEnemies = this.sound.add('ImpactEnemies',{volume: 0.24});
-    swordAir = this.sound.add('air',{volume: 0.4});
+    swordAir = this.sound.add('air',{volume: 0});
     themeSong.loop = true ;
     gameoverSong.stop();
-    themeSong.play();
+    //themeSong.play();
 
 
 
@@ -600,7 +605,7 @@ function create(){
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////// 
 
     // ENTREES CLAVIER
-
+    enterKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER)
     leftkey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Q);
     rightkey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
     upkey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Z);
@@ -1162,6 +1167,7 @@ function create(){
         frames: this.anims.generateFrameNumbers('slashGuard',{frames: [0, 1, 2, 3, 4]}),
         frameRate: 30,
     });
+    this.anims.pauseAll();
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // CREATE ENEMIES
@@ -1227,8 +1233,8 @@ function update(time, delta){
     comboText.x = player.body.position.x - 330;
     comboText.y = player.body.position.y - 110;
 
-    controlHelp.x = player.body.position.x - 215                                                      // position controlHelp
-    controlHelp.y = player.body.position.y + 150
+    controlHelp.x = player.body.position.x  + 25                                                    // position controlHelp
+    controlHelp.y = player.body.position.y + 50
     //controlHelp.alpha = 2.150 - ((player.body.position.x / 1000) * 2)                                                // opacity // control help
     // console.log((player.body.position.x / 1000)-(player.body.position.x - 1));
     //console.log(player.body.position.x);
@@ -1263,6 +1269,12 @@ function update(time, delta){
     // spawnReActivator.body.velocity.x = player.body.velocity.x ;
     // spawnReActivator.body.velocity.y = player.body.velocity.y ;
     // spawnDetector.y = player.body.position.y;
+    if(startGame === true){
+        controlHelp.setVisible(true)
+        controlHelp.setFrame(8);
+    }
+    else{
+
      if(player.body.position.x < 950){
         controlHelp.alpha = 2.150 - ((player.body.position.x / 1000) * 2)                                                // opacity // control help
         controlHelp.setVisible(true)
@@ -1294,6 +1306,7 @@ function update(time, delta){
         controlHelp.setFrame(7);
      }
      else{controlHelp.setVisible(false)}
+    }
 
 
     //ENEMY UPDATE
@@ -1699,6 +1712,18 @@ function update(time, delta){
             else if (counterMovePlayer >= 2 && playerInGround === true){attackComboTwo();}
             else if(counterMovePlayer === 1 && playerInGround === false){attackJump();}
         }  
+
+        if(Phaser.Input.Keyboard.JustDown(enterKey) && startGame === true){     
+            this.anims.resumeAll();
+            player.x = 600;
+            player.y = 1150;
+            startGame = false;
+
+            soundVolume = 1;
+            swordAir.volume = 0.4;
+            themeSong.play();
+
+        }
 // }  
 }
 
