@@ -84,6 +84,7 @@ var colideATK;
 
 var box;    // caisse en bois : sprite
 
+var comboValue = 0;
 var skyBg; //ciel
 var Coin;  //pieces
 var Arrow;
@@ -93,6 +94,7 @@ var Score = 0; // Score
 var personalBestText;
 var scoreText;
 var gameOverText;
+var comboText;
 var healthBar; 
 var specialBar;
 
@@ -346,6 +348,7 @@ function create(){
     personalBestText = this.add.text(0,0,'YOUR BEST : 0',{ fontFamily : 'PixelFont'})
     scoreText = this.add.text(0,0, 'SCORE : 0',{ fontFamily : 'PixelFont'})
     gameOverText = this.add.text(0,0, 'GAME OVER \n score : 0 \n press any to restart', { fontFamily : 'PixelFont', fontSize : '60px', color : '#FFF05B'});
+    comboText = this.add.text(0,0,'COMBO X0',{ fontFamily : 'PixelFont'});
     gameOverText.setDepth(-2);
     text.setDepth(2);
     scoreText.setDepth(2);
@@ -368,6 +371,12 @@ function create(){
         if(player.flipX === true){DestroyArrow.setX(player.x -100)}
         if(player.flipX === false){DestroyArrow.setX(player.x +100)}
         DestroyArrow.anims.play('breackArrow', true);
+        slashAtk.setY(player.y)
+        if(player.flipX === true){slashAtk.setX(player.x -100)}
+        if(player.flipX === false){slashAtk.setX(player.x +100)}
+
+        slashAtk.anims.play('slashed', true)
+        slashAtk.rotation = Phaser.Math.Between(0,2);
 
         arrow.setY(0)
     })
@@ -1215,6 +1224,8 @@ function update(time, delta){
     personalBestText.x = player.body.position.x + 60;                                                // position Score
     scoreText.y = player.body.position.y -160;
     personalBestText.y = player.body.position.y -160;
+    comboText.x = player.body.position.x - 330;
+    comboText.y = player.body.position.y - 110;
 
     controlHelp.x = player.body.position.x - 215                                                      // position controlHelp
     controlHelp.y = player.body.position.y + 150
@@ -1228,6 +1239,7 @@ function update(time, delta){
     scoreText.setText('SCORE : '+ Score);                                                            // maj score
     gameOverText.setText('   GAME OVER \n   score : '+ Score + '\npress "J" to restart');                                                           // maj score
     personalBestText.setText('YOUR BEST : '+ personalBest);                                          // maj score
+    comboText.setText('COMBO X '+ comboValue);                                                       // maj combo
     gameOverText.x = player.body.position.x - 260
     gameOverText.y = player.body.position.y
     spawnDetector.body.velocity.x = player.body.velocity.x ;
@@ -1530,6 +1542,7 @@ function update(time, delta){
     }
     if(player.data.list.health <= 0){                                                              //Player Die 
         themeSong.stop();
+        player.anims.play('knockBack', true);
         counterMovePlayer = 999;
         player.data.list.health = 0;
 
@@ -1646,6 +1659,7 @@ function update(time, delta){
                     player.body.checkCollision.right = true;
                     player.body.checkCollision.left = true;
                     playerCanFall = true;
+                    setCombo()     
                 }
             }
 
@@ -1892,6 +1906,7 @@ function powerAttackJump(){
         player.on('animationupdate', ()=>{
             if('specialAirSlash' === player.anims.currentAnim.key){
                 if(player.anims.currentFrame.index == 1){
+                    swordAir.play();
                     player.data.list.Eject = 3;
                     colideATK.setX(player.x);colideATK.setY(player.y)
                 }
@@ -2188,8 +2203,7 @@ function UltraSlash(){
 function KnockBack(){                                                                                  // Knock Back
     player.setGravityY(0);
     player.data.list.Eject = 0;
-    
-    //countTest = 0;
+    setCombo()
     playerCanFall = false
     player.anims.play('knockBack', true);
     var nameAction = 'knockBack';
@@ -2232,6 +2246,7 @@ function KnockBack(){                                                           
                 player.setGravityY(2000)
             }
             if(player.anims.currentFrame.index >=18){
+                
                 player.setGravityX(0)
             }
         }
@@ -2804,6 +2819,7 @@ function collisionAtkEnemies(htblObjct,atk){
     atk.setY(0);
     slashAtk.setY(player.y)
     player.data.list.special = player.data.list.special + 1;
+    comboValue ++;
     // console.log(htblObjct.flipX);
     if(player.flipX === true){slashAtk.setX(player.x -100)}
     if(player.flipX === false){slashAtk.setX(player.x +100)}
@@ -2859,6 +2875,42 @@ function knockBox(enmy){
         }
     });
 
+}
+
+function setCombo(){
+if(comboValue >= 3 && comboValue <= 4){
+    Score = Score + 5
+    //comboValue = 0;
+}
+if(comboValue >= 5 && comboValue <= 9){
+    Score = Score + 10
+    //comboValue = 0;
+}
+if(comboValue >= 10 && comboValue <= 19){
+    Score = Score + 25
+    //comboValue = 0;
+}
+if(comboValue >= 20 && comboValue <= 29){
+    Score = Score + 50
+    //comboValue = 0;
+}
+if(comboValue >= 30 && comboValue <= 39){
+    Score = Score + 100
+    //comboValue = 0;
+}
+if(comboValue >= 40 && comboValue <= 49){
+    Score = Score + 150
+    //comboValue = 0;
+}
+if(comboValue >= 50 && comboValue <= 99){
+    Score = Score + 250
+    //comboValue = 0;
+}
+if(comboValue >= 100){
+    Score = Score + 500
+    //comboValue = 0;
+}
+return comboValue = 0
 }
 // function stopEnemies(enemy){
 //     enemy.data.list.stopMove = true
