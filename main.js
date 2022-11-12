@@ -835,7 +835,7 @@ function create(){
     this.anims.create({
         key: 'shoryuSlash',
         // frames: this.anims.generateFrameNumbers('shoryu',{frames: [0, 2, 3, 4, 5, 6, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7]}),
-        frames: this.anims.generateFrameNumbers('shoryu',{frames: [0, 1, 2, 2, 3, 4, 5, 6, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7]}),
+        frames: this.anims.generateFrameNumbers('shoryu',{frames: [0, 1, 2, 2, 3, 4, 5, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 11, 11, 11]}),
         frameRate: 12,
         repeat : -1,
     });
@@ -2390,8 +2390,8 @@ function enemyStand(enmy1){                                                     
     enmy1.setVelocityX(0);
     enmy1.data.list.EnemyIsAttack = true
 
-    enmy1.body.checkCollision.left = true;
-    enmy1.body.checkCollision.right = true;
+    // enmy1.body.checkCollision.left = true;
+    // enmy1.body.checkCollision.right = true;
 }
 
 function enemyWalkFront(enemy1,target,game){                                                            // enemy Walk
@@ -2725,11 +2725,11 @@ if(enmy.data.list.type != 'box'){
                         enmy.setVelocityX(0)
                         enmy.setBounce(0,0)  
                     }
-                    if(enmy.anims.currentFrame.index >= 16){
-                        enmy.body.checkCollision.left = false;
-                        enmy.body.checkCollision.right = false;             
+                    // if(enmy.anims.currentFrame.index >= 16){
+                    //     enmy.body.checkCollision.left = false;
+                    //     enmy.body.checkCollision.right = false;             
 
-                    }
+                    // }
                     if(enmy.anims.currentFrame.index >= 20 &&
                         enmy.body.velocity.y === 0){ 
 
