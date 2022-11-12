@@ -1506,7 +1506,7 @@ function update(time, delta){
     //console.log(player.anims.currentAnim);
     //console.log(player.anims.currentAnim);
     //console.log('countTest : '+countTest);
-    console.log(attackintheair);
+    //console.log(attackintheair);
     //console.log(attackinground);
     //console.log(EnemyIsDie);
     //console.log(player.body.velocity.y);
@@ -2042,7 +2042,9 @@ function UltraSlash(){
     spevalue = player.data.list.special = player.data.list.special - 3;
 
     player.on('animationupdate', ()=>{
-
+        if(player.data.list.health <= 0){
+            counterMovePlayer = 999;
+        }
         if(nameAttack === player.anims.currentAnim.key){
             if(player.anims.currentFrame.index >= 2 && player.anims.currentFrame.index <= 3 ){
                 player.data.list.special = spevalue;
@@ -2492,7 +2494,7 @@ function enemyAttack(enemyone, currentArrow){
         if('attackRunMan' === enemyone.anims.currentAnim.key){                                              //attack RunMan
             if(enemyone.anims.currentFrame.index === 3 ){
                 enemyone.data.list.AtkCollide = true
-                enemyone.setSize(100,56)
+                enemyone.setSize(90,56)
                 setTimeout(()=>{
                     enemyone.setSize(24,56)
                     enemyone.data.list.AtkCollide = false
@@ -2504,7 +2506,7 @@ function enemyAttack(enemyone, currentArrow){
             }
             if(enemyone.anims.currentFrame.index === 8 ){
                 enemyone.data.list.AtkCollide = true
-                enemyone.setSize(110,56)
+                enemyone.setSize(90,56)
                 setTimeout(()=>{
                     enemyone.setSize(24,56)
                     enemyone.data.list.AtkCollide = false
