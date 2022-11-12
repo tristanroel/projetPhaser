@@ -342,7 +342,7 @@ function create(){
 
     // TEXT
 
-    text = this.add.text(0,0, 'version : O.23 | 5.10.22' , {fontFamily : 'PixelFont'}); 
+    text = this.add.text(0,0, 'version : O.30 | 12.11.22' , {fontFamily : 'PixelFont'}); 
     personalBestText = this.add.text(0,0,'YOUR BEST : 0',{ fontFamily : 'PixelFont'})
     scoreText = this.add.text(0,0, 'SCORE : 0',{ fontFamily : 'PixelFont'})
     gameOverText = this.add.text(0,0, 'GAME OVER \n score : 0 \n press any to restart', { fontFamily : 'PixelFont', fontSize : '60px', color : '#FFF05B'});
@@ -626,6 +626,12 @@ function create(){
                 counterMovePlayer = 34;
                 attackintheair = true;
                 powerAttackJump();
+            }
+            if(combo.keyCodes[0] === 68 || combo.keyCodes[0] === 81){
+                if(player.data.list.special >= 3){
+                    counterMovePlayer = 33;
+                    UltraSlash();
+                }
             }
         }
     });
@@ -1985,6 +1991,8 @@ function tornadoSlash(){                                                        
                 colideATK.setX(0)
                 colideATK.setY(0)
                 swordAir.play();
+                playerInGround = false
+
             }
                 if(player.anims.currentFrame.index === 6 ){
       
@@ -1998,7 +2006,6 @@ function tornadoSlash(){                                                        
             if(player.anims.currentFrame.index === 7 ){
                 colideATK.setX(0);
                 colideATK.setY(0);
-
             }
 
             if(player.anims.currentFrame.index >= 4 &&
