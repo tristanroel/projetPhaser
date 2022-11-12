@@ -342,7 +342,7 @@ function create(){
 
     // TEXT
 
-    text = this.add.text(0,0, 'version : O.30 | 12.11.22' , {fontFamily : 'PixelFont'}); 
+    text = this.add.text(0,0, 'version : O.31 | 12.11.22' , {fontFamily : 'PixelFont'}); 
     personalBestText = this.add.text(0,0,'YOUR BEST : 0',{ fontFamily : 'PixelFont'})
     scoreText = this.add.text(0,0, 'SCORE : 0',{ fontFamily : 'PixelFont'})
     gameOverText = this.add.text(0,0, 'GAME OVER \n score : 0 \n press any to restart', { fontFamily : 'PixelFont', fontSize : '60px', color : '#FFF05B'});
@@ -997,7 +997,7 @@ function create(){
     })
     this.anims.create({
         key: 'attackRunMan',
-        frames: this.anims.generateFrameNumbers('theEnemyRunMan',{frames : [ 5, 6, 6, 7, 8, 9, 10, 10, 10, 0, 0, 0]}),
+        frames: this.anims.generateFrameNumbers('theEnemyRunMan',{frames : [ 5, 5, 6, 6, 7, 7, 7, 8, 9, 10, 10, 10, 0, 0, 0]}),
         frameRate: 10,
     })
     this.anims.create({
@@ -1583,7 +1583,10 @@ function update(time, delta){
                     }
                     if(playerInGround === false){
                         attackintheair = true
-                        console.log('kikou');
+                        
+                        counterMovePlayer = 34;
+                        attackintheair = true;
+                        powerAttackJump();
                     }
                     gamePadCombo = [];
 
@@ -1885,10 +1888,10 @@ function powerAttackJump(){
         //player.anims.stop()
         player.anims.play('specialAirSlash', true);
 
+        swordAir.play();
         player.on('animationupdate', ()=>{
             if('specialAirSlash' === player.anims.currentAnim.key){
                 if(player.anims.currentFrame.index == 1){
-                    swordAir.play();
                     player.data.list.Eject = 3;
                     colideATK.setX(player.x);colideATK.setY(player.y)
                 }
@@ -2487,7 +2490,7 @@ function enemyAttack(enemyone, currentArrow){
             }
         }
         if('attackRunMan' === enemyone.anims.currentAnim.key){                                              //attack RunMan
-            if(enemyone.anims.currentFrame.index === 2 ){
+            if(enemyone.anims.currentFrame.index === 3 ){
                 enemyone.data.list.AtkCollide = true
                 enemyone.setSize(100,56)
                 setTimeout(()=>{
@@ -2499,7 +2502,7 @@ function enemyAttack(enemyone, currentArrow){
                 if(enemyone.flipX === true){enemyone.setVelocityX(600)}
                 if(enemyone.flipX === false){enemyone.setVelocityX(-600)}
             }
-            if(enemyone.anims.currentFrame.index === 5 ){
+            if(enemyone.anims.currentFrame.index === 8 ){
                 enemyone.data.list.AtkCollide = true
                 enemyone.setSize(110,56)
                 setTimeout(()=>{
