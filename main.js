@@ -351,10 +351,10 @@ function create(){
 
     // TEXT
 
-    text = this.add.text(0,0, 'version : O.32 | 12.11.22' , {fontFamily : 'PixelFont'}); 
+    text = this.add.text(0,0, 'version : O.33 | 12.11.22' , {fontFamily : 'PixelFont'}); 
     personalBestText = this.add.text(0,0,'YOUR BEST : 0',{ fontFamily : 'PixelFont'})
     scoreText = this.add.text(0,0, 'SCORE : 0',{ fontFamily : 'PixelFont'})
-    gameOverText = this.add.text(0,0, 'GAME OVER \n score : 0 \n press any to restart', { fontFamily : 'PixelFont', fontSize : '60px', color : '#FFF05B'});
+    gameOverText = this.add.text(0,0, 'GAME OVER \n score : 0 \n press any to restart', { fontFamily : 'PixelFont', fontSize : '60px'});
     comboText = this.add.text(0,0,'COMBO X0',{ fontFamily : 'PixelFont'});
     gameOverText.setDepth(-2);
     text.setDepth(2);
@@ -638,10 +638,12 @@ function create(){
             }
         }else{
             if(combo.keyCodes[0] === 83){
-                //console.log('kikou lol');
-                counterMovePlayer = 34;
-                attackintheair = true;
-                powerAttackJump();
+                if(player.data.list.special >= 1){
+                    //console.log('kikou lol');
+                    counterMovePlayer = 34;
+                    attackintheair = true;
+                    powerAttackJump();
+                }
             }
             if(combo.keyCodes[0] === 68 || combo.keyCodes[0] === 81){
                 if(player.data.list.special >= 3){
@@ -1898,12 +1900,10 @@ function attackJump(){                                                          
     player.anims.play('jumpAtk', true);
     var nameAttack4 = 'jumpAtk';
     swordAir.play();
-    // var colAtk5 = colideATK2.get();
-    // colAtk5.setScale(2)
-    // colAtk5.setSize(60,60)
-    // colAtk5.visible = false;
     gamepadJump = false
     attackintheair = true;
+    player.data.list.special = player.data.list.special + 1;
+
     player.on('animationupdate', ()=>{
         if(nameAttack4 === player.anims.currentAnim.key){
             if(player.anims.currentFrame.index === 4){
@@ -1925,8 +1925,9 @@ function powerAttackJump(){
     //if(player.anims.currentAnim.key === 'fall'){
         //player.anims.stop()
         player.anims.play('specialAirSlash', true);
-
         swordAir.play();
+        spevalue = player.data.list.special = player.data.list.special - 1;
+        
         player.on('animationupdate', ()=>{
             if('specialAirSlash' === player.anims.currentAnim.key){
                 if(player.anims.currentFrame.index == 1){
@@ -1976,7 +1977,6 @@ function powerAttackJump(){
         });
 
     //}
-    console.log('ehbeh');
 }
 function tornadoSlash(){                                                                                      // tornado slash
     playerCanFall = false;
@@ -2078,7 +2078,7 @@ function UltraSlash(){
     swordAir.play();
     
 
-    spevalue = player.data.list.special = player.data.list.special - 3;
+    spevalue = player.data.list.special = player.data.list.special - 2;
 
     player.on('animationupdate', ()=>{
         if(player.data.list.health <= 0){
@@ -2770,7 +2770,6 @@ if(enmy.data.list.type != 'box'){
         });
     } else if(player.data.list.Eject === 3){
         if(enmy.anims.currentAnim.key === 'expulse'+enmy.data.list.type){
-            console.log('ah');
             var animsName2 = 'knockback'+enmy.data.list.type;
             enmy.anims.play(animsName2,true);
     
