@@ -73,6 +73,7 @@ var colideATK2; // collision attaque 1 : sprite
 var attackintheair; // verifie si attaque en l'air : boolean
 var attackinground;
 var playerCanFall; // : boolean
+var rageMode; // : boolean
 
 
 var enemy1Spawn; //spawn enemy
@@ -205,6 +206,7 @@ function create(){
     playerCanFall = true;
     gamePadCombo = [];
     enemyNumberId = 0;
+    rageMode = false;
 
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -212,8 +214,8 @@ function create(){
     themeSong = this.sound.add('theme',{volume: 0.08});
     gameoverSong = this.sound.add('gameover',{volume: 0.08});
     coinImpact = this.sound.add('coinImpact',{volume: 1});
-    swordImpact = this.sound.add('swordImpact',{volume: 0.24});
-    swordImpact2 = this.sound.add('swordImpact2',{volume: 0.005});
+    swordImpact = this.sound.add('swordImpact',{volume: 0.04});
+    swordImpact2 = this.sound.add('swordImpact2',{volume: 0.012});
     swordImpactEnemies = this.sound.add('ImpactEnemies',{volume: 0.24});
     swordAir = this.sound.add('air',{volume: 0});
     themeSong.loop = true ;
@@ -1751,9 +1753,8 @@ function attackComboOne(){                                                      
         var nameAttack = 'attackOne'
         player.anims.play(nameAttack, true);
         swordAir.play();
-        //var colAtk2 = colideATK2.get(); 
-        //colAtk2.setScale(2)
-        //colAtk2.visible = false;
+        player.data.list.special = player.data.list.special + 1;
+
             player.on('animationupdate', ()=>{
                 if(nameAttack === player.anims.currentAnim.key){
                     if(4 === player.anims.currentFrame.index){
@@ -1785,11 +1786,8 @@ if(player.anims.currentAnim.key === 'attackOne'){
     if(countTest === 1){
         player.anims.play('attackTwo', true);
     var nameAttack2 = 'attackTwo'
-    // var colAtk2 = colideATK2.get();
-    // colAtk2.setScale(2)
-    // colAtk2.setSize(60,60)
-    // colAtk2.visible = false;
     swordAir.play();
+    player.data.list.special = player.data.list.special + 1;
 
 
     player.on('animationupdate', ()=>{
@@ -1830,13 +1828,14 @@ function attackComboThree(){
     // var colAtk2 = colideATK2.get();
     // colAtk2.visible = false;
     swordAir.play();
+    player.data.list.special = player.data.list.special + 1;
 
 
     player.on('animationupdate', ()=>{
         if(nameAttack === player.anims.currentAnim.key){
             if(player.anims.currentFrame.index === 5){
                 if(playerFlip === true){colideATK.setX(player.x -80);colideATK.setY(player.y)}
-                if(playerFlip === false){colideATK.setX(player.x +80);colideATK.setY(player.y)} 
+                if(playerFlip === false){colideATK.setX(player.x +80);colideATK.setY(player.y)}
             }
             if(player.anims.currentFrame.index <= 6){
                 if(playerFlip === true){player.setVelocityX(-200)}
@@ -2440,7 +2439,7 @@ function enemyWalkBack(enemy1,target,game){                                     
         }
         if(animsName === enemy1.anims.currentAnim.key){
             if(enemy1.anims.currentFrame.index >= 4){
-                enemy1.data.list.CounterMove = 2
+                enemy1.data.list.CounterMove = 0 // ou 2 ?
                 enemy1.data.list.AttackIsFinish = true
             }
         }
@@ -2843,8 +2842,11 @@ function collisionAtkEnemies(htblObjct,atk){
     atk.setX(-800);
     atk.setY(0);
     slashAtk.setY(player.y)
-    player.data.list.special = player.data.list.special + 1;
     comboValue ++;
+
+    if(rageMode === true){
+        player.data.list.special = player.data.list.special + 1;
+    }
     // console.log(htblObjct.flipX);
     if(player.flipX === true){slashAtk.setX(player.x -100)}
     if(player.flipX === false){slashAtk.setX(player.x +100)}
