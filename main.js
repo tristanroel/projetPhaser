@@ -26,7 +26,7 @@ var configuration = {
     physics :{
         default : 'arcade',
         arcade :{
-                    debug : false,
+                    debug : true,
                     tileBias : 36,
                     gravity : {y : 1000},
                 }
@@ -324,7 +324,8 @@ function create(){
     // player.setData('Expulse', false);
     player.setData('Eject', 0);
     player.body.checkCollision.up = false;
-    //console.log(player.body);
+    
+    console.log(player.body.touching);
 
     colideATK = this.add.rectangle(-800,0,100,100,0xB14F37)                                // collision attack final
     this.physics.add.existing(colideATK);
@@ -351,7 +352,7 @@ function create(){
 
     // TEXT
 
-    text = this.add.text(0,0, 'version : O.34 | 12.11.22' , {fontFamily : 'PixelFont'}); 
+    text = this.add.text(0,0, 'version : O.35 | 12.11.22' , {fontFamily : 'PixelFont'}); 
     personalBestText = this.add.text(0,0,'YOUR BEST : 0',{ fontFamily : 'PixelFont'})
     scoreText = this.add.text(0,0, 'SCORE : 0',{ fontFamily : 'PixelFont'})
     gameOverText = this.add.text(0,0, 'GAME OVER \n score : 0 \n press any to restart', { fontFamily : 'PixelFont', fontSize : '60px'});
@@ -1349,7 +1350,7 @@ function update(time, delta){
             //OVERLAP player + enemy
 
             this.physics.add.overlap(currentEnemy, player, function(htblobjct, plyr){               // overlap player + enemies
-                
+                if(counterMovePlayer != 34){
                 if(htblobjct.data.list.AtkCollide === true){                                        // collision Player Guard                     
                     if(plyr.data.list.Guard === true){
                         swordImpact2.play();
@@ -1383,6 +1384,7 @@ function update(time, delta){
                     }
                 }else{
                     //counterMove = 28
+                }
                 }
             });
 
