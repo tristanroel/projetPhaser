@@ -100,6 +100,8 @@ var comboText;
 var healthBar; 
 var specialBar;
 
+var rageCloud;
+
 var spawnDetector;
 var spawnReActivator;
 var spawnCounter = 0;
@@ -153,13 +155,13 @@ function preload(){
     this.load.image('spawner','assets/ROELprod.png');
     this.load.image('carreau', 'assets/carreau.png');
     this.load.image('spebar', 'assets/Spebar.png');
+    this.load.spritesheet('sfx','assets/Sprites/SFXGROUPE.png', {frameWidth : 170, frameHeight : 170});
     
     this.load.image('forest', 'assets/levelOne/Decor2.png');
     this.load.tilemapTiledJSON('tiles', 'assets/levelOne/forest.json')
 
     this.load.spritesheet('controlHelp','assets/controlHelp.png', {frameWidth : 501, frameHeight : 318});
     this.load.spritesheet('slash','assets/Slash.png', {frameWidth : 65, frameHeight : 65});
-    this.load.spritesheet('arrowbreack','assets/Sprites/carreaufrappe.png', {frameWidth : 170, frameHeight : 170});
     this.load.spritesheet('slashGuard','assets/SlashGuard.png', {frameWidth : 8, frameHeight : 23});
     this.load.spritesheet('piecette','assets/Coin.png', {frameWidth : 8, frameHeight : 8});
     this.load.spritesheet('hero', 'assets/Sprites/stancearmed.png',{frameWidth: 170, frameHeight: 170});
@@ -308,8 +310,10 @@ function create(){
 
     Arrow = this.physics.add.group({allowGravity : false})                              // Arrow 
 
-    DestroyArrow = this.add.sprite(0,0,'arrowbreack').setScale(2);                      // Destroy Arrow
+    DestroyArrow = this.add.sprite(0,0,'sfx').setScale(2);                      // Destroy Arrow
     
+    rageCloud = this.add.sprite(0,0,'sfx').setScale(2);
+    rageCloud.setDepth(1);
 
     hittableObject = this.physics.add.group({immovable: true})                          // enemy and other...
 
@@ -325,7 +329,7 @@ function create(){
     player.setData('Eject', 0);
     player.body.checkCollision.up = false;
     
-    console.log(player.body.touching);
+    //console.log(player.body.touching);
 
     colideATK = this.add.rectangle(-800,0,100,100,0xB14F37)                                // collision attack final
     this.physics.add.existing(colideATK);
@@ -1163,13 +1167,19 @@ function create(){
     });
     this.anims.create({
         key: 'breackArrow',
-        frames: this.anims.generateFrameNumbers('arrowbreack',{frames: [0 ,1, 2, 3, 4, 5, 6, 7]}),
+        frames: this.anims.generateFrameNumbers('sfx',{frames: [1, 2, 3, 4, 5, 6, 7, 8, 0]}),
         frameRate: 10,
     });
     this.anims.create({
         key: 'slashedGuard',
         frames: this.anims.generateFrameNumbers('slashGuard',{frames: [0, 1, 2, 3, 4]}),
         frameRate: 30,
+    });
+    this.anims.create({
+        key: 'rage',
+        frames: this.anims.generateFrameNumbers('sfx',{frames: [9, 10, 11, 12]}),
+        frameRate: 10,
+        repeat: -1
     });
     this.anims.pauseAll();
 
@@ -1237,6 +1247,9 @@ function update(time, delta){
     comboText.x = player.body.position.x - 999;
     comboText.y = player.body.position.y - 110;
 
+    rageCloud.x = player.body.position.x +20
+    rageCloud.y = player.body.position.y +46
+
     controlHelp.x = player.body.position.x  + 25                                                    // position controlHelp
     controlHelp.y = player.body.position.y + 50
     //controlHelp.alpha = 2.150 - ((player.body.position.x / 1000) * 2)                                                // opacity // control help
@@ -1260,10 +1273,12 @@ function update(time, delta){
     }
     if(comboValue <= 14){                                                                             //RAGEMODE
         rageMode = false;
+        rageCloud.setVisible(false);
         specialBar.fillColor = 16632447
     }
     if(comboValue >= 15){
         rageMode = true;
+        rageCloud.setVisible(true);
         specialBar.fillColor = 11620151;
     }
     
@@ -1736,6 +1751,8 @@ function update(time, delta){
             player.x = 600;
             player.y = 1150;
             startGame = false;
+            rageCloud.anims.play('rage',true);
+
 
             soundVolume = 1;
             swordAir.volume = 0.4;
