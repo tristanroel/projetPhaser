@@ -26,7 +26,7 @@ var configuration = {
     physics :{
         default : 'arcade',
         arcade :{
-                    debug : true,
+                    debug : false,
                     tileBias : 36,
                     gravity : {y : 1000},
                 }
