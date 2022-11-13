@@ -1233,7 +1233,7 @@ function update(time, delta){
     personalBestText.x = player.body.position.x + 60;                                                // position Score
     scoreText.y = player.body.position.y -160;
     personalBestText.y = player.body.position.y -160;
-    comboText.x = player.body.position.x - 330;
+    comboText.x = player.body.position.x - 999;
     comboText.y = player.body.position.y - 110;
 
     controlHelp.x = player.body.position.x  + 25                                                    // position controlHelp
@@ -1254,11 +1254,16 @@ function update(time, delta){
     spawnDetector.body.velocity.x = player.body.velocity.x ;
     spawnDetector.body.velocity.y = player.body.velocity.y ;
 
+    if(comboValue >= 1){
+        comboText.x = player.body.position.x + 150;
+    }
     if(comboValue <= 14){                                                                             //RAGEMODE
         rageMode = false;
+        specialBar.fillColor = 16632447
     }
     if(comboValue >= 15){
         rageMode = true;
+        specialBar.fillColor = 11620151;
     }
     
     // TouchLeft.x = player.body.position.x - 300;                                                           // position touch
@@ -1710,7 +1715,8 @@ function update(time, delta){
             player.setVelocityX(0);
             player.setVelocityY(0);
             player.anims.play('guard', true);
-            player.data.list.Guard = true
+            player.data.list.Guard = true;
+            setCombo()
         }else if(touchesGuard.isUp && playerInGround === true && counterMovePlayer != 14){
              player.data.list.Guard = false}
         
