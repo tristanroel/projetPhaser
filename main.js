@@ -351,7 +351,7 @@ function create(){
 
     // TEXT
 
-    text = this.add.text(0,0, 'version : O.33 | 12.11.22' , {fontFamily : 'PixelFont'}); 
+    text = this.add.text(0,0, 'version : O.34 | 12.11.22' , {fontFamily : 'PixelFont'}); 
     personalBestText = this.add.text(0,0,'YOUR BEST : 0',{ fontFamily : 'PixelFont'})
     scoreText = this.add.text(0,0, 'SCORE : 0',{ fontFamily : 'PixelFont'})
     gameOverText = this.add.text(0,0, 'GAME OVER \n score : 0 \n press any to restart', { fontFamily : 'PixelFont', fontSize : '60px'});
@@ -373,7 +373,6 @@ function create(){
     // COLLISIONS
 
     this.physics.add.collider(colideATK, Arrow, function(atk,arrow){
-        console.log('lol');
         DestroyArrow.setY(player.y);
         if(player.flipX === true){DestroyArrow.setX(player.x -100)}
         if(player.flipX === false){DestroyArrow.setX(player.x +100)}
@@ -1255,6 +1254,12 @@ function update(time, delta){
     spawnDetector.body.velocity.x = player.body.velocity.x ;
     spawnDetector.body.velocity.y = player.body.velocity.y ;
 
+    if(comboValue <= 14){                                                                             //RAGEMODE
+        rageMode = false;
+    }
+    if(comboValue >= 15){
+        rageMode = true;
+    }
     
     // TouchLeft.x = player.body.position.x - 300;                                                           // position touch
     // TouchLeft.y = player.body.position.y + 160;
@@ -1550,6 +1555,7 @@ function update(time, delta){
     //if(player.flipX === true && player.body.velocity.x === 0){console.log('flip');}
     //console.log(player.body.velocity.y);
     //console.log(touchesAttack._justDown);
+    console.log(rageMode)
 
     if(counterMovePlayer === 28){
         KnockBack()
