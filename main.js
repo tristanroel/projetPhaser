@@ -38,6 +38,8 @@ var configuration = {
 
 var game = new Phaser.Game(configuration);
 
+var cameraPlayer;
+
 var startGame; //Boolean
 var controlHelp;
 //var touchesClavier; //touches de direction
@@ -61,6 +63,7 @@ var TouchDown;
 var TouchJump;
 var TouchAttack;
 
+var rageValue;
 
 var player;
 var playerVelocityX;
@@ -87,20 +90,23 @@ var colideATK;
 var box;    // caisse en bois : sprite
 
 var comboValue = 0;
-var skyBg; //ciel
-var Coin;  //pieces
-var Arrow;
-var DestroyArrow;
+var comboText;
 var text;  // info command list
 var Score = 0; // Score
 var personalBestText;
 var scoreText;
 var gameOverText;
-var comboText;
+var funText;
+
 var healthBar; 
 var specialBar;
 
+var Coin;  //pieces
+var skyBg; //ciel
+var Arrow;
+var DestroyArrow;
 var rageCloud;
+var oldfilter;
 
 var spawnDetector;
 var spawnReActivator;
@@ -122,7 +128,7 @@ var soundVolume = 0;
 var currentEnemy;
 var enemyCanDie = false;
 
-var personalBest = localStorage.getItem('score');                                               //best score in localStorage
+var personalBest;                                               //best score in localStorage
 var GameOver = false;
 
 function preload(){
@@ -155,6 +161,7 @@ function preload(){
     this.load.image('spawner','assets/ROELprod.png');
     this.load.image('carreau', 'assets/carreau.png');
     this.load.image('spebar', 'assets/Spebar.png');
+    this.load.image('oldTvFilter', 'assets/IMG_0567.jpg');
     this.load.spritesheet('sfx','assets/Sprites/SFXGROUPE.png', {frameWidth : 170, frameHeight : 170});
     
     this.load.image('forest', 'assets/levelOne/Decor2.png');
@@ -197,7 +204,13 @@ function create(){
 
     //	You can listen for each of these events from Phaser.Loader
 
-    /// SET VARIABLE    
+    /// SET VARIABLE  
+    if(localStorage.getItem('score') === null){
+        personalBest = 0;
+    }else{
+        personalBest = localStorage.getItem('score');                                               //best score in localStorage
+    }
+
     startGame = true;
     attackintheair = false;
     counterMovePlayer = 0;
@@ -315,6 +328,10 @@ function create(){
     rageCloud = this.add.sprite(0,0,'sfx').setScale(2);
     rageCloud.setDepth(1);
 
+    oldfilter = this.add.sprite(600,1150,'oldTvFilter').setScale(0.4).setDepth(3);
+    oldfilter.alpha = 0.1
+    //console.log(oldfilter);
+
     hittableObject = this.physics.add.group({immovable: true})                          // enemy and other...
 
     controlHelp = this.add.sprite(360,1260,'controlHelp').setScale(1.5).setDepth(2);    // controlHelp
@@ -356,22 +373,27 @@ function create(){
 
     // TEXT
 
-    text = this.add.text(0,0, 'version : O.35 | 12.11.22' , {fontFamily : 'PixelFont'}); 
+    text = this.add.text(0,0, 'version : O.36 | 14.11.22' , {fontFamily : 'PixelFont'}); 
     personalBestText = this.add.text(0,0,'YOUR BEST : 0',{ fontFamily : 'PixelFont'})
     scoreText = this.add.text(0,0, 'SCORE : 0',{ fontFamily : 'PixelFont'})
     gameOverText = this.add.text(0,0, 'GAME OVER \n score : 0 \n press any to restart', { fontFamily : 'PixelFont', fontSize : '60px'});
     comboText = this.add.text(0,0,'COMBO X0',{ fontFamily : 'PixelFont'});
+    funText = this.add.text(0,0,'',{ fontFamily : 'PixelFont'});
     gameOverText.setDepth(-2);
     text.setDepth(2);
     scoreText.setDepth(2);
     personalBestText.setDepth(2);
+    comboText.setDepth(2);
     //text.setFontSize(text.fontSize - 2);
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     
     // CAMERA
 
-    this.cameras.main.startFollow(player);
-    this.cameras.main.setZoom(4);
+    // this.cameras.main.startFollow(player);
+    // this.cameras.main.setZoom(4);
+
+    cameraPlayer = this.cameras.main.startFollow(player).setZoom(4);
+    // cameraPlayer.main.setZoom(4);
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -1178,7 +1200,7 @@ function create(){
     this.anims.create({
         key: 'rage',
         frames: this.anims.generateFrameNumbers('sfx',{frames: [9, 10, 11, 12]}),
-        frameRate: 10,
+        frameRate: 15,
         repeat: -1
     });
     this.anims.pauseAll();
@@ -1228,7 +1250,7 @@ function update(time, delta){
 
 // if(GameOver === false){
     //BACKGROUND AND TEXT
-    
+        
     skyBg.x = player.body.position.x;                                                                // position du ciel
     skyBg.y = player.body.position.y;                                                                // position du ciel
     skyBg.tilePositionX += 0.5;
@@ -1246,9 +1268,13 @@ function update(time, delta){
     personalBestText.y = player.body.position.y -160;
     comboText.x = player.body.position.x - 999;
     comboText.y = player.body.position.y - 110;
+    funText.x = player.body.position.x - 999;
+    funText.y = player.body.position.y - 80;
 
-    rageCloud.x = player.body.position.x +20
+    rageCloud.x = player.body.position.x +18
     rageCloud.y = player.body.position.y +46
+    oldfilter.x = player.body.position.x +20
+    oldfilter.y = player.body.position.y +46
 
     controlHelp.x = player.body.position.x  + 25                                                    // position controlHelp
     controlHelp.y = player.body.position.y + 50
@@ -1270,17 +1296,36 @@ function update(time, delta){
 
     if(comboValue >= 1){
         comboText.x = player.body.position.x + 150;
+        funText.x = player.body.position.x + 150;
     }
+    if(comboValue <= 9){funText.setText(''+''); }
     if(comboValue <= 14){                                                                             //RAGEMODE
         rageMode = false;
         rageCloud.setVisible(false);
         specialBar.fillColor = 16632447
     }
-    if(comboValue >= 15){
+    if(comboValue >= 10){funText.setText(''+'Nice !'); }
+    if(comboValue >= 15){                                        
         rageMode = true;
         rageCloud.setVisible(true);
         specialBar.fillColor = 11620151;
+        funText.setText(''+'"RAGE !!"');
+        //console.log(player);
     }
+    // if(comboValue >= 20){funText.setText(''+'Good Job !'); }
+    // if(comboValue >= 30){funText.setText(''+'Incredible !!!'); }
+    // if(comboValue >= 40){funText.setText(''+'Marvelous !!!'); }
+    // if(comboValue >= 50){funText.setText(''+'Oh My God !!!'); }
+    // if(comboValue >= 60){funText.setText(''+'Unstoppable !'); }
+    // if(comboValue >= 70){funText.setText(''+'No Mercy !'); }
+    // if(comboValue >= 80){funText.setText(''+'Great !!'); }
+    // if(comboValue >= 90){funText.setText(''+'Stupefying !!'); }
+    // if(comboValue >= 100){funText.setText(''+'You\'re a GOD !'); }
+    // if(comboValue >= 150){funText.setText(''+'Beyond the Limits !'); }
+    // if(comboValue >= 200){funText.setText(''+'You\'re a MONSTER !'); }
+    // if(comboValue >= 300){funText.setText(''+'CRAZY !!!!'); }
+    // if(comboValue >= 400){funText.setText(''+'IMPOSSIBLE !'); }
+    // if(comboValue >= 500){funText.setText(''+'Take My Virginity !!'); }
     
     // TouchLeft.x = player.body.position.x - 300;                                                           // position touch
     // TouchLeft.y = player.body.position.y + 160;
@@ -1365,7 +1410,7 @@ function update(time, delta){
             //OVERLAP player + enemy
 
             this.physics.add.overlap(currentEnemy, player, function(htblobjct, plyr){               // overlap player + enemies
-                if(counterMovePlayer != 34){
+                if(counterMovePlayer != 35){
                 if(htblobjct.data.list.AtkCollide === true){                                        // collision Player Guard                     
                     if(plyr.data.list.Guard === true){
                         swordImpact2.play();
@@ -1414,7 +1459,7 @@ function update(time, delta){
         let rdmNbr = currentEnemy.data.list.randomValue / 2;
 
             if(currentEnemy.data.list.stopMove === false){
-                if(Phaser.Math.Distance.BetweenPoints(currentEnemy,player) >= 100 + rdmNbr &&                        // walk enemies
+                if(Phaser.Math.Distance.BetweenPoints(currentEnemy,player) >= 100 + rdmNbr &&             // walk enemies
                 currentEnemy.data.list.AttackIsFinish === true){
 
                     currentEnemy.data.list.CounterMove = 1; 
@@ -1461,7 +1506,7 @@ function update(time, delta){
                 }
             }
 
-            if(currentEnemy.data.list.CounterMove != 28){        // action enemies
+            //if(currentEnemy.data.list.CounterMove != 28){        // action enemies
                 if(currentEnemy.data.list.health <= 0 ){
                     if(enemyCanDie === true){
                         currentEnemy.data.list.CounterMove = 4
@@ -1520,7 +1565,7 @@ function update(time, delta){
                     currentEnemy.destroy()
                 }
             
-            }
+            //}
             
         }
         // else if(hittableObject.children.entries[i].data.list.name === 'slash'){                         //img attack slash
@@ -1536,9 +1581,9 @@ function update(time, delta){
 
         // else{hittableObject.children.entries[i] = [];} 
     }
-
+    //console.log(counterMovePlayer);
     //console.log(player.data.list.Eject);
-    //console.log(currentEnemy);
+    // console.log(currentEnemy);
     //console.log(Arrow);
     //console.log(Phaser.Math.Distance.BetweenPoints(hittableObject.children.entries[0],player));
     //console.log(enemyMoveDetection.children.entries[0]);
@@ -1577,7 +1622,8 @@ function update(time, delta){
     //if(player.flipX === true && player.body.velocity.x === 0){console.log('flip');}
     //console.log(player.body.velocity.y);
     //console.log(touchesAttack._justDown);
-    console.log(rageMode)
+    //console.log(rageMode)
+    //console.log(enemyCanDie);
 
     if(counterMovePlayer === 28){
         KnockBack()
@@ -1612,7 +1658,7 @@ function update(time, delta){
                 GameOver = false;
                 this.anims.resumeAll();
                 counterMovePlayer = 0;
-                console.log(theGamePad);
+                //console.log(theGamePad);
                 //console.log(gamePadCombo.includes);
                 
             }
@@ -1740,6 +1786,8 @@ function update(time, delta){
         if(Phaser.Input.Keyboard.JustDown(touchesAttack) || gamepadAttack === true){                            //attack     
             gamepadAttack = false;
             counterMovePlayer++;
+            cameraPlayer.shakeEffect.progress = 0                                                   //shaker camera reset
+            cameraPlayer.shakeEffect._elapsed = 0
             if (countTest === 2 && playerInGround === true){attackComboThree();}
             if(counterMovePlayer === 1 && playerInGround === true){attackComboOne();}
             else if (counterMovePlayer >= 2 && playerInGround === true){attackComboTwo();}
@@ -1747,17 +1795,16 @@ function update(time, delta){
         }  
 
         if(Phaser.Input.Keyboard.JustDown(enterKey) && startGame === true){     
-            this.anims.resumeAll();
             player.x = 600;
             player.y = 1150;
             startGame = false;
             rageCloud.anims.play('rage',true);
-
-
+            player.anims.play('idle', true)
             soundVolume = 1;
             swordAir.volume = 0.4;
             themeSong.play();
-
+            
+            this.anims.resumeAll();
         }
 // }  
 }
@@ -1786,7 +1833,8 @@ function attackComboOne(){                                                      
         var nameAttack = 'attackOne'
         player.anims.play(nameAttack, true);
         swordAir.play();
-        player.data.list.special = player.data.list.special + 1;
+        //player.data.list.special = player.data.list.special + 1;
+        rageValue = 1
 
             player.on('animationupdate', ()=>{
                 if(nameAttack === player.anims.currentAnim.key){
@@ -1820,7 +1868,8 @@ if(player.anims.currentAnim.key === 'attackOne'){
         player.anims.play('attackTwo', true);
     var nameAttack2 = 'attackTwo'
     swordAir.play();
-    player.data.list.special = player.data.list.special + 1;
+    //player.data.list.special = player.data.list.special + 1;
+    rageValue = 1
 
 
     player.on('animationupdate', ()=>{
@@ -1861,7 +1910,8 @@ function attackComboThree(){
     // var colAtk2 = colideATK2.get();
     // colAtk2.visible = false;
     swordAir.play();
-    player.data.list.special = player.data.list.special + 1;
+    //player.data.list.special = player.data.list.special + 1;
+    rageValue = 1;
 
 
     player.on('animationupdate', ()=>{
@@ -1933,7 +1983,8 @@ function attackJump(){                                                          
     swordAir.play();
     gamepadJump = false
     attackintheair = true;
-    player.data.list.special = player.data.list.special + 1;
+    //player.data.list.special = player.data.list.special + 1;
+    rageValue = 1;
 
     player.on('animationupdate', ()=>{
         if(nameAttack4 === player.anims.currentAnim.key){
@@ -1958,6 +2009,11 @@ function powerAttackJump(){
         player.anims.play('specialAirSlash', true);
         swordAir.play();
         spevalue = player.data.list.special = player.data.list.special - 1;
+        if(rageMode === false){
+            rageValue = 0;
+        }else{
+            rageValue = 1;
+        }
         
         player.on('animationupdate', ()=>{
             if('specialAirSlash' === player.anims.currentAnim.key){
@@ -1977,16 +2033,23 @@ function powerAttackJump(){
                     colideATK.setX(player.x -40);colideATK.setY(player.y)
                 }
                 if(player.anims.currentFrame.index == 5){
+                    // camera.main.shake(200,0.0004);
+
                     player.data.list.Eject = 3;
                     colideATK.setX(player.x +40);colideATK.setY(player.y)
                 }
                 if(player.anims.currentFrame.index == 6){
                     colideATK.setX(player.x -40);colideATK.setY(player.y +40)
+                    colideATK.setX(player.x +60);colideATK.setY(player.y +40)
+                    cameraPlayer.shakeEffect.intensity.x = 0.001
+                    cameraPlayer.shakeEffect.intensity.y = 0.001
+                    cameraPlayer.shakeEffect.duration = 200
+                    cameraPlayer.shakeEffect.isRunning = true
+                    
+                    console.log(cameraPlayer.shakeEffect);
                 }
                 if(player.anims.currentFrame.index == 7){
                     player.data.list.Eject = 1;
-                    colideATK.setX(player.x +60);colideATK.setY(player.y +40)
-                    
                 }
                 if(player.anims.currentFrame.index == 8){
                     colideATK.setX(player.x +60);colideATK.setY(player.y +40)
@@ -1995,6 +2058,7 @@ function powerAttackJump(){
                     colideATK.setX(player.x -60);colideATK.setY(player.y +40)
                 }
                 if(player.anims.currentFrame.index < 13){
+                    
                     player.setVelocityY(1200)
                 }
                 if(player.anims.currentFrame.index >= 16){
@@ -2018,6 +2082,11 @@ function tornadoSlash(){                                                        
     swordAir.play();
     
     spevalue = player.data.list.special = player.data.list.special - 1;
+    if(rageMode === false){
+        rageValue = 0;
+    }else{
+        rageValue = 1;
+    }
 
     // 
     // var colAtk = colideATK2.get().setSize(60,60);
@@ -2089,6 +2158,7 @@ function tornadoSlash(){                                                        
             if(player.anims.currentFrame.index >= 16){
                 player.data.list.special = spevalue;
                 player.data.list.Eject = 0;
+                attackinground = false;
                 if(player.body.velocity.y != 0){
                     playerCanFall = false
                     
@@ -2108,8 +2178,8 @@ function UltraSlash(){
     var nameAttack = 'ultra';
     swordAir.play();
     
-
     spevalue = player.data.list.special = player.data.list.special - 2;
+    rageValue = 0;
 
     player.on('animationupdate', ()=>{
         if(player.data.list.health <= 0){
@@ -2117,7 +2187,7 @@ function UltraSlash(){
         }
         if(nameAttack === player.anims.currentAnim.key){
             if(player.anims.currentFrame.index >= 2 && player.anims.currentFrame.index <= 3 ){
-                player.data.list.special = spevalue;
+                //player.data.list.special = spevalue;
                 player.data.list.Eject = 2;
                 swordAir.play();
                 player.setGravityY(600);
@@ -2247,6 +2317,7 @@ function UltraSlash(){
                 player.data.list.special = spevalue;
                 colideATK.setX(0);colideATK.setY(0);
                 playerCanFall = false;
+                attackinground = false;
                 player.setGravityY(0);
                 //player.data.list.Eject = 0;
                 counterMovePlayer = 0;
@@ -2484,9 +2555,14 @@ function enemyWalkBack(enemy1,target,game){                                     
 
 function enemyAttack(enemyone, currentArrow){
     enemyone.setVelocityX(0);
+    // if(enemyone.data.list.health <= 0){
+    //     enemyone.data.list.CounterMove = 4;
+    // }else{
+    // }
+    enemyCanDie = true
     var animsName = 'attack'+enemyone.data.list.type;
     //console.log(animsName);
-
+console.log('enemyHealth :'+ enemyone.data.list.health);
     enemyone.anims.play(animsName,true)
     
     enemyone.on('animationupdate', ()=>{                                                                // attack enemy1
@@ -2709,8 +2785,7 @@ if(enmy.data.list.type != 'box'){
                             if(enmy.flipX === true){enmy.setVelocityX(0)}
                             if(enmy.flipX === false){enmy.setVelocityX(0)}   
                         }
-                        if(enmy.anims.currentFrame.index >= 5 &&
-                            player.data.list.Eject === 0){ 
+                        if(enmy.anims.currentFrame.index >= 5){ 
                                 enmy.data.list.CounterMove = 0
 
                             enmy.data.list.AttackIsFinish = true
@@ -2812,6 +2887,8 @@ if(enmy.data.list.type != 'box'){
                         if(enmy.flipX === true){enmy.setVelocityX(-200)}
                         if(enmy.flipX === false){enmy.setVelocityX(+200)}  
                         enmy.setVelocityY(-100)
+                        enmy.data.list.CounterMove = 77;
+
                     }
                     if(enmy.anims.currentFrame.index >= 6){
                         enmy.setVelocityX(0)
@@ -2868,15 +2945,16 @@ function enemyDie(enmyOne){
 }
 
 function collisionAtkEnemies(htblObjct,atk){
+
     swordImpact.play();
     atk.setX(-800);
     atk.setY(0);
     slashAtk.setY(player.y)
     comboValue ++;
 
-    if(rageMode === true){
-        player.data.list.special = player.data.list.special + 1;
-    }
+    //if(rageMode === true){
+        player.data.list.special = player.data.list.special + rageValue;
+    //}
     // console.log(htblObjct.flipX);
     if(player.flipX === true){slashAtk.setX(player.x -100)}
     if(player.flipX === false){slashAtk.setX(player.x +100)}
