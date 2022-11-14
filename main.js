@@ -373,7 +373,7 @@ function create(){
 
     // TEXT
 
-    text = this.add.text(0,0, 'version : O.36 | 14.11.22' , {fontFamily : 'PixelFont'}); 
+    text = this.add.text(0,0, 'version : O.37 | 14.11.22' , {fontFamily : 'PixelFont'}); 
     personalBestText = this.add.text(0,0,'YOUR BEST : 0',{ fontFamily : 'PixelFont'})
     scoreText = this.add.text(0,0, 'SCORE : 0',{ fontFamily : 'PixelFont'})
     gameOverText = this.add.text(0,0, 'GAME OVER \n score : 0 \n press any to restart', { fontFamily : 'PixelFont', fontSize : '60px'});
@@ -2037,16 +2037,16 @@ function powerAttackJump(){
 
                     player.data.list.Eject = 3;
                     colideATK.setX(player.x +40);colideATK.setY(player.y)
-                }
-                if(player.anims.currentFrame.index == 6){
-                    colideATK.setX(player.x -40);colideATK.setY(player.y +40)
-                    colideATK.setX(player.x +60);colideATK.setY(player.y +40)
                     cameraPlayer.shakeEffect.intensity.x = 0.001
                     cameraPlayer.shakeEffect.intensity.y = 0.001
                     cameraPlayer.shakeEffect.duration = 200
                     cameraPlayer.shakeEffect.isRunning = true
                     
                     console.log(cameraPlayer.shakeEffect);
+                }
+                if(player.anims.currentFrame.index == 6){
+                    colideATK.setX(player.x -40);colideATK.setY(player.y +40)
+                    colideATK.setX(player.x +60);colideATK.setY(player.y +40)
                 }
                 if(player.anims.currentFrame.index == 7){
                     player.data.list.Eject = 1;
