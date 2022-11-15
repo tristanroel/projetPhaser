@@ -3,7 +3,6 @@ var configuration = {
     pixelArt : true,
     width : 3000,
     height : 1780,
-    // backgroundColor : '#353535',
     backgroundColor : '#FFFFFF',
     fps: {
         target: 50,
@@ -97,6 +96,8 @@ var personalBestText;
 var scoreText;
 var gameOverText;
 var funText;
+var messageFunText = '';
+var messageFunTextList;
 
 var healthBar; 
 var specialBar;
@@ -173,7 +174,8 @@ function preload(){
     this.load.spritesheet('piecette','assets/Coin.png', {frameWidth : 8, frameHeight : 8});
     this.load.spritesheet('hero', 'assets/Sprites/stancearmed.png',{frameWidth: 170, frameHeight: 170});
     this.load.spritesheet('heroAttack', 'assets/Sprites/swordattackmove.png',{frameWidth: 170, frameHeight: 170});
-    this.load.spritesheet('heroAttacktwo', 'assets/Sprites/3hitcombo.png',{frameWidth: 170, frameHeight: 170});
+    // this.load.spritesheet('heroAttacktwo', 'assets/Sprites/3hitcombo.png',{frameWidth: 170, frameHeight: 170});
+    this.load.spritesheet('heroAttackthree', 'assets/Sprites/3ndhit.png',{frameWidth: 170, frameHeight: 170});
     this.load.spritesheet('herorun', 'assets/Sprites/walkarmed.png',{frameWidth: 170, frameHeight: 170});
     this.load.spritesheet('herojump', 'assets/Sprites/jumparmed.png',{frameWidth: 170, frameHeight: 170});
     this.load.spritesheet('herojumpAtk', 'assets/Sprites/jump_sword_attack.png',{frameWidth: 170, frameHeight: 170});
@@ -222,6 +224,8 @@ function create(){
     gamePadCombo = [];
     enemyNumberId = 0;
     rageMode = false;
+    messageFunTextList = ['','Good !', 'Nice !','Yes !','Nice Shot !','Cool !','Perfect !','Graceful !','Nicely Done ! ','Impressive !','Remarkable !','Powerful !','All That Power !?','Excellent','Slice !!','RAGE MODE !','Incredible !!','Marvelous !!','Oh My God !','Unthinkable !', 'No Mercy','Stupefying !!','You\'re a GOD !!','Beyond the Limits !','You\'re a MONSTER !', 'CRAZY !!!', 'IMPOSSIBLE !!!','Take My Virginity !!','DIVINE !!']
+
 
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -240,7 +244,6 @@ function create(){
 
 
    /// OBJECT
-
     skyBg = this.add.tileSprite(0, 0, 404, 482, 'sky').setScale(2); //image ciel
    
     ////////////////////////////////////////////////////////////////////
@@ -368,12 +371,13 @@ function create(){
     // //spawnDetector.setData('Active', false)
     // //spawnDetector.setVisible(false)
     // spawnReActivator.body.allowGravity = false;
+    
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     // TEXT
 
-    text = this.add.text(0,0, 'version : O.37 | 14.11.22' , {fontFamily : 'PixelFont'}); 
+    text = this.add.text(0,0, 'version : O.38 | 14.11.22' , {fontFamily : 'PixelFont'}); 
     personalBestText = this.add.text(0,0,'YOUR BEST : 0',{ fontFamily : 'PixelFont'})
     scoreText = this.add.text(0,0, 'SCORE : 0',{ fontFamily : 'PixelFont'})
     gameOverText = this.add.text(0,0, 'GAME OVER \n score : 0 \n press any to restart', { fontFamily : 'PixelFont', fontSize : '60px'});
@@ -647,6 +651,9 @@ function create(){
     var UltraSlashLeft = this.input.keyboard.createCombo([81, 83, 68, 74], {resetOnMatch:true, maxKeyDelay:700}); //300ms pour taper le combo, sinon se reinitialise
     var UltraSlashRight = this.input.keyboard.createCombo([68, 83, 81, 74], {resetOnMatch:true, maxKeyDelay:700}); 
 
+    var ShielAttackLeft = this.input.keyboard.createCombo([83, 68, 73], {resetOnMatch:true, maxKeyDelay:700}); 
+    var ShielAttackRight = this.input.keyboard.createCombo([83, 81, 73], {resetOnMatch:true, maxKeyDelay:700}); 
+
     this.input.keyboard.on('keycombomatch', function(combo){ //verification du secialAtk entrée
         //console.log(combo);
         if(playerInGround === true){
@@ -654,10 +661,15 @@ function create(){
                 if(player.data.list.special >= 1){
                     counterMovePlayer = 32;
                     tornadoSlash();
+                    //console.log(combo.keyCodes = 81, 83, 68, 74);
                 }
+                // if(combo.keyCodes[3] === 73){
+                //     console.log(combo.keyCodes);
+
+                // }
             }
             if(combo.keyCodes[0] === 68 || combo.keyCodes[0] === 81){
-                if(player.data.list.special >= 3){
+                if(player.data.list.special >= 2){
                     counterMovePlayer = 33;
                     UltraSlash();
                 }
@@ -672,7 +684,7 @@ function create(){
                 }
             }
             if(combo.keyCodes[0] === 68 || combo.keyCodes[0] === 81){
-                if(player.data.list.special >= 3){
+                if(player.data.list.special >= 2){
                     counterMovePlayer = 33;
                     UltraSlash();
                 }
@@ -818,7 +830,7 @@ function create(){
     });
     this.anims.create({
         key: 'attackThree',
-        frames: this.anims.generateFrameNumbers('heroAttacktwo',{frames: [16, 17, 18, 19, 20, 21, 22, 23, 23, 23, 23, 23]}),
+        frames: this.anims.generateFrameNumbers('heroAttackthree',{frames: [0, 1, 2, 3, 4, 5, 6, 7, 7, 7, 7, 7]}),
         frameRate: 19,
         //repeat: -1
     });
@@ -1203,7 +1215,7 @@ function create(){
         frameRate: 15,
         repeat: -1
     });
-    this.anims.pauseAll();
+    // this.anims.pauseAll();
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // CREATE ENEMIES
@@ -1293,26 +1305,30 @@ function update(time, delta){
     gameOverText.y = player.body.position.y
     spawnDetector.body.velocity.x = player.body.velocity.x ;
     spawnDetector.body.velocity.y = player.body.velocity.y ;
+    funText.setText(''+ messageFunTextList[comboValue]);
+
 
     if(comboValue >= 1){
         comboText.x = player.body.position.x + 150;
         funText.x = player.body.position.x + 150;
     }
-    if(comboValue <= 9){funText.setText(''+''); }
+    //if(comboValue <= 9){messageFunText =''; }
     if(comboValue <= 14){                                                                             //RAGEMODE
         rageMode = false;
         rageCloud.setVisible(false);
         specialBar.fillColor = 16632447
     }
-    if(comboValue >= 10){funText.setText(''+'Nice !'); }
+    //if(comboValue >= 10){messageFunText = 'Nice !'; }
     if(comboValue >= 15){                                        
         rageMode = true;
         rageCloud.setVisible(true);
         specialBar.fillColor = 11620151;
-        funText.setText(''+'"RAGE !!"');
+        //messageFunText ='"RAGE !!"';
         //console.log(player);
     }
-    // if(comboValue >= 20){funText.setText(''+'Good Job !'); }
+    countComboFunText = 10;
+    
+    // if(comboValue >= 20){funText.setText(''+'Good !'); }
     // if(comboValue >= 30){funText.setText(''+'Incredible !!!'); }
     // if(comboValue >= 40){funText.setText(''+'Marvelous !!!'); }
     // if(comboValue >= 50){funText.setText(''+'Oh My God !!!'); }
@@ -1799,12 +1815,12 @@ function update(time, delta){
             player.y = 1150;
             startGame = false;
             rageCloud.anims.play('rage',true);
-            player.anims.play('idle', true)
+            //player.anims.play('idle', true)
             soundVolume = 1;
             swordAir.volume = 0.4;
             themeSong.play();
             
-            this.anims.resumeAll();
+            // this.anims.resumeAll();
         }
 // }  
 }
@@ -1985,6 +2001,8 @@ function attackJump(){                                                          
     attackintheair = true;
     //player.data.list.special = player.data.list.special + 1;
     rageValue = 1;
+    var velocityX = player.body.velocity.x
+
 
     player.on('animationupdate', ()=>{
         if(nameAttack4 === player.anims.currentAnim.key){
@@ -1994,6 +2012,9 @@ function attackJump(){                                                          
             }
             if(player.anims.currentFrame.index >= 5){
                 colideATK.setX(0)
+            }
+            if(player.anims.currentFrame.index < 25){
+                player.body.velocity.x = velocityX;
             }
             if(playerInGround === true || player.anims.currentFrame.index >= 25){
                 counterMovePlayer = 0; 
@@ -2063,6 +2084,7 @@ function powerAttackJump(){
                 }
                 if(player.anims.currentFrame.index >= 16){
                     counterMovePlayer = 0; 
+                    attackinground = false;
                     player.data.list.Eject = 0;
                     colideATK.setX(-99)
                     //colideATK.body.enable = true;
