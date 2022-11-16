@@ -184,8 +184,9 @@ function preload(){
     this.load.spritesheet('heroProtectGuard', 'assets/Sprites/Playerkbtest.png',{frameWidth: 170, frameHeight: 170});
     this.load.spritesheet('heroKnockBack', 'assets/Sprites/KnockBack.png',{frameWidth: 170, frameHeight: 170});
     this.load.spritesheet('shoryu', 'assets/Sprites/shoryu.png',{frameWidth: 170, frameHeight: 170});
+    this.load.spritesheet('shieldTackle', 'assets/Sprites/coupdebouclier2.png',{frameWidth: 170, frameHeight: 170});
     this.load.spritesheet('ultimate', 'assets/Sprites/SuperAttack.png',{frameWidth: 170, frameHeight: 170});
-    this.load.spritesheet('pushBox', 'assets/Sprites/pousse.png',{frameWidth: 170, frameHeight: 170});
+    //this.load.spritesheet('pushBox', 'assets/Sprites/pousse.png',{frameWidth: 170, frameHeight: 170});
     this.load.spritesheet('heroClimb', 'assets/Sprites/escalade.png',{frameWidth: 170, frameHeight: 170});
     //this.load.spritesheet('carreau', 'assets/carreau.png',{frameWidth: 20, frameHeight: 4});
 
@@ -224,7 +225,7 @@ function create(){
     gamePadCombo = [];
     enemyNumberId = 0;
     rageMode = false;
-    messageFunTextList = ['','Good !', 'Nice !','Yes !','Nice Shot !','Cool !','Perfect !','Graceful !','Nicely Done ! ','Impressive !','Remarkable !','Powerful !','All That Power !?','Excellent','Slice !!','RAGE MODE !','Incredible !!','Marvelous !!','Oh My God !','Unthinkable !', 'No Mercy','Stupefying !!','You\'re a GOD !!','Beyond the Limits !','You\'re a MONSTER !', 'CRAZY !!!', 'IMPOSSIBLE !!!','Take My Virginity !!','DIVINE !!']
+    messageFunTextList = ['','Good !', 'Nice !','Yes !','Strike !','Cool !','Perfect !','Graceful !','Nicely Done ! ','Impressive !','Remarkable !','Powerful !','All That Power !?','Excellent','Slice !!','RAGE MODE !','it\'s not possible!?','Fast Fury!!!','INTENSE!!','Sword Master!!','Destroy Them All!!','Slices The Universe!!','WAOUH!!!','Rapid Anger','Incredible!!','Marvelous!!','Oh My God!','Unthinkable!!','Gracious!!','MAD!!','Powerful!!','STRONG!!','Fast Combo!!!','Dance Of Death!','KILL THEM ALL!!','MASSACRE!!','Beautifull!!','No Time To Die !!!','Sensational!!','WonderFull!!!','Gorgeous!','NO MERCY','Excellent!!!','Mesmerizing!!','Quick And Efficient!','HEAVY!!','CumberSome!!!','So Bulky!','Overwhelming!!','OVERKILL!!!','In Trance State!','Big Flow!!','High-intensity!!!','Invincible!!','Overly Strong!!!','Amazing!!!','OverPowering!','Hypnotic!!','Stupefying!!','You\'re a GOD!!','Beyond the Limits!','You\'re a MONSTER!!', 'CRAZY!!!', 'IMPOSSIBLE!!!','Take My Virginity!!','DIVINE !!']
 
 
 
@@ -388,6 +389,17 @@ function create(){
     scoreText.setDepth(2);
     personalBestText.setDepth(2);
     comboText.setDepth(2);
+
+    // var tween = this.tweens.add({
+    //     targets : player,
+    //     ease: 'Power1',
+    //     duration: 9000,
+    //     x : 5,
+    //     y : 5,
+    //     yoyo : true,
+    //     repeat: -1
+
+    // })
     //text.setFontSize(text.fontSize - 2);
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     
@@ -651,25 +663,36 @@ function create(){
     var UltraSlashLeft = this.input.keyboard.createCombo([81, 83, 68, 74], {resetOnMatch:true, maxKeyDelay:700}); //300ms pour taper le combo, sinon se reinitialise
     var UltraSlashRight = this.input.keyboard.createCombo([68, 83, 81, 74], {resetOnMatch:true, maxKeyDelay:700}); 
 
-    var ShielAttackLeft = this.input.keyboard.createCombo([83, 68, 73], {resetOnMatch:true, maxKeyDelay:700}); 
-    var ShielAttackRight = this.input.keyboard.createCombo([83, 81, 73], {resetOnMatch:true, maxKeyDelay:700}); 
+    var ShieldAttackLeft = this.input.keyboard.createCombo([73, 73], {resetOnMatch:true, maxKeyDelay:700}); 
+    //var ShieldAttackRight = this.input.keyboard.createCombo([83, 81, 73], {resetOnMatch:true, maxKeyDelay:700}); 
 
     this.input.keyboard.on('keycombomatch', function(combo){ //verification du secialAtk entrée
-        //console.log(combo);
+        console.log(combo.keyCodes);
+        console.log(tornadoSlashLeft.keyCodes)
         if(playerInGround === true){
+            if(combo.keyCodes[0] === 73){
+                console.log('enculé de ta race');
+                shieldTackle();
+                counterMovePlayer = 36;
+
+            }
             if(combo.keyCodes[0] === 83){
-                if(player.data.list.special >= 1){
-                    counterMovePlayer = 32;
-                    tornadoSlash();
-                    //console.log(combo.keyCodes = 81, 83, 68, 74);
-                }
                 // if(combo.keyCodes[3] === 73){
-                //     console.log(combo.keyCodes);
+                //     console.log('enculé de ta race');
+                // }else{
+
+                    if(player.data.list.special >= 1){
+                        counterMovePlayer = 32;
+                        tornadoSlash();
+                    }
+                // }
+                // if(combo.keyCodes[3] === 73){
+                    //console.log(combo);
 
                 // }
             }
             if(combo.keyCodes[0] === 68 || combo.keyCodes[0] === 81){
-                if(player.data.list.special >= 2){
+                if(player.data.list.special >= 3){
                     counterMovePlayer = 33;
                     UltraSlash();
                 }
@@ -678,13 +701,13 @@ function create(){
             if(combo.keyCodes[0] === 83){
                 if(player.data.list.special >= 1){
                     //console.log('kikou lol');
-                    counterMovePlayer = 34;
+                    counterMovePlayer = 34; //35 apparement
                     attackintheair = true;
                     powerAttackJump();
                 }
             }
             if(combo.keyCodes[0] === 68 || combo.keyCodes[0] === 81){
-                if(player.data.list.special >= 2){
+                if(player.data.list.special >= 3){
                     counterMovePlayer = 33;
                     UltraSlash();
                 }
@@ -882,6 +905,11 @@ function create(){
         repeat : -1,
     });
     this.anims.create({
+        key: 'shieldAttack',
+        frames: this.anims.generateFrameNumbers('shieldTackle',{frames: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 11, 12, 12, 12, 12, 12]}),
+        frameRate: 25,
+    });
+    this.anims.create({
         key: 'specialAirSlash',
         frames: this.anims.generateFrameNumbers('specialairslash',{frames: [0, 1, 2, 2, 3, 4, 5, 6, 7, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8]}),
         frameRate: 16,
@@ -892,11 +920,11 @@ function create(){
         frames: this.anims.generateFrameNumbers('ultimate',{frames: [0, 1, 23, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 59, 59, 59, 59, 59]}),
         frameRate: 25,
     });
-    this.anims.create({
-        key: 'pushBox',
-        frames: this.anims.generateFrameNumbers('pushBox',{frames: [0, 1, 2, 3, 4, 5]}),
-        frameRate: 8,
-    });
+    // this.anims.create({
+    //     key: 'pushBox',
+    //     frames: this.anims.generateFrameNumbers('pushBox',{frames: [0, 1, 2, 3, 4, 5]}),
+    //     frameRate: 8,
+    // });
     this.anims.create({
         key: 'climb',
         frames: this.anims.generateFrameNumbers('heroClimb',{frames: [0, 1, 3, 4, 5, 5, 6, 6]}),
@@ -1427,40 +1455,40 @@ function update(time, delta){
 
             this.physics.add.overlap(currentEnemy, player, function(htblobjct, plyr){               // overlap player + enemies
                 if(counterMovePlayer != 35){
-                if(htblobjct.data.list.AtkCollide === true){                                        // collision Player Guard                     
-                    if(plyr.data.list.Guard === true){
-                        swordImpact2.play();
-                        player.data.list.special = player.data.list.special - 1;
-                        // htblobjct.data.list.AtkCollide = false;
-                        if(plyr.flipX === false && htblobjct.flipX === false){
-                            counterMovePlayer = 14;
-                            htblobjct.data.list.AtkCollide = false;
-                        }
+                    if(htblobjct.data.list.AtkCollide === true){                                        // collision Player Guard                     
+                        if(plyr.data.list.Guard === true){
+                            swordImpact2.play();
+                            player.data.list.special = player.data.list.special - 1;
+                            // htblobjct.data.list.AtkCollide = false;
+                            if(plyr.flipX === false && htblobjct.flipX === false){
+                                counterMovePlayer = 14;
+                                htblobjct.data.list.AtkCollide = false;
+                            }
 
-                        else if(plyr.flipX === true && htblobjct.flipX === true){
-                            counterMovePlayer = 14;
-                            //console.log(plyr.body.velocity);
-                            htblobjct.data.list.AtkCollide = false;
+                            else if(plyr.flipX === true && htblobjct.flipX === true){
+                                counterMovePlayer = 14;
+                                //console.log(plyr.body.velocity);
+                                htblobjct.data.list.AtkCollide = false;
 
-                        }else if(plyr.flipX === true && htblobjct.flipX === false){
-                            
+                            }else if(plyr.flipX === true && htblobjct.flipX === false){
+                                
+                                counterMovePlayer = 28
+                            }
+
+                            else if(plyr.flipX === false && htblobjct.flipX === true){
+                                
+                                counterMovePlayer = 28
+                            }
+                        }else{                                                                          // collision Player KnockBack
+                            swordImpact.play();
                             counterMovePlayer = 28
-                        }
+                            plyr.data.list.health--;
+                            htblobjct.data.list.AtkCollide = false;
 
-                        else if(plyr.flipX === false && htblobjct.flipX === true){
-                            
-                            counterMovePlayer = 28
                         }
-                    }else{                                                                          // collision Player KnockBack
-                        swordImpact.play();
-                        counterMovePlayer = 28
-                        plyr.data.list.health--;
-                        htblobjct.data.list.AtkCollide = false;
-
+                    }else{
+                        //counterMove = 28
                     }
-                }else{
-                    //counterMove = 28
-                }
                 }
             });
 
@@ -1597,7 +1625,7 @@ function update(time, delta){
 
         // else{hittableObject.children.entries[i] = [];} 
     }
-    //console.log(counterMovePlayer);
+    console.log(counterMovePlayer);
     //console.log(player.data.list.Eject);
     // console.log(currentEnemy);
     //console.log(Arrow);
@@ -1928,6 +1956,7 @@ function attackComboThree(){
     swordAir.play();
     //player.data.list.special = player.data.list.special + 1;
     rageValue = 1;
+    player.data.list.Eject = 3;
 
 
     player.on('animationupdate', ()=>{
@@ -2002,6 +2031,8 @@ function attackJump(){                                                          
     //player.data.list.special = player.data.list.special + 1;
     rageValue = 1;
     var velocityX = player.body.velocity.x
+    player.data.list.Eject = 3;
+
 
 
     player.on('animationupdate', ()=>{
@@ -2018,13 +2049,15 @@ function attackJump(){                                                          
             }
             if(playerInGround === true || player.anims.currentFrame.index >= 25){
                 counterMovePlayer = 0; 
+                player.data.list.Eject = 0;
+
                 //colideATK.body.enable = true;
                 // colAtk5.destroy();
             ;}
         }
     });
 }
-function powerAttackJump(){
+function powerAttackJump(){                                                                                 //PowerAttackJump
     //if(player.anims.currentAnim.key === 'fall'){
         //player.anims.stop()
         player.anims.play('specialAirSlash', true);
@@ -2094,6 +2127,48 @@ function powerAttackJump(){
         });
 
     //}
+}
+function shieldTackle(){                                                                                     // ShieldTackle
+    player.anims.play('shieldAttack', true);
+    player.data.list.Eject = 0;
+    spevalue = player.data.list.special = player.data.list.special - 2;
+    player.on('animationupdate', ()=>{
+        if('shieldAttack' === player.anims.currentAnim.key){
+            if(player.anims.currentFrame.index <= 13 ){
+                if(playerFlip === true){player.setVelocityX(-300)}
+                if(playerFlip === false){player.setVelocityX(300)}
+            }
+            if(player.anims.currentFrame.index === 9){
+                if(playerFlip === true){colideATK.setX(player.x -40);colideATK.setY(player.y)}
+                if(playerFlip === false){colideATK.setX(player.x +40);colideATK.setY(player.y)}
+                player.data.list.Eject = 2;
+
+            }
+            if(player.anims.currentFrame.index === 10){
+                if(playerFlip === true){colideATK.setX(player.x -60);colideATK.setY(player.y)}
+                if(playerFlip === false){colideATK.setX(player.x +60);colideATK.setY(player.y)}
+                player.data.list.Eject = 3;
+
+            }
+            if(player.anims.currentFrame.index === 11){
+                if(playerFlip === true){colideATK.setX(player.x -70);colideATK.setY(player.y)}
+                if(playerFlip === false){colideATK.setX(player.x +70);colideATK.setY(player.y)}
+                player.data.list.Eject = 3;
+
+            }
+            if(player.anims.currentFrame.index >= 14){
+                colideATK.setX(0)
+                player.data.list.Eject = 0;
+
+            }
+            if(player.anims.currentFrame.index >= 18 ){
+                counterMovePlayer = 0; 
+                player.data.list.special = spevalue;
+            }
+        }
+    });
+
+
 }
 function tornadoSlash(){                                                                                      // tornado slash
     playerCanFall = false;
@@ -2200,7 +2275,7 @@ function UltraSlash(){
     var nameAttack = 'ultra';
     swordAir.play();
     
-    spevalue = player.data.list.special = player.data.list.special - 2;
+    spevalue = player.data.list.special = player.data.list.special - 3;
     rageValue = 0;
 
     player.on('animationupdate', ()=>{
@@ -2584,7 +2659,7 @@ function enemyAttack(enemyone, currentArrow){
     enemyCanDie = true
     var animsName = 'attack'+enemyone.data.list.type;
     //console.log(animsName);
-console.log('enemyHealth :'+ enemyone.data.list.health);
+//console.log('enemyHealth :'+ enemyone.data.list.health);
     enemyone.anims.play(animsName,true)
     
     enemyone.on('animationupdate', ()=>{                                                                // attack enemy1
@@ -2897,7 +2972,7 @@ if(enmy.data.list.type != 'box'){
             }
         });
     } else if(player.data.list.Eject === 3){
-        if(enmy.anims.currentAnim.key === 'expulse'+enmy.data.list.type){
+        // if(enmy.anims.currentAnim.key === 'expulse'+enmy.data.list.type){
             var animsName2 = 'knockback'+enmy.data.list.type;
             enmy.anims.play(animsName2,true);
     
@@ -2920,7 +2995,7 @@ if(enmy.data.list.type != 'box'){
                     }
                 }
             });
-        }
+        // }d
     }
 }else{                                                                                              //knock box
     knockBox(enmy);
