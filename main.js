@@ -76,6 +76,7 @@ var attackintheair; // verifie si attaque en l'air : boolean
 var attackinground;
 var playerCanFall; // : boolean
 var rageMode; // : boolean
+var canShoryu; // : boolean
 
 
 var enemy1Spawn; //spawn enemy
@@ -207,12 +208,12 @@ function create(){
 
     //	You can listen for each of these events from Phaser.Loader
 
-    /// SET VARIABLE  
     if(localStorage.getItem('score') === null){
         personalBest = 0;
     }else{
         personalBest = localStorage.getItem('score');                                               //best score in localStorage
     }
+    /// SET VARIABLE  
 
     startGame = true;
     attackintheair = false;
@@ -225,6 +226,7 @@ function create(){
     gamePadCombo = [];
     enemyNumberId = 0;
     rageMode = false;
+    canShoryu = true
     messageFunTextList = ['','Good !', 'Nice !','Yes !','Strike !','Cool !','Perfect !','Graceful !','Nicely Done ! ','Impressive !','Remarkable !','Powerful !','All That Power !?','Excellent','Slice !!','RAGE MODE !','it\'s not possible!?','Fast Fury!!!','INTENSE!!','Sword Master!!','Destroy Them All!!','Slices The Universe!!','WAOUH!!!','Rapid Anger','Incredible!!','Marvelous!!','Oh My God!','Unthinkable!!','Gracious!!','MAD!!','Powerful!!','STRONG!!','Fast Combo!!!','Dance Of Death!','KILL THEM ALL!!','MASSACRE!!','Beautifull!!','No Time To Die !!!','Sensational!!','WonderFull!!!','Gorgeous!','NO MERCY','Excellent!!!','Mesmerizing!!','Quick And Efficient!','HEAVY!!','CumberSome!!!','So Bulky!','Overwhelming!!','OVERKILL!!!','In Trance State!','Big Flow!!','High-intensity!!!','Invincible!!','Overly Strong!!!','Amazing!!!','OverPowering!','Hypnotic!!','Stupefying!!','You\'re a GOD!!','Beyond the Limits!','You\'re a MONSTER!!', 'CRAZY!!!', 'IMPOSSIBLE!!!','Take My Virginity!!','DIVINE !!']
 
 
@@ -361,7 +363,7 @@ function create(){
     slashAtk.setDepth(1);
 
 
-    spawnDetector = this.add.rectangle(1300,1000,50,350,0xB14F37);                      // Spawn Detector
+    spawnDetector = this.add.rectangle(1300,1000,20,350,0xB14F37);                      // Spawn Detector
     this.physics.add.existing(spawnDetector);
     //spawnDetector.setData('Active', false)
     //spawnDetector.setVisible(false)
@@ -378,7 +380,7 @@ function create(){
 
     // TEXT
 
-    text = this.add.text(0,0, 'version : O.38 | 14.11.22' , {fontFamily : 'PixelFont'}); 
+    text = this.add.text(0,0, 'version : O.39 | 14.11.22' , {fontFamily : 'PixelFont'}); 
     personalBestText = this.add.text(0,0,'YOUR BEST : 0',{ fontFamily : 'PixelFont'})
     scoreText = this.add.text(0,0, 'SCORE : 0',{ fontFamily : 'PixelFont'})
     gameOverText = this.add.text(0,0, 'GAME OVER \n score : 0 \n press any to restart', { fontFamily : 'PixelFont', fontSize : '60px'});
@@ -532,7 +534,7 @@ function create(){
 
             spawnCounter ++;
 
-            detector.body.position.x = player.body.position.x +800
+            detector.body.position.x = player.body.position.x +700
             detector.body.position.y = player.body.position.y -150
 
             //console.log(spawnCounter);
@@ -663,56 +665,129 @@ function create(){
     var UltraSlashLeft = this.input.keyboard.createCombo([81, 83, 68, 74], {resetOnMatch:true, maxKeyDelay:700}); //300ms pour taper le combo, sinon se reinitialise
     var UltraSlashRight = this.input.keyboard.createCombo([68, 83, 81, 74], {resetOnMatch:true, maxKeyDelay:700}); 
 
-    var ShieldAttackLeft = this.input.keyboard.createCombo([73, 73], {resetOnMatch:true, maxKeyDelay:700}); 
-    //var ShieldAttackRight = this.input.keyboard.createCombo([83, 81, 73], {resetOnMatch:true, maxKeyDelay:700}); 
+    var ShieldAttackLeft = this.input.keyboard.createCombo([83,68,73], {resetOnMatch:true, maxKeyDelay:700}); 
+    var ShieldAttackRight = this.input.keyboard.createCombo([83, 81, 73], {resetOnMatch:true, maxKeyDelay:700}); 
 
-    this.input.keyboard.on('keycombomatch', function(combo){ //verification du secialAtk entrée
-        console.log(combo.keyCodes);
-        console.log(tornadoSlashLeft.keyCodes)
+    var keycomboinput = this.input.keyboard.on('keycombomatch', function(combo){ //verification du secialAtk entrée
+
         if(playerInGround === true){
-            if(combo.keyCodes[0] === 73){
-                console.log('enculé de ta race');
-                shieldTackle();
-                counterMovePlayer = 36;
-
-            }
-            if(combo.keyCodes[0] === 83){
-                // if(combo.keyCodes[3] === 73){
-                //     console.log('enculé de ta race');
-                // }else{
-
+            if(combo.keyCodes == tornadoSlashRight.keyCodes){
+                if(canShoryu === true){
                     if(player.data.list.special >= 1){
                         counterMovePlayer = 32;
                         tornadoSlash();
                     }
-                // }
-                // if(combo.keyCodes[3] === 73){
-                    //console.log(combo);
-
-                // }
+                }
+                // console.log('tsr');
             }
-            if(combo.keyCodes[0] === 68 || combo.keyCodes[0] === 81){
+            if(combo.keyCodes == tornadoSlashLeft.keyCodes){
+                if(canShoryu === true){
+                    if(player.data.list.special >= 1){
+                        counterMovePlayer = 32;
+                        tornadoSlash();
+                    }
+                }
+                // console.log('tsl');
+            }
+            if(combo.keyCodes == UltraSlashRight.keyCodes){
                 if(player.data.list.special >= 3){
                     counterMovePlayer = 33;
                     UltraSlash();
                 }
+                // console.log('Usr');
+            }
+            if(combo.keyCodes == UltraSlashLeft.keyCodes){
+                if(player.data.list.special >= 3){
+                    counterMovePlayer = 33;
+                    UltraSlash();
+                }
+                // console.log('Usl');
+            }
+            if(combo.keyCodes == ShieldAttackRight.keyCodes){
+                if(player.data.list.special >= 2){
+                    shieldTackle();
+                    counterMovePlayer = 36;
+                }
+                // console.log('Sar');
+            }
+            if(combo.keyCodes == ShieldAttackLeft.keyCodes){
+                if(player.data.list.special >= 2){
+                    shieldTackle();
+                    counterMovePlayer = 36;
+                }
+                // console.log('Sal');
             }
         }else{
-            if(combo.keyCodes[0] === 83){
-                if(player.data.list.special >= 1){
-                    //console.log('kikou lol');
+            if(combo.keyCodes == tornadoSlashRight.keyCodes){
+                if(player.data.list.special >= 2){
                     counterMovePlayer = 34; //35 apparement
                     attackintheair = true;
                     powerAttackJump();
                 }
+                // console.log('paj');
             }
-            if(combo.keyCodes[0] === 68 || combo.keyCodes[0] === 81){
+            if(combo.keyCodes == tornadoSlashLeft.keyCodes){
+                if(player.data.list.special >= 2){
+                    counterMovePlayer = 34; //35 apparement
+                    attackintheair = true;
+                    powerAttackJump();
+                }
+                // console.log('paj');
+            }
+            if(combo.keyCodes == UltraSlashRight.keyCodes){
                 if(player.data.list.special >= 3){
+                    player.data.list.special++
                     counterMovePlayer = 33;
                     UltraSlash();
                 }
+                // console.log('Usr');
+            }
+            if(combo.keyCodes == UltraSlashLeft.keyCodes){
+                if(player.data.list.special >= 3){
+                    player.data.list.special++
+                    counterMovePlayer = 33;
+                    UltraSlash();
+                }
+                // console.log('Usl');
             }
         }
+        
+        // if(playerInGround === true){
+        //     if(combo.keyCodes[0] === 72){
+        //         if(player.data.list.special >= 2){
+        //             console.log('enculé de ta race');
+        //             shieldTackle();
+        //             counterMovePlayer = 36;
+        //         }
+
+        //     }
+        //     if(combo.keyCodes[0] === 83){
+        //             if(player.data.list.special >= 1){
+        //                 counterMovePlayer = 32;
+        //                 tornadoSlash();
+        //             }
+        //     }
+        //     if(combo.keyCodes[0] === 68 || combo.keyCodes[0] === 81){
+        //         if(player.data.list.special >= 3){
+        //             counterMovePlayer = 33;
+        //             UltraSlash();
+        //         }
+        //     }
+        // }else{
+        //     if(combo.keyCodes[0] === 83){
+        //         if(player.data.list.special >= 2){
+        //             counterMovePlayer = 34; //35 apparement
+        //             attackintheair = true;
+        //             powerAttackJump();
+        //         }
+        //     }
+        //     if(combo.keyCodes[0] === 68 || combo.keyCodes[0] === 81){
+        //         if(player.data.list.special >= 3){
+        //             counterMovePlayer = 33;
+        //             UltraSlash();
+        //         }
+        //     }
+        // }
     });
 
     //////////////////////////////////////////////////////////////////////////////////////////////////
@@ -729,21 +804,109 @@ function create(){
             gamepadJump = true;
         }
         if(pad._RCLeft.pressed){    //Attack
-            gamePadCombo = gamePadCombo + 'A';
+            // gamePadCombo = gamePadCombo + 'A';
+            gamePadCombo.push(74);
             gamepadAttack = true;
         }
+        if(pad._RCTop.pressed){    //Protect
+            // gamePadCombo = gamePadCombo + 'P';
+            gamePadCombo.push(73);
+            //gamepadAttack = true;
+        }
         if(pad._LCTop.pressed){  //up
-            gamePadCombo = gamePadCombo + 'H';
+            gamePadCombo.push('H');
         }
         if(pad._LCBottom.pressed){  //down
-            gamePadCombo = gamePadCombo + 'B';
+            // gamePadCombo = gamePadCombo + 'B';
+            gamePadCombo.push(83);
         }
         if(pad._LCRight.pressed){   //Right
-            gamePadCombo = gamePadCombo + 'D';
+            // gamePadCombo = gamePadCombo + 'D';
+            gamePadCombo.push(81);
         }
         if(pad._LCLeft.pressed){    //Left
-            gamePadCombo = gamePadCombo + 'G';
+            // gamePadCombo = gamePadCombo + 'G';
+            gamePadCombo.push(68);
         }
+        //console.log(keycomboinput._events);
+        console.log(pad);
+        // console.log(pad.);
+        let checker = (arr, target) => target.every(v => arr.includes(v));
+
+        if(playerInGround === true){
+            if(checker(gamePadCombo, tornadoSlashLeft.keyCodes) == true){
+                if(canShoryu === true){
+                    if(player.data.list.special >= 1){
+                        counterMovePlayer = 32;
+                        tornadoSlash();
+                    }
+                }
+            }
+            if(checker(gamePadCombo, tornadoSlashRight.keyCodes) == true){
+                if(canShoryu === true){
+                    if(player.data.list.special >= 1){
+                        counterMovePlayer = 32;
+                        tornadoSlash();
+                    }
+                }
+            }
+            if(checker(gamePadCombo, UltraSlashLeft.keyCodes) == true){
+                if(player.data.list.special >= 2){
+                    player.data.list.special++
+                    counterMovePlayer = 33;
+                    UltraSlash();
+                }
+            }
+            if(checker(gamePadCombo, UltraSlashRight.keyCodes) == true){
+                if(player.data.list.special >= 2){
+                    player.data.list.special++
+                    counterMovePlayer = 33;
+                    UltraSlash();
+                }
+            }
+            if(checker(gamePadCombo, ShieldAttackLeft.keyCodes) == true){
+                if(player.data.list.special >= 2){
+                    shieldTackle();
+                    counterMovePlayer = 36;
+                }
+            }
+            if(checker(gamePadCombo, ShieldAttackRight.keyCodes) == true){
+                if(player.data.list.special >= 2){
+                    shieldTackle();
+                    counterMovePlayer = 36;
+                }
+            }
+        }else{
+            if(checker(gamePadCombo, tornadoSlashLeft.keyCodes) == true){
+                if(player.data.list.special >= 2){
+                    counterMovePlayer = 34; //35 apparement
+                    attackintheair = true;
+                    powerAttackJump();
+                }
+            }
+            if(checker(gamePadCombo, tornadoSlashRight.keyCodes) == true){
+                if(player.data.list.special >= 2){
+                    counterMovePlayer = 34; //35 apparement
+                    attackintheair = true;
+                    powerAttackJump();
+                }
+            }
+            if(checker(gamePadCombo, UltraSlashLeft.keyCodes) == true){
+                if(player.data.list.special >= 3){
+                    player.data.list.special++
+                    counterMovePlayer = 33;
+                    UltraSlash();
+                }
+            }
+            if(checker(gamePadCombo, UltraSlashRight.keyCodes) == true){
+                if(player.data.list.special >= 3){
+                    player.data.list.special++
+                    counterMovePlayer = 33;
+                    UltraSlash();
+                }
+            }
+        }
+        setTimeout(()=>{gamePadCombo = []},400);
     }, this);
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -1625,14 +1788,13 @@ function update(time, delta){
 
         // else{hittableObject.children.entries[i] = [];} 
     }
-    console.log(counterMovePlayer);
+    //console.log(counterMovePlayer);
     //console.log(player.data.list.Eject);
     // console.log(currentEnemy);
     //console.log(Arrow);
     //console.log(Phaser.Math.Distance.BetweenPoints(hittableObject.children.entries[0],player));
     //console.log(enemyMoveDetection.children.entries[0]);
     //enemyMoveDetection.children.entries[0].body.destroy()
-    //console.log(counterMovePlayer);
     //console.log(Arrow);
     //console.log(PlayerTouchEnemy);
     //console.log(colideATK2);
@@ -1716,75 +1878,53 @@ function update(time, delta){
         player.data.list.special = 0;
     }
     // CONTROL PLAYER
-
-    if((theGamePad.X)){                                                                             //Gamepad Combo
-            if(gamePadCombo.includes("BDA") || gamePadCombo.includes("BGA")){
-                // if(gamePadCombo[0] === "B"){
-                    if(playerInGround === true){
-                        if(player.data.list.special >= 1){
-    
-                            counterMovePlayer = 32;
-                            tornadoSlash();
-                            console.log(gamePadCombo[0]);
-                            gamePadCombo = [];
-                        }
-                    }
-                    if(playerInGround === false){
-                        attackintheair = true
-                        
-                        counterMovePlayer = 34;
-                        attackintheair = true;
-                        powerAttackJump();
-                    }
-                    gamePadCombo = [];
-
-                // }
-            }
-            else if(gamePadCombo.includes("BGDA") || gamePadCombo.includes("BDGA")){
-                // if(gamePadCombo[0] === "G"){
-                    if(playerInGround === true){
-                        if(player.data.list.special >= 3){
-                                
-                            //console.log('ultra');
-                            counterMovePlayer = 33;
-                            UltraSlash();
-                            gamePadCombo = [];
-                        }
-                    }
-                    gamePadCombo = [];
-
-                // }
-            }
-            else{
-                gamePadCombo = [];
-            }
-    }
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // if((theGamePad.X)){                                                                             //Gamepad Combo
+    //         if(gamePadCombo.includes("BDA") || gamePadCombo.includes("BGA")){
+    //                 if(playerInGround === true){
+    //                     if(player.data.list.special >= 1){
+    //                         counterMovePlayer = 32;
+    //                         tornadoSlash();
+    //                         console.log(gamePadCombo[0]);
+    //                         gamePadCombo = [];
+    //                     }
+    //                 }
+    //                 if(playerInGround === false){
+    //                     attackintheair = true
+    //                     counterMovePlayer = 34;
+    //                     attackintheair = true;
+    //                     powerAttackJump();
+    //                 }
+    //                 gamePadCombo = [];
+    //         }
+    //         else if(gamePadCombo.includes("BGDA") || gamePadCombo.includes("BDGA")){
+    //                 if(playerInGround === true){
+    //                     if(player.data.list.special >= 3){
+    //                         counterMovePlayer = 33;
+    //                         UltraSlash();
+    //                         gamePadCombo = [];
+    //                     }
+    //                 }
+    //                 gamePadCombo = [];
+    //         }
+    //         else{
+    //             gamePadCombo = [];
+    //         }
+    // }
         if(theGamePad.up && counterMovePlayer === 0){                                                               //up (climb pad)
             console.log('haut');
             if(playerInGround === false){
                 player.data.list.Climb = true
-                
             }
         }
-       
+        //console.log(theGamePad.X);
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
         if (leftkey.isDown && counterMovePlayer === 0 || theGamePad.left  && counterMovePlayer === 0){              //left
-        // if (leftkey.isDown && counterMovePlayer === 0 || gamepadLeft === true  && counterMovePlayer === 0){              //left
-                // player.setVelocityX(-playerVelocityX);
-                // playerFlip = player.flipX=true;
-
-                // if(playerInGround === true){
-                //     player.anims.play('runLeft', true);
-                // }
                 heroLeft();
             }
         else if (rightkey.isDown && counterMovePlayer === 0 || theGamePad.right && counterMovePlayer === 0){       //right
-                // player.setVelocityX(playerVelocityX);
-                // playerFlip = player.flipX=false;
-            
-                // if(playerInGround === true){
-                //     player.anims.play('runRight', true);
-                // }
                 heroRight();
             }
         else if (player.setVelocityX(0)){                                                               //idle
@@ -1897,6 +2037,7 @@ function attackComboOne(){                                                      
                         countTest = 1
                     };
                     if(13 === player.anims.currentFrame.index){
+                        canShoryu = true
                         counterMovePlayer = 0;
                         //colideATK.body.enable = true;
                         attackinground = false;
@@ -2060,9 +2201,9 @@ function attackJump(){                                                          
 function powerAttackJump(){                                                                                 //PowerAttackJump
     //if(player.anims.currentAnim.key === 'fall'){
         //player.anims.stop()
+        spevalue = player.data.list.special = player.data.list.special - 2;
         player.anims.play('specialAirSlash', true);
         swordAir.play();
-        spevalue = player.data.list.special = player.data.list.special - 1;
         if(rageMode === false){
             rageValue = 0;
         }else{
@@ -2086,6 +2227,9 @@ function powerAttackJump(){                                                     
                 if(player.anims.currentFrame.index == 4){
                     colideATK.setX(player.x -40);colideATK.setY(player.y)
                 }
+                if(player.anims.currentFrame.index <= 4){
+                    canShoryu = false
+                }
                 if(player.anims.currentFrame.index == 5){
                     // camera.main.shake(200,0.0004);
 
@@ -2101,6 +2245,7 @@ function powerAttackJump(){                                                     
                 if(player.anims.currentFrame.index == 6){
                     colideATK.setX(player.x -40);colideATK.setY(player.y +40)
                     colideATK.setX(player.x +60);colideATK.setY(player.y +40)
+                    canShoryu = true
                 }
                 if(player.anims.currentFrame.index == 7){
                     player.data.list.Eject = 1;
@@ -2112,7 +2257,6 @@ function powerAttackJump(){                                                     
                     colideATK.setX(player.x -60);colideATK.setY(player.y +40)
                 }
                 if(player.anims.currentFrame.index < 13){
-                    
                     player.setVelocityY(1200)
                 }
                 if(player.anims.currentFrame.index >= 16){
@@ -2131,12 +2275,22 @@ function powerAttackJump(){                                                     
 function shieldTackle(){                                                                                     // ShieldTackle
     player.anims.play('shieldAttack', true);
     player.data.list.Eject = 0;
+    canShoryu = true;
+
     spevalue = player.data.list.special = player.data.list.special - 2;
+    if(rageMode === false){
+        rageValue = 0;
+    }else{
+        rageValue = 1;
+    }
+    
     player.on('animationupdate', ()=>{
         if('shieldAttack' === player.anims.currentAnim.key){
             if(player.anims.currentFrame.index <= 13 ){
-                if(playerFlip === true){player.setVelocityX(-300)}
-                if(playerFlip === false){player.setVelocityX(300)}
+                if(playerFlip === true){player.setVelocityX(-playerVelocityX * 2)}
+                if(playerFlip === false){player.setVelocityX(playerVelocityX * 2)}
+                playerCanFall = false;
+                player.setGravityY(-10);
             }
             if(player.anims.currentFrame.index === 9){
                 if(playerFlip === true){colideATK.setX(player.x -40);colideATK.setY(player.y)}
@@ -2147,7 +2301,7 @@ function shieldTackle(){                                                        
             if(player.anims.currentFrame.index === 10){
                 if(playerFlip === true){colideATK.setX(player.x -60);colideATK.setY(player.y)}
                 if(playerFlip === false){colideATK.setX(player.x +60);colideATK.setY(player.y)}
-                player.data.list.Eject = 3;
+                player.data.list.Eject = 0;
 
             }
             if(player.anims.currentFrame.index === 11){
@@ -2162,8 +2316,13 @@ function shieldTackle(){                                                        
 
             }
             if(player.anims.currentFrame.index >= 18 ){
-                counterMovePlayer = 0; 
                 player.data.list.special = spevalue;
+                colideATK.setX(0);colideATK.setY(0);
+                playerCanFall = false;
+                attackinground = false;
+                player.setGravityY(0);
+                //player.data.list.Eject = 0;
+                counterMovePlayer = 0;
             }
         }
     });
@@ -2171,34 +2330,23 @@ function shieldTackle(){                                                        
 
 }
 function tornadoSlash(){                                                                                      // tornado slash
+    //if(player.anims.currentAnim.key != 'shoryuSlash'){
     playerCanFall = false;
-    //console.log(player.body.checkCollision);
     player.anims.play('shoryuSlash', true);
-
     var nameAttack = 'shoryuSlash';
     swordAir.play();
-    
     spevalue = player.data.list.special = player.data.list.special - 1;
     if(rageMode === false){
         rageValue = 0;
     }else{
         rageValue = 1;
     }
-
-    // 
-    // var colAtk = colideATK2.get().setSize(60,60);
-    // var colAtkTwo = colideATK2.get().setSize(80,60);
-    // var colAtkThree = colideATK2.get().setSize(60,60);
-
-    // colAtk.visible = false;
-    // colAtkTwo.visible = false;
-    // colAtkThree.visible = false;
-
     player.on('animationupdate', ()=>{
-
+        
         if(nameAttack === player.anims.currentAnim.key){
-
+            
             if(player.anims.currentFrame.index <= 3 ){
+                canShoryu = false
                 player.setGravityY(-1200);
                 if(playerFlip === true){player.setVelocityX(-playerVelocityX * 4)}
                 if(playerFlip === false){player.setVelocityX(playerVelocityX * 4)} 
@@ -2224,22 +2372,22 @@ function tornadoSlash(){                                                        
                 if(playerFlip === true){colideATK.setX(player.x -60);colideATK.setY(player.y -32)}
                 if(playerFlip === false){colideATK.setX(player.x +60);colideATK.setY(player.y -32)} 
             }
-
+            
             if(player.anims.currentFrame.index === 5 ){
                 //colideATK.body.enable = true;
                 colideATK.setX(0)
                 colideATK.setY(0)
                 swordAir.play();
-                playerInGround = false
-
+                
             }
-                if(player.anims.currentFrame.index === 6 ){
-      
+            if(player.anims.currentFrame.index === 6 ){
+                
                 //player.anims.stop()
                 colideATK.setY(player.y -120)
                 player.data.list.Eject = 1;
                 if(playerFlip === true){colideATK.setX(player.x -30);}
                 if(playerFlip === false){colideATK.setX(player.x +30);} 
+                playerInGround = false
             }
             
             if(player.anims.currentFrame.index === 7 ){
@@ -2250,9 +2398,11 @@ function tornadoSlash(){                                                        
             if(player.anims.currentFrame.index >= 4 &&
                 player.anims.currentFrame.index <= 6){
                 player.setVelocityY(-320)
+                
             }
             
             if(player.anims.currentFrame.index >= 16){
+                canShoryu = true;
                 player.data.list.special = spevalue;
                 player.data.list.Eject = 0;
                 attackinground = false;
@@ -2266,7 +2416,8 @@ function tornadoSlash(){                                                        
                 
             }
         }
-    });
+    }); 
+    //}   
 }
 
 function UltraSlash(){
@@ -2274,6 +2425,7 @@ function UltraSlash(){
     player.anims.play('ultra', true);
     var nameAttack = 'ultra';
     swordAir.play();
+    canShoryu = true;
     
     spevalue = player.data.list.special = player.data.list.special - 3;
     rageValue = 0;
@@ -2424,6 +2576,7 @@ function UltraSlash(){
 }
 
 function KnockBack(){                                                                                  // Knock Back
+    canShoryu = true
     player.setGravityY(0);
     player.data.list.Eject = 0;
     setCombo()
