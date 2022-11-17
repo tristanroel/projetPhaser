@@ -1978,7 +1978,8 @@ function update(time, delta){
             else if(counterMovePlayer === 1 && playerInGround === false){attackJump();}
         }  
 
-        if(Phaser.Input.Keyboard.JustDown(enterKey) && startGame === true){     
+        if(Phaser.Input.Keyboard.JustDown(enterKey) && startGame === true ||
+        theGamePad.X && startGame === true){     
             player.x = 600;
             player.y = 1150;
             startGame = false;
