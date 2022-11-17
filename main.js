@@ -380,7 +380,7 @@ function create(){
 
     // TEXT
 
-    text = this.add.text(0,0, 'version : O.41 | 14.11.22' , {fontFamily : 'PixelFont'}); 
+    text = this.add.text(0,0, 'version : O.42 | 14.11.22' , {fontFamily : 'PixelFont'}); 
     personalBestText = this.add.text(0,0,'YOUR BEST : 0',{ fontFamily : 'PixelFont'})
     scoreText = this.add.text(0,0, 'SCORE : 0',{ fontFamily : 'PixelFont'})
     gameOverText = this.add.text(0,0, 'GAME OVER \n score : 0 \n press any to restart', { fontFamily : 'PixelFont', fontSize : '60px'});
@@ -2369,13 +2369,13 @@ function tornadoSlash(){                                                        
                 player.setGravityY(0);
                 player.data.list.Eject = 1;
                 //player.anims.stop()
+                playerInGround = false
                 if(playerFlip === true){colideATK.setX(player.x -60);colideATK.setY(player.y -32)}
                 if(playerFlip === false){colideATK.setX(player.x +60);colideATK.setY(player.y -32)} 
             }
             
             if(player.anims.currentFrame.index === 5 ){
                 //colideATK.body.enable = true;
-                playerInGround = false
                 colideATK.setX(0)
                 colideATK.setY(0)
                 swordAir.play();
