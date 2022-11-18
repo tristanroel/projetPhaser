@@ -378,7 +378,7 @@ function create(){
 
     // TEXT
 
-    text = this.add.text(0,0, 'version : O.44 | 14.11.22' , {fontFamily : 'PixelFont'}); 
+    text = this.add.text(0,0, 'version : O.45 | 14.11.22' , {fontFamily : 'PixelFont'}); 
     personalBestText = this.add.text(0,0,'YOUR BEST : 0',{ fontFamily : 'PixelFont'})
     scoreText = this.add.text(0,0, 'SCORE : 0',{ fontFamily : 'PixelFont'})
     gameOverText = this.add.text(0,0, 'GAME OVER \n score : 0 \n press any to restart', { fontFamily : 'PixelFont', fontSize : '60px'});
@@ -842,7 +842,7 @@ function create(){
         let comboResponse;
         for(let i = 0; i < gamePadCombo.length; i++){
             comboResponse = 0;
-            setTimeout(()=>{gamePadCombo = []},250);
+            setTimeout(()=>{gamePadCombo = []},270);
             if(playerInGround === true){
             if(gamePadCombo[i] == 83){
                 let val = i + 1;
