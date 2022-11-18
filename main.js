@@ -227,7 +227,7 @@ function create(){
     enemyNumberId = 0;
     rageMode = false;
     canShoryu = true
-    messageFunTextList = ['','Good !', 'Nice !','Yes !','Strike !','Cool !','Perfect !','Graceful !','Nicely Done ! ','Impressive !','Remarkable !','Powerful !','All That Power !?','Excellent','Slice !!','RAGE MODE !','it\'s not possible!?','Fast Fury!!!','INTENSE!!','Sword Master!!','Destroy Them All!!','Slices The Universe!!','WAOUH!!!','Rapid Anger','Incredible!!','Marvelous!!','Oh My God!','Unthinkable!!','Gracious!!','MAD!!','Powerful!!','STRONG!!','Fast Combo!!!','Dance Of Death!','KILL THEM ALL!!','MASSACRE!!','Beautifull!!','No Time To Die !!!','Sensational!!','WonderFull!!!','Gorgeous!','NO MERCY','Excellent!!!','Mesmerizing!!','Quick And Efficient!','HEAVY!!','CumberSome!!!','So Bulky!','Overwhelming!!','OVERKILL!!!','In Trance State!','Big Flow!!','High-intensity!!!','Invincible!!','Overly Strong!!!','Amazing!!!','OverPowering!','Hypnotic!!','Stupefying!!','You\'re a GOD!!','Beyond the Limits!','You\'re a MONSTER!!', 'CRAZY!!!', 'IMPOSSIBLE!!!','Take My Virginity!!','DIVINE !!']
+    messageFunTextList = ['','Good!', 'Nice!','Yes!','Great!','Cool!','Perfect!','Graceful!','Nicely Done! ','Impressive!','Remarkable!','Powerful!','Very Nice!!','Excellent!!','Slice!!','RAGE MODE !','Good Job!','Well-Done!','Crush!!','Super!','Spreads!','Really Good!!','Nice Trick!!','Ruthless!','','Nice Butchery!!','YES!!','Technical!','Killings!!','Execution!!','Excessive!!','PrettyDanceStep!!','"Baked-Ham"','FATALITY!!!','Continue?','Rhythmic!!','Nice Synthesis!!','Fatal Sequence!!!','OVERDRIVE!!!','High Velocity!!','Dithirambic!!','You Are Scary!!','Well!!','Right!!','Without Respite!','Tenseiken Slash!!','Finish Them!!','DESTRUCTOR-MODE','Relentless!!','In Mind!!','Merciless!!!','WhatAreYourLimits!?','SunlightYellowOverdrive!!','EXPLOSIVE!','DestroyYourEnemies!!','Very Cool!','FeedsYourBladeWithBlood!','Bullying!!!','Too Fast!!','I can\'t Follow!!','Nice Try!!','Easy to Break!','Emotional Damage!!','BURNING!!','Very Well!','Obliterate!!!','Grinding!!','Blade Infusion!!!','Splash!!','Quarter Circle!!','Divide!!','BreezeFromTheAir!!','splits!','Angry Kid!!','BROKEN!!','Without Limit!','UNBELIEVABLE!!','Enraged!!','Delicately!','Strike!','Famous!!','Magic!!','Very Good!','For Honor!!','Deadly Dance!!!','Heroic Madness!!!','Last Breath!!','Twisted Barrel!!','Unlimited!!','Wind Dance!!!','Slash!!','Iron Wall!!','Great Performance!','SUCCESS!!!','Cutting Edge!!','Brilliant!!','Human Blade!!!','Sharpness!!!','SHRED!!','Fatal Blow!!! ','LETHAL!','Quick Destruction!','burning!!','Pungent!','SPICY!','Efficient!!','COMBO-BREAKER!!!','Deadly!!!','Lethal Shot!!!','SERIOUS SEQUENCE!','Effective!!','it\'s not possible!?','OUGISHIPUKOGETSUSAN!','Fast Fury!!!','INTENSE!!','Sword Master!!','Destroy Them All!!','Slices The Universe!!','WAOUH!!!','Rapid Anger','Incredible!!','Marvelous!!','Oh My God!','OneTooMany?!','Unthinkable!!','Gracious!!','MAD!!','Powerful!!','STRONG!!','Fast Combo!!!','HowAreYouToday?','Dance Of Death!','KILL THEM ALL!!','MASSACRE!!','Beautifull!!','No Time To Die !!!','For Glory!!!','Sensational!!','OK!!!','WonderFull!!!','Gorgeous!','NO MERCY','Excellent!!!','Mesmerizing!!','Quick And Efficient!','HEAVY!!','CumberSome!!!','Fabulous!!','So Bulky!','Overwhelming!!','OVERKILL!!!','In Trance State!','Big Flow!!','High-intensity!!!','Invincible!!','Overly Strong!!!','Amazing!!!','OverPowering!','Hypnotic!!','Stupefying!!','You\'re a GOD!!','Beyond the Limits!', 'CRAZY!!!', 'IMPOSSIBLE!!!','Take My Virginity!!','DIVINE !!','You\'re a MONSTER!!']
 
 
 
@@ -380,7 +380,7 @@ function create(){
 
     // TEXT
 
-    text = this.add.text(0,0, 'version : O.42 | 14.11.22' , {fontFamily : 'PixelFont'}); 
+    text = this.add.text(0,0, 'version : O.43 | 14.11.22' , {fontFamily : 'PixelFont'}); 
     personalBestText = this.add.text(0,0,'YOUR BEST : 0',{ fontFamily : 'PixelFont'})
     scoreText = this.add.text(0,0, 'SCORE : 0',{ fontFamily : 'PixelFont'})
     gameOverText = this.add.text(0,0, 'GAME OVER \n score : 0 \n press any to restart', { fontFamily : 'PixelFont', fontSize : '60px'});
@@ -667,7 +667,7 @@ function create(){
     var ShieldAttackLeft = this.input.keyboard.createCombo([83,68,73], {resetOnMatch:true, maxKeyDelay:700}); 
     var ShieldAttackRight = this.input.keyboard.createCombo([83, 81, 73], {resetOnMatch:true, maxKeyDelay:700}); 
 
-    var keycomboinput = this.input.keyboard.on('keycombomatch', function(combo){ //verification du secialAtk entrée
+    this.input.keyboard.on('keycombomatch', function(combo){ //verification du secialAtk entrée
 
         if(playerInGround === true){
             if(combo.keyCodes == tornadoSlashRight.keyCodes){
@@ -798,7 +798,7 @@ function create(){
     theGamePad = this.input.gamepad.on('down', function(pad, button, index){
         theGamePad = pad
         text.setText('Playing with : ' + pad.id);
-
+        
         if(pad._RCBottom.pressed && playerInGround === true && counterMovePlayer === 0){ //jump
             gamepadJump = true;
         }
@@ -810,6 +810,16 @@ function create(){
         if(pad._RCTop.pressed){    //Protect
             // gamePadCombo = gamePadCombo + 'P';
             gamePadCombo.push(73);
+            //gamepadAttack = true;
+        }
+        if(pad._RCRight.pressed){    //Rond/B
+            // gamePadCombo = gamePadCombo + 'P';
+            gamePadCombo.push('D');
+            //gamepadAttack = true;
+        }
+        if(pad._RCBottom.pressed){    //X/A/jump
+            // gamePadCombo = gamePadCombo + 'P';
+            gamePadCombo.push('J');
             //gamepadAttack = true;
         }
         if(pad._LCTop.pressed){  //up
@@ -827,85 +837,246 @@ function create(){
             // gamePadCombo = gamePadCombo + 'G';
             gamePadCombo.push(68);
         }
-        //console.log(keycomboinput._events);
-        console.log(pad);
+           
+        //console.log(player.data.list.special);
+        //console.log(pad);
         // console.log(pad.);
-        let checker = (arr, target) => target.every(v => arr.includes(v));
+        let comboResponse;
+        for(let i = 0; i < gamePadCombo.length; i++){
+            comboResponse = 0;
+            setTimeout(()=>{gamePadCombo = []},300);
+            if(playerInGround === true){
+            if(gamePadCombo[i] == 83){
+                let val = i + 1;
+                if(gamePadCombo[val] == 81){
+                    let val2 = val + 1;
+                    if(gamePadCombo[val2] == 74){ //shoryu
+                       
+                        //console.log('shoryu');
+                        comboResponse++
+                        
+                        gamePadCombo = [];
 
-        if(playerInGround === true){
-            if(checker(gamePadCombo, tornadoSlashLeft.keyCodes) == true){
-                if(canShoryu === true){
-                    if(player.data.list.special >= 1){
-                        counterMovePlayer = 32;
-                        tornadoSlash();
+                    }
+                    else if(gamePadCombo[val2] == 73){ //shieldTackle
+                        comboResponse += 3
+                        gamePadCombo = [];
+                    }
+                }else if(gamePadCombo[val] == 68){
+                    let val2 = val + 1;
+                    if(gamePadCombo[val2] == 74){   //shoryu
+                        //console.log('shoryu');
+                        comboResponse++
+                        gamePadCombo = [];
+                    }
+                    else if(gamePadCombo[val2] == 73){  //shieldTackle
+                        comboResponse += 3
+                        gamePadCombo = [];
+                    }
+                }
+            }if(gamePadCombo[i] == 81){
+                let val = i + 1;
+                if(gamePadCombo[val] == 83){
+                    let val2 = val + 1;
+                    if(gamePadCombo[val2] == 68){
+                        let val3 = val2 + 1;
+                        if(gamePadCombo[val3] == 74){ //ultra
+                                //console.log('ultra');
+                                comboResponse += 2
+                            //player.data.list.special++
+                            gamePadCombo = [];
+                        }
+                    }
+                }
+            }else if(gamePadCombo[i] == 68){
+                let val = i + 1;
+                if(gamePadCombo[val] == 83){
+                    let val2 = val + 1;
+                    if(gamePadCombo[val2] == 81){
+                        let val3 = val2 + 1;
+                        if(gamePadCombo[val3] == 74){  //ultra
+                                //console.log('ultra');
+                                comboResponse +=2
+                            //player.data.list.special++
+                            gamePadCombo = [];
+                        }else if(gamePadCombo[val2] == 73){ //shieldTackle
+                            //comboResponse += 3
+                            gamePadCombo = [];
+                        }
                     }
                 }
             }
-            if(checker(gamePadCombo, tornadoSlashRight.keyCodes) == true){
-                if(canShoryu === true){
-                    if(player.data.list.special >= 1){
-                        counterMovePlayer = 32;
-                        tornadoSlash();
+            }else{
+                if(gamePadCombo[i] == 83){
+                    let val = i + 1;
+                    if(gamePadCombo[val] == 81){
+                        let val2 = val + 1;
+                        if(gamePadCombo[val2] == 74){ //SpeJump
+                            //console.log('spejump');
+                            comboResponse+= 5
+                            gamePadCombo = [];
+                        }
+                        else if(gamePadCombo[val2] == 73){ //shieldTackle
+                            //comboResponse += 3
+                            gamePadCombo = [];
+                        }
+                    }else if(gamePadCombo[val] == 68){
+                        let val2 = val + 1;
+                        if(gamePadCombo[val2] == 74){ //SpeJump
+                            //console.log('spejump');
+                            comboResponse+=5
+                            gamePadCombo = [];
+                        }
+                    }
+                }if(gamePadCombo[i] == 81){
+                    let val = i + 1;
+                    if(gamePadCombo[val] == 83){
+                        let val2 = val + 1;
+                        if(gamePadCombo[val2] == 68){
+                            let val3 = val2 + 1;
+                            if(gamePadCombo[val3] == 74){ //ultra
+                                    //console.log('ultra');
+                                    comboResponse += 6
+                                //player.data.list.special++
+                                gamePadCombo = [];
+                            }
+                        }
+                    }
+                }else if(gamePadCombo[i] == 68){
+                    let val = i + 1;
+                    if(gamePadCombo[val] == 83){
+                        let val2 = val + 1;
+                        if(gamePadCombo[val2] == 81){
+                            let val3 = val2 + 1;
+                            if(gamePadCombo[val3] == 74){ //ultra
+                                    //console.log('ultra');
+                                    comboResponse +=6
+                                //player.data.list.special++
+                                gamePadCombo = [];
+                            }
+                        }
                     }
                 }
+
             }
-            if(checker(gamePadCombo, UltraSlashLeft.keyCodes) == true){
-                if(player.data.list.special >= 2){
-                    player.data.list.special++
-                    counterMovePlayer = 33;
-                    UltraSlash();
-                }
-            }
-            if(checker(gamePadCombo, UltraSlashRight.keyCodes) == true){
-                if(player.data.list.special >= 2){
-                    player.data.list.special++
-                    counterMovePlayer = 33;
-                    UltraSlash();
-                }
-            }
-            if(checker(gamePadCombo, ShieldAttackLeft.keyCodes) == true){
-                if(player.data.list.special >= 2){
-                    shieldTackle();
-                    counterMovePlayer = 36;
-                }
-            }
-            if(checker(gamePadCombo, ShieldAttackRight.keyCodes) == true){
-                if(player.data.list.special >= 2){
-                    shieldTackle();
-                    counterMovePlayer = 36;
-                }
-            }
-        }else{
-            if(checker(gamePadCombo, tornadoSlashLeft.keyCodes) == true){
-                if(player.data.list.special >= 2){
-                    counterMovePlayer = 34; //35 apparement
-                    attackintheair = true;
-                    powerAttackJump();
-                }
-            }
-            if(checker(gamePadCombo, tornadoSlashRight.keyCodes) == true){
-                if(player.data.list.special >= 2){
-                    counterMovePlayer = 34; //35 apparement
-                    attackintheair = true;
-                    powerAttackJump();
-                }
-            }
-            if(checker(gamePadCombo, UltraSlashLeft.keyCodes) == true){
-                if(player.data.list.special >= 3){
-                    player.data.list.special++
-                    counterMovePlayer = 33;
-                    UltraSlash();
-                }
-            }
-            if(checker(gamePadCombo, UltraSlashRight.keyCodes) == true){
-                if(player.data.list.special >= 3){
-                    player.data.list.special++
-                    counterMovePlayer = 33;
-                    UltraSlash();
+        }
+
+        // console.log(comboResponse);
+        // console.log(gamePadCombo);
+        if(comboResponse == 1){
+            if(canShoryu === true){
+                if(player.data.list.special >= 1){
+                counterMovePlayer = 32;
+                attackintheair = true;
+                tornadoSlash();
                 }
             }
         }
-        setTimeout(()=>{gamePadCombo = []},400);
+        if(comboResponse == 2){
+            if(player.data.list.special >= 4){
+            counterMovePlayer = 33;
+            UltraSlash();
+            }
+        }
+        if(comboResponse == 3){
+            if(player.data.list.special >= 2){
+            shieldTackle();
+            counterMovePlayer = 36;
+            }
+        }
+        if(comboResponse == 5){
+            if(player.data.list.special >= 2){
+            counterMovePlayer = 34; //35 apparement
+            attackintheair = true;
+            powerAttackJump();
+            }
+        }
+        if(comboResponse == 6){
+            if(player.data.list.special >= 4){
+            attackintheair = true;
+            counterMovePlayer = 33;
+            UltraSlash();
+            }
+        }
+        // let checker = (arr, target) => target.every(v => arr.includes(v));
+
+        // if(playerInGround === true){
+            
+        //         if(checker(gamePadCombo, tornadoSlashLeft.keyCodes) == true){
+        //             if(canShoryu === true){
+        //                 if(player.data.list.special >= 1){
+        //                     counterMovePlayer = 32;
+        //                     tornadoSlash();
+        //                 }
+        //             }
+        //         }
+        //         if(checker(gamePadCombo, tornadoSlashRight.keyCodes) == true){
+        //             if(canShoryu === true){
+        //                 if(player.data.list.special >= 1){
+        //                     counterMovePlayer = 32;
+        //                     tornadoSlash();
+        //                 }
+        //             }
+        //         }
+            //     if(checker(gamePadCombo, ShieldAttackLeft.keyCodes) == true){
+            //         if(player.data.list.special >= 2){
+            //             shieldTackle();
+            //             counterMovePlayer = 36;
+            //         }
+            //     }
+            //     if(checker(gamePadCombo, ShieldAttackRight.keyCodes) == true){
+            //         if(player.data.list.special >= 2){
+            //             shieldTackle();
+            //             counterMovePlayer = 36;
+            //         }
+            //     }
+             
+            // if(checker(gamePadCombo, UltraSlashLeft.keyCodes) == true){
+            //     if(player.data.list.special >= 2){
+            //         player.data.list.special++
+            //         counterMovePlayer = 33;
+            //         UltraSlash();
+            //     }
+            // }
+            // if(checker(gamePadCombo, UltraSlashRight.keyCodes) == true){
+            //     if(player.data.list.special >= 2){
+            //         player.data.list.special++
+            //         counterMovePlayer = 33;
+            //         UltraSlash();
+            //     }
+        //     }
+        // }else{
+        //     if(checker(gamePadCombo, tornadoSlashLeft.keyCodes) == true){
+        //         if(player.data.list.special >= 2){
+        //             counterMovePlayer = 34; //35 apparement
+        //             attackintheair = true;
+        //             powerAttackJump();
+        //         }
+        //     }
+        //     if(checker(gamePadCombo, tornadoSlashRight.keyCodes) == true){
+        //         if(player.data.list.special >= 2){
+        //             counterMovePlayer = 34; //35 apparement
+        //             attackintheair = true;
+        //             powerAttackJump();
+        //         }
+        //     }
+        //     if(checker(gamePadCombo, UltraSlashLeft.keyCodes) == true){
+        //         if(player.data.list.special >= 3){
+        //             player.data.list.special++
+        //             counterMovePlayer = 33;
+        //             UltraSlash();
+        //         }
+        //     }
+        //     if(checker(gamePadCombo, UltraSlashRight.keyCodes) == true){
+        //         if(player.data.list.special >= 3){
+        //             player.data.list.special++
+        //             counterMovePlayer = 33;
+        //             UltraSlash();
+        //         }
+        //     }
+        // }
+        //console.log(gamePadCombo);
+        // setTimeout(()=>{gamePadCombo = []},700);
     }, this);
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -1051,12 +1222,12 @@ function create(){
     });
     this.anims.create({
         key: 'knockBack',
-        frames: this.anims.generateFrameNumbers('heroKnockBack',{frames: [0, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5]}),
+        frames: this.anims.generateFrameNumbers('heroKnockBack',{frames: [5, 0, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5]}),
         frameRate: 8,
     });
     this.anims.create({
         key: 'die',
-        frames: this.anims.generateFrameNumbers('heroKnockBack',{frames: [2, 3, 4, 5, 5, 5, 5, 5]}),
+        frames: this.anims.generateFrameNumbers('heroKnockBack',{frames: [5]}),
         frameRate: 8,
     });
     this.anims.create({
@@ -1695,6 +1866,10 @@ function update(time, delta){
                 currentEnemy.data.list.EnemyIsAttack = false
                 currentEnemy.data.list.CounterMove = 6;
             }
+            if(Phaser.Math.Distance.BetweenPoints(currentEnemy,player) < 180 &&                         // attack Spearman
+            Phaser.Math.Distance.BetweenPoints(currentEnemy,player) > 101){
+                //console.log('bim');
+            }
 
             if(Phaser.Math.Distance.BetweenPoints(currentEnemy,player) <= 90 + rdmNbr &&                        // action enemies
             currentEnemy.data.list.type != 'box' &&
@@ -1798,6 +1973,7 @@ function update(time, delta){
     //console.log(PlayerTouchEnemy);
     //console.log(colideATK2);
     //console.log(playerCanFall);
+    //console.log(canShoryu);
     //console.log(returnRandomNumber(10, 20));
     //console.log('AtkCollide : '+ hittableObject.children.entries[0].data.list.AtkCollide);
     //console.log(player.data.list.Eject);
@@ -1830,28 +2006,48 @@ function update(time, delta){
     //console.log(rageMode)
     //console.log(enemyCanDie);
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     if(counterMovePlayer === 28){
         KnockBack()
     }
     if(counterMovePlayer === 14){
         GuardKnockBack()
     }
+
+    if(player.data.list.special >= 6){
+        player.data.list.special = 6;
+    }
+    if(player.data.list.special <= 0){
+        player.data.list.special = 0;
+    }
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
     if(player.data.list.health <= 0){                                                              //Player Die 
         themeSong.stop();
         player.anims.play('knockBack', true);
         counterMovePlayer = 999;
         player.data.list.health = 0;
-
-        player.on('animationcomplete', ()=>{                                                        // GAME OVER
-            this.anims.pauseAll();
-            GameOver = true;
-            gameoverSong.play();
-            if(Score > personalBest){
-                localStorage.setItem('score', Score)
-            }
-            gameOverText.setDepth(3);
+        //console.log(theGamePad.x = false);
+        //player.on('animationupdate', ()=>{
+            // if(player.anims.currentFrame.index < 19){
+            //     console.log(player.body.velocity.y = 0);
+            // }
+            // if(player.anims.currentFrame.index >= 19){
+        player.on('animationcomplete', ()=>{                                             // GAME OVER
+                //console.log(player.anims.play('die',true))
+                
+                this.anims.pauseAll();
+                GameOver = true;
+                gameoverSong.play();
+                if(Score > personalBest){
+                    localStorage.setItem('score', Score)
+                }
+                gameOverText.setDepth(3);
+               
+            // }
         });
         setTimeout(()=>{
+            // console.log(player.anims.currentAnim.frames)
             if(touchesAttack._justDown === true  && GameOver === true                             // Restart Game
             || theGamePad.X && GameOver === true){
                 this.registry.destroy(); //destroy registry
@@ -1869,54 +2065,13 @@ function update(time, delta){
             }
         },5000)
     }
-
-    if(player.data.list.special >= 6){
-        player.data.list.special = 6;
-    }
-    if(player.data.list.special <= 0){
-        player.data.list.special = 0;
-    }
-    // CONTROL PLAYER
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // if((theGamePad.X)){                                                                             //Gamepad Combo
-    //         if(gamePadCombo.includes("BDA") || gamePadCombo.includes("BGA")){
-    //                 if(playerInGround === true){
-    //                     if(player.data.list.special >= 1){
-    //                         counterMovePlayer = 32;
-    //                         tornadoSlash();
-    //                         console.log(gamePadCombo[0]);
-    //                         gamePadCombo = [];
-    //                     }
-    //                 }
-    //                 if(playerInGround === false){
-    //                     attackintheair = true
-    //                     counterMovePlayer = 34;
-    //                     attackintheair = true;
-    //                     powerAttackJump();
-    //                 }
-    //                 gamePadCombo = [];
-    //         }
-    //         else if(gamePadCombo.includes("BGDA") || gamePadCombo.includes("BDGA")){
-    //                 if(playerInGround === true){
-    //                     if(player.data.list.special >= 3){
-    //                         counterMovePlayer = 33;
-    //                         UltraSlash();
-    //                         gamePadCombo = [];
-    //                     }
-    //                 }
-    //                 gamePadCombo = [];
-    //         }
-    //         else{
-    //             gamePadCombo = [];
-    //         }
-    // }
-        if(theGamePad.up && counterMovePlayer === 0){                                                               //up (climb pad)
-            console.log('haut');
+   
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        if(theGamePad.up && counterMovePlayer === 0){                                                       //up (climb pad)
             if(playerInGround === false){
                 player.data.list.Climb = true
             }
         }
-        //console.log(theGamePad.X);
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -1981,6 +2136,7 @@ function update(time, delta){
         theGamePad.X && startGame === true){     
             player.x = 600;
             player.y = 1150;
+            // counterMovePlayer = 0;
             startGame = false;
             rageCloud.anims.play('rage',true);
             //player.anims.play('idle', true)
@@ -2047,7 +2203,6 @@ function attackComboOne(){                                                      
    
 }
 function attackComboTwo(){                                                                              //attack two
-
 if(player.anims.currentAnim.key === 'attackOne'){
     if(countTest === 1){
         player.anims.play('attackTwo', true);
@@ -2072,8 +2227,12 @@ if(player.anims.currentAnim.key === 'attackOne'){
                 colideATK.setX(0)
                 // player.data.list.Eject = 0;
             }
+            // if(player.anims.currentFrame.index <= 11){
+            //     canShoryu = true;
+            // }
+            
             if(player.anims.currentFrame.index >= 6 && player.anims.currentFrame.index <= 10){
-                countTest = 2;
+                    countTest = 2;  
             }
             if(12 === player.anims.currentFrame.index){//reset counterMove : 0
                 //player.data.list.Eject = 0;
@@ -2111,6 +2270,7 @@ function attackComboThree(){
                 if(playerFlip === false){player.setVelocityX(200)}
                 player.data.list.Eject = 3;
                 countTest = 0;
+                canShoryu = true
             }
             
             if(player.anims.currentFrame.index >= 7){
@@ -2240,7 +2400,7 @@ function powerAttackJump(){                                                     
                     cameraPlayer.shakeEffect.duration = 200
                     cameraPlayer.shakeEffect.isRunning = true
                     
-                    console.log(cameraPlayer.shakeEffect);
+                    //console.log(cameraPlayer.shakeEffect);
                 }
                 if(player.anims.currentFrame.index == 6){
                     colideATK.setX(player.x -40);colideATK.setY(player.y +40)
@@ -2581,11 +2741,11 @@ function KnockBack(){                                                           
     player.data.list.Eject = 0;
     setCombo()
     playerCanFall = false
-    player.anims.play('knockBack', true);
+    player.anims.play({ key: 'knockBack', startFrame: 1 }, true);
     var nameAction = 'knockBack';
     player.on('animationupdate', ()=>{
         if(nameAction === player.anims.currentAnim.key){
-            if(player.anims.currentFrame.index <=4){
+            if(player.anims.currentFrame.index <=5){
                 if(player.flipX === true){
                     player.setVelocityX(400)
                 }
@@ -2593,7 +2753,7 @@ function KnockBack(){                                                           
                     player.setVelocityX(-400)
                 } 
             }
-            if(player.anims.currentFrame.index >=5){
+            if(player.anims.currentFrame.index >=6){
                 if(player.data.list.health > 0){
                     if(player.body.velocity.y != 0){
                         playerCanFall = false;
@@ -2615,15 +2775,15 @@ function KnockBack(){                                                           
                     } 
                 }
             }
-            if(player.anims.currentFrame.index >=10){
+            if(player.anims.currentFrame.index >=11){
                 player.setGravityY(-600)
             }
-            if(player.anims.currentFrame.index >=12){
+            if(player.anims.currentFrame.index >=13){
                 player.setGravityY(2000)
             }
-            if(player.anims.currentFrame.index >=18){
-                
+            if(player.anims.currentFrame.index >=19){
                 player.setGravityX(0)
+                
             }
         }
     });
