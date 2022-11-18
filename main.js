@@ -229,8 +229,6 @@ function create(){
     canShoryu = true
     messageFunTextList = ['','Good!', 'Nice!','Yes!','Great!','Cool!','Perfect!','Graceful!','Nicely Done! ','Impressive!','Remarkable!','Powerful!','Very Nice!!','Excellent!!','Slice!!','RAGE MODE !','Good Job!','Well-Done!','Crush!!','Super!','Spreads!','Really Good!!','Nice Trick!!','Ruthless!','','Nice Butchery!!','YES!!','Technical!','Killings!!','Execution!!','Excessive!!','PrettyDanceStep!!','"Baked-Ham"','FATALITY!!!','Continue?','Rhythmic!!','Nice Synthesis!!','Fatal Sequence!!!','OVERDRIVE!!!','High Velocity!!','Dithirambic!!','You Are Scary!!','Well!!','Right!!','Without Respite!','Tenseiken Slash!!','Finish Them!!','DESTRUCTOR-MODE','Relentless!!','In Mind!!','Merciless!!!','WhatAreYourLimits!?','SunlightYellowOverdrive!!','EXPLOSIVE!','DestroyYourEnemies!!','Very Cool!','FeedsYourBladeWithBlood!','Bullying!!!','Too Fast!!','I can\'t Follow!!','Nice Try!!','Easy to Break!','Emotional Damage!!','BURNING!!','Very Well!','Obliterate!!!','Grinding!!','Blade Infusion!!!','Splash!!','Quarter Circle!!','Divide!!','BreezeFromTheAir!!','splits!','Angry Kid!!','BROKEN!!','Without Limit!','UNBELIEVABLE!!','Enraged!!','Delicately!','Strike!','Famous!!','Magic!!','Very Good!','For Honor!!','Deadly Dance!!!','Heroic Madness!!!','Last Breath!!','Twisted Barrel!!','Unlimited!!','Wind Dance!!!','Slash!!','Iron Wall!!','Great Performance!','SUCCESS!!!','Cutting Edge!!','Brilliant!!','Human Blade!!!','Sharpness!!!','SHRED!!','Fatal Blow!!! ','LETHAL!','Quick Destruction!','burning!!','Pungent!','SPICY!','Efficient!!','COMBO-BREAKER!!!','Deadly!!!','Lethal Shot!!!','SERIOUS SEQUENCE!','Effective!!','it\'s not possible!?','OUGISHIPUKOGETSUSAN!','Fast Fury!!!','INTENSE!!','Sword Master!!','Destroy Them All!!','Slices The Universe!!','WAOUH!!!','Rapid Anger','Incredible!!','Marvelous!!','Oh My God!','OneTooMany?!','Unthinkable!!','Gracious!!','MAD!!','Powerful!!','STRONG!!','Fast Combo!!!','HowAreYouToday?','Dance Of Death!','KILL THEM ALL!!','MASSACRE!!','Beautifull!!','No Time To Die !!!','For Glory!!!','Sensational!!','OK!!!','WonderFull!!!','Gorgeous!','NO MERCY','Excellent!!!','Mesmerizing!!','Quick And Efficient!','HEAVY!!','CumberSome!!!','Fabulous!!','So Bulky!','Overwhelming!!','OVERKILL!!!','In Trance State!','Big Flow!!','High-intensity!!!','Invincible!!','Overly Strong!!!','Amazing!!!','OverPowering!','Hypnotic!!','Stupefying!!','You\'re a GOD!!','Beyond the Limits!', 'CRAZY!!!', 'IMPOSSIBLE!!!','Take My Virginity!!','DIVINE !!','You\'re a MONSTER!!']
 
-
-
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// SONG
     themeSong = this.sound.add('theme',{volume: 0.08});
@@ -380,7 +378,7 @@ function create(){
 
     // TEXT
 
-    text = this.add.text(0,0, 'version : O.43 | 14.11.22' , {fontFamily : 'PixelFont'}); 
+    text = this.add.text(0,0, 'version : O.44 | 14.11.22' , {fontFamily : 'PixelFont'}); 
     personalBestText = this.add.text(0,0,'YOUR BEST : 0',{ fontFamily : 'PixelFont'})
     scoreText = this.add.text(0,0, 'SCORE : 0',{ fontFamily : 'PixelFont'})
     gameOverText = this.add.text(0,0, 'GAME OVER \n score : 0 \n press any to restart', { fontFamily : 'PixelFont', fontSize : '60px'});
@@ -844,7 +842,7 @@ function create(){
         let comboResponse;
         for(let i = 0; i < gamePadCombo.length; i++){
             comboResponse = 0;
-            setTimeout(()=>{gamePadCombo = []},300);
+            setTimeout(()=>{gamePadCombo = []},250);
             if(playerInGround === true){
             if(gamePadCombo[i] == 83){
                 let val = i + 1;
