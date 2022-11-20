@@ -109,6 +109,7 @@ var Arrow;
 var DestroyArrow;
 var rageCloud;
 var oldfilter;
+var seal;
 
 var spawnDetector;
 var spawnReActivator;
@@ -169,13 +170,15 @@ function preload(){
     this.load.image('forest', 'assets/levelOne/Decor2.png');
     this.load.tilemapTiledJSON('tiles', 'assets/levelOne/forest.json')
 
+    //this.load.spritesheet('spritesChar','assets/Sprites/characters.png', {frameWidth : 200, frameHeight : 200});
     this.load.spritesheet('controlHelp','assets/controlHelp.png', {frameWidth : 501, frameHeight : 318});
     this.load.spritesheet('slash','assets/Slash.png', {frameWidth : 65, frameHeight : 65});
     this.load.spritesheet('slashGuard','assets/SlashGuard.png', {frameWidth : 8, frameHeight : 23});
     this.load.spritesheet('piecette','assets/Coin.png', {frameWidth : 8, frameHeight : 8});
+    this.load.spritesheet('seal','assets/Sprites/Sealofinfinity.png', {frameWidth : 170, frameHeight : 170});
+
     this.load.spritesheet('hero', 'assets/Sprites/stancearmed.png',{frameWidth: 170, frameHeight: 170});
     this.load.spritesheet('heroAttack', 'assets/Sprites/swordattackmove.png',{frameWidth: 170, frameHeight: 170});
-    // this.load.spritesheet('heroAttacktwo', 'assets/Sprites/3hitcombo.png',{frameWidth: 170, frameHeight: 170});
     this.load.spritesheet('heroAttackthree', 'assets/Sprites/3ndhit.png',{frameWidth: 170, frameHeight: 170});
     this.load.spritesheet('herorun', 'assets/Sprites/walkarmed.png',{frameWidth: 170, frameHeight: 170});
     this.load.spritesheet('herojump', 'assets/Sprites/jumparmed.png',{frameWidth: 170, frameHeight: 170});
@@ -227,7 +230,7 @@ function create(){
     enemyNumberId = 0;
     rageMode = false;
     canShoryu = true
-    messageFunTextList = ['','Good!', 'Nice!','Yes!','Great!','Cool!','Perfect!','Graceful!','Nicely Done! ','Impressive!','Remarkable!','Powerful!','Very Nice!!','Excellent!!','Slice!!','RAGE MODE !','Good Job!','Well-Done!','Crush!!','Super!','Spreads!','Really Good!!','Nice Trick!!','Ruthless!','','Nice Butchery!!','YES!!','Technical!','Killings!!','Execution!!','Excessive!!','PrettyDanceStep!!','"Baked-Ham"','FATALITY!!!','Continue?','Rhythmic!!','Nice Synthesis!!','Fatal Sequence!!!','OVERDRIVE!!!','High Velocity!!','Dithirambic!!','You Are Scary!!','Well!!','Right!!','Without Respite!','Tenseiken Slash!!','Finish Them!!','DESTRUCTOR-MODE','Relentless!!','In Mind!!','Merciless!!!','WhatAreYourLimits!?','SunlightYellowOverdrive!!','EXPLOSIVE!','DestroyYourEnemies!!','Very Cool!','FeedsYourBladeWithBlood!','Bullying!!!','Too Fast!!','I can\'t Follow!!','Nice Try!!','Easy to Break!','Emotional Damage!!','BURNING!!','Very Well!','Obliterate!!!','Grinding!!','Blade Infusion!!!','Splash!!','Quarter Circle!!','Divide!!','BreezeFromTheAir!!','splits!','Angry Kid!!','BROKEN!!','Without Limit!','UNBELIEVABLE!!','Enraged!!','Delicately!','Strike!','Famous!!','Magic!!','Very Good!','For Honor!!','Deadly Dance!!!','Heroic Madness!!!','Last Breath!!','Twisted Barrel!!','Unlimited!!','Wind Dance!!!','Slash!!','Iron Wall!!','Great Performance!','SUCCESS!!!','Cutting Edge!!','Brilliant!!','Human Blade!!!','Sharpness!!!','SHRED!!','Fatal Blow!!! ','LETHAL!','Quick Destruction!','burning!!','Pungent!','SPICY!','Efficient!!','COMBO-BREAKER!!!','Deadly!!!','Lethal Shot!!!','SERIOUS SEQUENCE!','Effective!!','it\'s not possible!?','OUGISHIPUKOGETSUSAN!','Fast Fury!!!','INTENSE!!','Sword Master!!','Destroy Them All!!','Slices The Universe!!','WAOUH!!!','Rapid Anger','Incredible!!','Marvelous!!','Oh My God!','OneTooMany?!','Unthinkable!!','Gracious!!','MAD!!','Powerful!!','STRONG!!','Fast Combo!!!','HowAreYouToday?','Dance Of Death!','KILL THEM ALL!!','MASSACRE!!','Beautifull!!','No Time To Die !!!','For Glory!!!','Sensational!!','OK!!!','WonderFull!!!','Gorgeous!','NO MERCY','Excellent!!!','Mesmerizing!!','Quick And Efficient!','HEAVY!!','CumberSome!!!','Fabulous!!','So Bulky!','Overwhelming!!','OVERKILL!!!','In Trance State!','Big Flow!!','High-intensity!!!','Invincible!!','Overly Strong!!!','Amazing!!!','OverPowering!','Hypnotic!!','Stupefying!!','You\'re a GOD!!','Beyond the Limits!', 'CRAZY!!!', 'IMPOSSIBLE!!!','Take My Virginity!!','DIVINE !!','You\'re a MONSTER!!']
+    messageFunTextList = ['pouet','Good!', 'Nice!','Yes!','Great!','Cool!','Perfect!','Graceful!','Nicely Done! ','Impressive!','Remarkable!','Powerful!','Very Nice!!','Excellent!!','Slice!!','RAGE MODE !','Good Job!','Well-Done!','Crush!!','Super!','Spreads!','Really Good!!','Nice Trick!!','Ruthless!','','Nice Butchery!!','YES!!','Technical!','Killings!!','Execution!!','Excessive!!','PrettyDanceStep!!','"Baked-Ham"','FATALITY!!!','Continue?','Rhythmic!!','Nice Synthesis!!','Fatal Sequence!!!','OVERDRIVE!!!','High Velocity!!','Dithirambic!!','You Are Scary!!','Well!!','Right!!','Without Respite!','Tenseiken Slash!!','Finish Them!!','DESTRUCTOR-MODE','Relentless!!','In Mind!!','INSANE!!','Merciless!!!','WhatAreYourLimits!?','BELLISSIMO!!','Tasty!!!!','Still COOL!!','DRY!!','Hard!!!','Impressed!!!','Don\'t Cry Baby!!','','GRANDIOSE!!!','SunlightYellowOverdrive!!','EXPLOSIVE!','DestroyYourEnemies!!','Very Cool!','FeedsYourBladeWithBlood!','Bullying!!!','Too Fast!!','I can\'t Follow!!','Nice Try!!','Easy to Break!','Emotional Damage!!','BURNING!!','Very Well!','Obliterate!!!','Grinding!!','Blade Infusion!!!','Splash!!','Quarter Circle!!','Divide!!','BreezeFromTheAir!!','splits!','Angry Kid!!','BROKEN!!','Without Limit!','UNBELIEVABLE!!','Enraged!!','Delicately!','Strike!','Famous!!','Magic!!','Very Good!','For Honor!!','Deadly Dance!!!','Heroic Madness!!!','Last Breath!!','Twisted Barrel!!','Unlimited!!','Wind Dance!!!','Slash!!','Iron Wall!!','Great Performance!','SUCCESS!!!','Cutting Edge!!','Brilliant!!','Human Blade!!!','Audacious!','Sharpness!!!','SHRED!!','Fatal Blow!!! ','LETHAL!','Quick Destruction!','BURNING!!','Synchronized!!','Pungent!','SPICY!','Efficient!!','Okey!!','COMBO-BREAKER!!!','Deadly!!!','Lethal Shot!!!','SERIOUS SEQUENCE!','You Got It, Baby?!!','Effective!!','CLEAN!!','it\'s not possible!?','OUGISHIPUKOGETSUSAN!','Fast Fury!!!','INTENSE!!','Sword Master!!','Destroy Them All!!','Slices The Universe!!','WAOUH!!!','Rapid Anger','Incredible!!','Marvelous!!','Oh My God!','OneTooMany?!','Unthinkable!!','OWN!!','Gracious!!','MAD!!','Powerful!!','STRONG!!','Fast Combo!!!','HowAreYouToday?','Dance Of Death!!','KILL THEM ALL!!','MASSACRE!!','Beautifull!!','No Time To Die !!!','For Glory!!!','Sensational!!','OK!!!','WonderFull!!!','Gorgeous!','NO MERCY','Excellent!!!','Mesmerizing!!','Quick And Efficient!','HEAVY!!','CumberSome!!!','BERSERKER!!','Crazed!!','Fabulous!!','So Bulky!','Overwhelming!!','OVERKILL!!!','In Trance State!','BIG FLOW!!','High-intensity!!!','Invincible!!','Overly Strong!!!','Amazing!!!','OverPowering!','Hypnotic!!','Stupefying!!','You\'re a GOD!!','Beyond the Limits!', 'CRAZY!!!', 'IMPOSSIBLE!!!','Take My Virginity!!','DIVINE !!','You\'re a MONSTER!!']
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// SONG
@@ -245,7 +248,8 @@ function create(){
 
 
    /// OBJECT
-    skyBg = this.add.tileSprite(0, 0, 404, 482, 'sky').setScale(2); //image ciel
+    skyBg = this.add.tileSprite(1500, 800, 404, 482, 'sky').setScale(2); //image ciel
+    skyBg.setScrollFactor(0,0)
    
     ////////////////////////////////////////////////////////////////////
 
@@ -308,13 +312,16 @@ function create(){
         visible : false,
     });           
 
-    healthBar = this.add.rectangle(0,0,120,10,0xB14F37).setStrokeStyle(2, 0xFFFFFF);    //healthbar
+    healthBar = this.add.rectangle(1205,685,120,10,0xB14F37).setStrokeStyle(2, 0xFFFFFF);    //healthbar
+    healthBar.setScrollFactor(0,0);
     healthBar.setDepth(2);
 
-    specialBar = this.add.rectangle(0,0,120,10,0xFDCA7F);                               //specialbar
+    specialBar = this.add.rectangle(1205,705,120,10,0xFDCA7F);                               //specialbar
+    specialBar.setScrollFactor(0,0);
     specialBar.setDepth(2);
 
-    spebar = this.add.image(0, 0,'spebar').setScale(2).setDepth(2);
+    spebar = this.add.image(1215,705,'spebar').setScale(2).setDepth(2);
+    spebar.setScrollFactor(0,0);
     
 
     Coin = this.physics.add.group({                                                     // Coin
@@ -327,18 +334,40 @@ function create(){
 
     Arrow = this.physics.add.group({allowGravity : false})                              // Arrow 
 
-    DestroyArrow = this.add.sprite(0,0,'sfx').setScale(2);                      // Destroy Arrow
+    seal = this.physics.add.sprite(4700,1100,'seal').setScale(2);
+    seal.body.setSize(25, 58) 
+    seal.body.allowGravity = false;
     
-    rageCloud = this.add.sprite(0,0,'sfx').setScale(2);
+    rageCloud = this.add.sprite(1490,880,'sfx').setScale(2)
+    rageCloud.setScrollFactor(0,0);
     rageCloud.setDepth(1);
 
-    oldfilter = this.add.sprite(600,1150,'oldTvFilter').setScale(0.4).setDepth(3);
+    oldfilter = this.add.sprite(1500,850,'oldTvFilter').setScale(0.4).setDepth(3);
+    oldfilter.setScrollFactor(0,0);
     oldfilter.alpha = 0.1
     //console.log(oldfilter);
+    var particles = this.add.particles('spawner')
+    var emitter = particles.createEmitter({
+        x : seal.x,
+        y : seal.y,
+        lifespan: 1000,
+        gravityY: 1000,
+        bounce: 0.9,
+        scale: { start: 0.1, end: 0 },
+        //bounds: { x: 50, y: 0, w: 50, h: 0 },
+        angle: { min: 225, max: 315 },
+        speed: { min: 100, max: 300 },
+        //bounds: { x: 0, y: 100, w: 350, h: 200 },
+        blendMode: 'ADD',
+        delay : 1,
+    });
+    emitter.active = false;
 
     hittableObject = this.physics.add.group({immovable: true})                          // enemy and other...
 
-    controlHelp = this.add.sprite(360,1260,'controlHelp').setScale(1.5).setDepth(2);    // controlHelp
+    controlHelp = this.add.sprite(1500,885,'controlHelp').setScale(1.5).setDepth(2);    // controlHelp
+    controlHelp.setScrollFactor(0,0);
+
 
     player = this.physics.add.sprite(600, 1150,'hero').setScale(2);                     // player
     player.body.setSize(25, 58)                                         
@@ -350,6 +379,9 @@ function create(){
     player.setData('Eject', 0);
     player.body.checkCollision.up = false;
     
+    DestroyArrow = this.add.sprite(1600,850,'sfx').setScale(2);                      // Destroy Arrow
+    DestroyArrow.setScrollFactor(0,0);
+    // console.log(DestroyArrow.flipX = true);
     //console.log(player.body.touching);
 
     colideATK = this.add.rectangle(-800,0,100,100,0xB14F37)                                // collision attack final
@@ -361,12 +393,12 @@ function create(){
     slashAtk.setDepth(1);
 
 
-    spawnDetector = this.add.rectangle(1300,1000,20,350,0xB14F37);                      // Spawn Detector
+    spawnDetector = this.add.rectangle(1200,1200,20,350,0xB14F37);                      // Spawn Detector
     this.physics.add.existing(spawnDetector);
     //spawnDetector.setData('Active', false)
     //spawnDetector.setVisible(false)
     spawnDetector.body.allowGravity = false;
-
+//console.log();
     // spawnReActivator = this.add.rectangle(400,1000,50,400,0x3F88E8);
     // this.physics.add.existing(spawnReActivator);
     // //spawnDetector.setData('Active', false)
@@ -378,14 +410,15 @@ function create(){
 
     // TEXT
 
-    text = this.add.text(0,0, 'version : O.45 | 14.11.22' , {fontFamily : 'PixelFont'}); 
-    personalBestText = this.add.text(0,0,'YOUR BEST : 0',{ fontFamily : 'PixelFont'})
-    scoreText = this.add.text(0,0, 'SCORE : 0',{ fontFamily : 'PixelFont'})
-    gameOverText = this.add.text(0,0, 'GAME OVER \n score : 0 \n press any to restart', { fontFamily : 'PixelFont', fontSize : '60px'});
-    comboText = this.add.text(0,0,'COMBO X0',{ fontFamily : 'PixelFont'});
-    funText = this.add.text(0,0,'',{ fontFamily : 'PixelFont'});
+    text = this.add.text(1145,1095, 'version : O.46 | 14.11.22' , {fontFamily : 'PixelFont'}).setScrollFactor(0,0);
+    personalBestText = this.add.text(1450,672,'YOUR BEST : 0',{ fontFamily : 'PixelFont'}).setScrollFactor(0,0);
+    scoreText = this.add.text(1700,672, 'SCORE : 0',{ fontFamily : 'PixelFont'}).setScrollFactor(0,0);
+    gameOverText = this.add.text(1218,780, 'GAME OVER \n score : 0 \n press any to restart', { fontFamily : 'PixelFont', fontSize : '60px'}).setScrollFactor(0,0);
+    comboText = this.add.text(1600,740,'COMBO X0',{ fontFamily : 'PixelFont'}).setScrollFactor(0,0);
+    funText = this.add.text(1600,760,'',{ fontFamily : 'PixelFont'}).setScrollFactor(0,0);
     gameOverText.setDepth(-2);
     text.setDepth(2);
+    funText.setDepth(2);
     scoreText.setDepth(2);
     personalBestText.setDepth(2);
     comboText.setDepth(2);
@@ -416,9 +449,15 @@ function create(){
     // COLLISIONS
 
     this.physics.add.collider(colideATK, Arrow, function(atk,arrow){
-        DestroyArrow.setY(player.y);
-        if(player.flipX === true){DestroyArrow.setX(player.x -100)}
-        if(player.flipX === false){DestroyArrow.setX(player.x +100)}
+        // DestroyArrow.setY(player.y);
+        if(player.flipX === true){
+            DestroyArrow.setX(1400)
+            DestroyArrow.flipX = true
+        }
+        if(player.flipX === false){
+            DestroyArrow.setX(1600)
+            DestroyArrow.flipX = false
+        }
         DestroyArrow.anims.play('breackArrow', true);
         slashAtk.setY(player.y)
         if(player.flipX === true){slashAtk.setX(player.x -100)}
@@ -429,6 +468,15 @@ function create(){
 
         arrow.setY(0)
     })
+
+    this.physics.add.overlap(seal, player, function(theseal,theplayer){
+        // console.log(theseal);
+        theseal.setVisible(false)
+        emitter.active = true
+        setTimeout(()=>{emitter.stop()},200)
+    })
+
+
     // var platform = this.physics.add.staticGroup();// groupe plateforme
     //     platform.add(sol1)//asigne
     //     platform.add(sol2)//asigne
@@ -803,107 +851,113 @@ function create(){
         if(pad._RCLeft.pressed){    //Attack
             // gamePadCombo = gamePadCombo + 'A';
             gamePadCombo.push(74);
-            gamepadAttack = true;
+            //gamepadAttack = true;
         }
         if(pad._RCTop.pressed){    //Protect
-            // gamePadCombo = gamePadCombo + 'P';
             gamePadCombo.push(73);
-            //gamepadAttack = true;
         }
         if(pad._RCRight.pressed){    //Rond/B
-            // gamePadCombo = gamePadCombo + 'P';
             gamePadCombo.push('D');
-            //gamepadAttack = true;
         }
         if(pad._RCBottom.pressed){    //X/A/jump
-            // gamePadCombo = gamePadCombo + 'P';
             gamePadCombo.push('J');
-            //gamepadAttack = true;
         }
         if(pad._LCTop.pressed){  //up
             gamePadCombo.push('H');
         }
         if(pad._LCBottom.pressed){  //down
-            // gamePadCombo = gamePadCombo + 'B';
             gamePadCombo.push(83);
         }
         if(pad._LCRight.pressed){   //Right
-            // gamePadCombo = gamePadCombo + 'D';
             gamePadCombo.push(81);
         }
         if(pad._LCLeft.pressed){    //Left
-            // gamePadCombo = gamePadCombo + 'G';
             gamePadCombo.push(68);
         }
+        // if(pad.leftStick.x < 0){    //stick left
+        //     gamePadCombo.push(68);
+        // }
+        // if(pad.leftStick.x > 0){    //stick right
+        //     gamePadCombo.push(81);
+        // }
            
         //console.log(player.data.list.special);
-        //console.log(pad);
-        // console.log(pad.);
+        // console.log(pad);
+        // console.log(pad.leftStick.x);
         let comboResponse;
         for(let i = 0; i < gamePadCombo.length; i++){
             comboResponse = 0;
-            setTimeout(()=>{gamePadCombo = []},270);
+            setTimeout(()=>{gamePadCombo = []},275);//270
             if(playerInGround === true){
-            if(gamePadCombo[i] == 83){
-                let val = i + 1;
-                if(gamePadCombo[val] == 81){
-                    let val2 = val + 1;
-                    if(gamePadCombo[val2] == 74){ //shoryu
-                       
-                        //console.log('shoryu');
-                        comboResponse++
-                        
-                        gamePadCombo = [];
 
-                    }
-                    else if(gamePadCombo[val2] == 73){ //shieldTackle
-                        comboResponse += 3
-                        gamePadCombo = [];
-                    }
-                }else if(gamePadCombo[val] == 68){
-                    let val2 = val + 1;
-                    if(gamePadCombo[val2] == 74){   //shoryu
-                        //console.log('shoryu');
-                        comboResponse++
-                        gamePadCombo = [];
-                    }
-                    else if(gamePadCombo[val2] == 73){  //shieldTackle
-                        comboResponse += 3
-                        gamePadCombo = [];
-                    }
-                }
-            }if(gamePadCombo[i] == 81){
-                let val = i + 1;
-                if(gamePadCombo[val] == 83){
-                    let val2 = val + 1;
-                    if(gamePadCombo[val2] == 68){
-                        let val3 = val2 + 1;
-                        if(gamePadCombo[val3] == 74){ //ultra
-                                //console.log('ultra');
-                                comboResponse += 2
-                            //player.data.list.special++
+                if(gamePadCombo[i] == 83){
+
+                    let val = i + 1;
+                    if(gamePadCombo[val] == 81){
+                        let val2 = val + 1;
+                        if(gamePadCombo[val2] == 74){ //shoryu
+                            //console.log('shoryu');
+                            comboResponse++   
+                            gamePadCombo = [];
+                        }
+                        else if(gamePadCombo[val2] == 73){ //shieldTackle
+                            comboResponse += 3
+                            gamePadCombo = [];
+                        }
+                    }else if(gamePadCombo[val] == 68){
+                        let val2 = val + 1;
+                        if(gamePadCombo[val2] == 74){   //shoryu
+                            //console.log('shoryu');
+                            comboResponse++
+                            gamePadCombo = [];
+                        }
+                        else if(gamePadCombo[val2] == 73){  //shieldTackle
+                            comboResponse += 3
                             gamePadCombo = [];
                         }
                     }
-                }
-            }else if(gamePadCombo[i] == 68){
-                let val = i + 1;
-                if(gamePadCombo[val] == 83){
-                    let val2 = val + 1;
-                    if(gamePadCombo[val2] == 81){
-                        let val3 = val2 + 1;
-                        if(gamePadCombo[val3] == 74){  //ultra
-                                //console.log('ultra');
-                                comboResponse +=2
-                            //player.data.list.special++
-                            gamePadCombo = [];
-                        }else if(gamePadCombo[val2] == 73){ //shieldTackle
-                            //comboResponse += 3
-                            gamePadCombo = [];
+                }if(gamePadCombo[i] == 81){
+
+                    let val = i + 1;
+
+                    if(gamePadCombo[val] == 83){
+                        let val2 = val + 1;
+                        if(gamePadCombo[val2] == 68){
+                            let val3 = val2 + 1;
+                            if(gamePadCombo[val3] == 74){ //ultra
+                                    //console.log('ultra');
+                                    comboResponse += 2
+                                //player.data.list.special++
+                                gamePadCombo = [];
+                            }
+                        }
+                    }
+                }if(gamePadCombo[i] == 68){
+
+                    let val = i + 1;
+
+                    if(gamePadCombo[val] == 83){
+                        let val2 = val + 1;
+                        if(gamePadCombo[val2] == 81){
+                            let val3 = val2 + 1;
+                            if(gamePadCombo[val3] == 74){  //ultra
+                                    //console.log('ultra');
+                                    comboResponse +=2
+                                //player.data.list.special++
+                                gamePadCombo = [];
+                            }else if(gamePadCombo[val2] == 73){ //shieldTackle
+                                //comboResponse += 3
+                                gamePadCombo = [];
+                            }
                         }
                     }
                 }
-            }
+                if(gamePadCombo[i] == 74){
+                    //comboResponse +=7
+                    gamepadAttack = true;
+                    gamePadCombo = [];
+
+                }
             }else{
                 if(gamePadCombo[i] == 83){
                     let val = i + 1;
@@ -940,7 +994,7 @@ function create(){
                             }
                         }
                     }
-                }else if(gamePadCombo[i] == 68){
+                }if(gamePadCombo[i] == 68){
                     let val = i + 1;
                     if(gamePadCombo[val] == 83){
                         let val2 = val + 1;
@@ -954,12 +1008,15 @@ function create(){
                             }
                         }
                     }
+                }if(gamePadCombo[i] == 74){
+                    //comboResponse +=7
+                    gamepadAttack = true;
+                    gamePadCombo = [];
                 }
-
             }
         }
 
-        // console.log(comboResponse);
+        //console.log(comboResponse);
         // console.log(gamePadCombo);
         if(comboResponse == 1){
             if(canShoryu === true){
@@ -967,6 +1024,7 @@ function create(){
                 counterMovePlayer = 32;
                 attackintheair = true;
                 tornadoSlash();
+                // gamepadAttack = false
                 }
             }
         }
@@ -996,6 +1054,9 @@ function create(){
             UltraSlash();
             }
         }
+        //console.log(gamePadCombo);
+
+
         // let checker = (arr, target) => target.every(v => arr.includes(v));
 
         // if(playerInGround === true){
@@ -1158,6 +1219,12 @@ function create(){
         frameRate: 6,
         repeat: -1
     })
+    // this.anims.create({
+    //     key: 'idle',
+    //     frames: this.anims.generateFrameNumbers('spitesChar',{frames: [1, 2, 3, 4]}),
+    //     frameRate: 6,
+    //     repeat: -1
+    // })
     this.anims.create({
         key: 'runRight',
         frames: this.anims.generateFrameNumbers('herorun',{frames: [0, 1, 2, 3, 4, 5, 6, 7]}),
@@ -1574,11 +1641,17 @@ function create(){
         frameRate: 15,
         repeat: -1
     });
+    this.anims.create({
+        key: 'sealflame',
+        frames: this.anims.generateFrameNumbers('seal',{frames: [0, 1, 2, 3, 4, 5, 6]}),
+        frameRate: 15,
+        repeat: -1
+    });
     // this.anims.pauseAll();
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // CREATE ENEMIES
-
+seal.anims.play('sealflame', true)
     //createEnemies(enemy1Spawn,'RunMan');
     // createEnemies(enemy1Spawn,'Enemy1');
     // createEnemies(enemyCrossBowSpawn,'Enemy1');
@@ -1601,7 +1674,7 @@ function create(){
 
     //console.log(localStorage);
 
-
+    if(player.body.position.x == 950){console.log('hello');}
     // if(GameOver === true){
         // setTimeout(()=>{
         //     this.registry.destroy(); // destroy registry
@@ -1621,34 +1694,54 @@ function update(time, delta){
 
 // if(GameOver === false){
     //BACKGROUND AND TEXT
-        
-    skyBg.x = player.body.position.x;                                                                // position du ciel
-    skyBg.y = player.body.position.y;                                                                // position du ciel
+        // if(theGamePad.leftStick.x < 0){
+            // if(theGamePad.leftStick === undefined){
+            // }else{
+            //     if(theGamePad.leftStick.x < -0.8){
+            //         console.log('gauche');
+            //         joystickLeft = true
+            //     }
+            //     if(theGamePad.leftStick.x > 0.8){
+            //         console.log('droite');
+            //         joystickRight = true
+            //     }
+            //     if(theGamePad.leftStick.y > 0.8){
+            //         console.log('bas');
+            //         joystickBottom = true
+            //     }
+            //     if(theGamePad.leftStick.y < -0.8){
+            //         console.log('haut');
+            //         joystickTop = true
+            //     }
+            // }
+        // };
+    // skyBg.x = player.body.position.x;                                                                // position du ciel
+    // skyBg.y = player.body.position.y;                                                                // position du ciel
     skyBg.tilePositionX += 0.5;
-    text.x = player.body.position.x - 345;                                                           // position text
-    text.y = player.body.position.y + 260;
-    healthBar.x = player.body.position.x - 270;                                                      // position healthbar
-    healthBar.y = player.body.position.y - 140;
-    specialBar.x = player.body.position.x - 270;                                                     // position healthbar
-    specialBar.y = player.body.position.y - 120;
-    spebar.x = player.body.position.x - 260;
-    spebar.y = player.body.position.y - 120;
-    scoreText.x = player.body.position.x + 260;                                                      // position Score
-    personalBestText.x = player.body.position.x + 60;                                                // position Score
-    scoreText.y = player.body.position.y -160;
-    personalBestText.y = player.body.position.y -160;
-    comboText.x = player.body.position.x - 999;
-    comboText.y = player.body.position.y - 110;
-    funText.x = player.body.position.x - 999;
-    funText.y = player.body.position.y - 80;
+    // text.x = player.body.position.x - 345;                                                           // position text
+    // text.y = player.body.position.y + 260;
+    // healthBar.x = player.body.position.x - 270;                                                      // position healthbar
+    // healthBar.y = player.body.position.y - 140;
+    // specialBar.x = player.body.position.x - 270;                                                     // position healthbar
+    // specialBar.y = player.body.position.y - 120;
+    // spebar.x = player.body.position.x - 260;
+    // spebar.y = player.body.position.y - 120;
+    // scoreText.x = player.body.position.x + 260;                                                      // position Score
+    // personalBestText.x = player.body.position.x + 60;                                                // position Score
+    // scoreText.y = player.body.position.y -160;
+    // personalBestText.y = player.body.position.y -160;
+    // comboText.x = player.body.position.x - 999;
+    // comboText.y = player.body.position.y - 110;
+    // funText.x = player.body.position.x - 999;
+    // funText.y = player.body.position.y - 80;
 
-    rageCloud.x = player.body.position.x +18
-    rageCloud.y = player.body.position.y +46
-    oldfilter.x = player.body.position.x +20
-    oldfilter.y = player.body.position.y +46
+    // rageCloud.x = player.body.position.x +18
+    // rageCloud.y = player.body.position.y +46
+    // oldfilter.x = player.body.position.x +20
+    // oldfilter.y = player.body.position.y +46
 
-    controlHelp.x = player.body.position.x  + 25                                                    // position controlHelp
-    controlHelp.y = player.body.position.y + 50
+    // controlHelp.x = player.body.position.x  + 25                                                    // position controlHelp
+    // controlHelp.y = player.body.position.y + 50
     //controlHelp.alpha = 2.150 - ((player.body.position.x / 1000) * 2)                                                // opacity // control help
     // console.log((player.body.position.x / 1000)-(player.body.position.x - 1));
     //console.log(player.body.position.x);
@@ -1660,30 +1753,29 @@ function update(time, delta){
     gameOverText.setText('   GAME OVER \n   score : '+ Score + '\npress "J" to restart');                                                           // maj score
     personalBestText.setText('YOUR BEST : '+ personalBest);                                          // maj score
     comboText.setText('COMBO X '+ comboValue);                                                       // maj combo
-    gameOverText.x = player.body.position.x - 260
-    gameOverText.y = player.body.position.y
+    // gameOverText.x = player.body.position.x - 260
+    // gameOverText.y = player.body.position.y
     spawnDetector.body.velocity.x = player.body.velocity.x ;
     spawnDetector.body.velocity.y = player.body.velocity.y ;
     funText.setText(''+ messageFunTextList[comboValue]);
 
-
-    if(comboValue >= 1){
-        comboText.x = player.body.position.x + 150;
-        funText.x = player.body.position.x + 150;
+    if(comboValue <= 0){
+        comboText.setVisible(false);
+        funText.setVisible(false);
     }
-    //if(comboValue <= 9){messageFunText =''; }
+    if(comboValue >= 1){
+        comboText.setVisible(true);
+        funText.setVisible(true);
+    }
     if(comboValue <= 14){                                                                             //RAGEMODE
         rageMode = false;
         rageCloud.setVisible(false);
         specialBar.fillColor = 16632447
     }
-    //if(comboValue >= 10){messageFunText = 'Nice !'; }
     if(comboValue >= 15){                                        
         rageMode = true;
         rageCloud.setVisible(true);
         specialBar.fillColor = 11620151;
-        //messageFunText ='"RAGE !!"';
-        //console.log(player);
     }
     countComboFunText = 10;
     
@@ -1960,6 +2052,8 @@ function update(time, delta){
 
         // else{hittableObject.children.entries[i] = [];} 
     }
+    //console.log(gamepadAttack);
+    //console.log(gamePadCombo);
     //console.log(counterMovePlayer);
     //console.log(player.data.list.Eject);
     // console.log(currentEnemy);
@@ -2134,10 +2228,8 @@ function update(time, delta){
         theGamePad.X && startGame === true){     
             player.x = 600;
             player.y = 1150;
-            // counterMovePlayer = 0;
             startGame = false;
             rageCloud.anims.play('rage',true);
-            //player.anims.play('idle', true)
             soundVolume = 1;
             swordAir.volume = 0.4;
             themeSong.play();
