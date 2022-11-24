@@ -411,7 +411,7 @@ function create(){
 
     // TEXT
 
-    text = this.add.text(1145,1095, 'version : O.47 | 14.11.22' , {fontFamily : 'PixelFont'}).setScrollFactor(0,0);
+    text = this.add.text(1145,1095, 'version : O.48 | 14.11.22' , {fontFamily : 'PixelFont'}).setScrollFactor(0,0);
     personalBestText = this.add.text(1450,672,'YOUR BEST : 0',{ fontFamily : 'PixelFont'}).setScrollFactor(0,0);
     scoreText = this.add.text(1700,672, 'SCORE : 0',{ fontFamily : 'PixelFont'}).setScrollFactor(0,0);
     gameOverText = this.add.text(1218,780, 'GAME OVER \n score : 0 \n press any to restart', { fontFamily : 'PixelFont', fontSize : '60px'}).setScrollFactor(0,0);
@@ -1814,7 +1814,7 @@ function update(time, delta){
     // spawnDetector.y = player.body.position.y;
     if(startGame === true){
         controlHelp.setVisible(true)
-        controlHelp.setFrame(8);
+        controlHelp.setFrame(9);
     }
     else{
 
@@ -1846,7 +1846,7 @@ function update(time, delta){
      }
      else if(player.body.position.x > 5600 && player.body.position.x < 6374){
         controlHelp.setVisible(true)
-        controlHelp.setFrame(7);
+        controlHelp.setFrame(8);
      }
      else{controlHelp.setVisible(false)}
     }
