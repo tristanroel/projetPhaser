@@ -157,7 +157,8 @@ function preload(){
     this.load.audio('air', ['assets/audio/Air.mp3']);
     this.load.audio('ImpactEnemies', ['assets/audio/Poutchack.mp3']);
 
-    this.load.scenePlugin('AnimatedTiles', 'https://raw.githubusercontent.com/nkholski/phaser-animated-tiles/master/dist/AnimatedTiles.js', 'animatedTiles', 'animatedTiles');   
+    // this.load.scenePlugin('AnimatedTiles', 'https://raw.githubusercontent.com/nkholski/phaser-animated-tiles/master/dist/AnimatedTiles.js', 'animatedTiles', 'animatedTiles');   
+    this.load.scenePlugin('AnimatedTiles', 'animatedTiles.js', 'animatedTiles', 'animatedTiles');   
     this.load.image('sky','assets/Thesky.png');
     this.load.image('ground','assets/solPave.png');
     this.load.image('ATK1','assets/TRlogo.png');
@@ -344,7 +345,7 @@ function create(){
 
     oldfilter = this.add.sprite(1500,850,'oldTvFilter').setScale(0.4).setDepth(3);
     oldfilter.setScrollFactor(0,0);
-    oldfilter.alpha = 0.1
+    oldfilter.alpha = 0.05
     //console.log(oldfilter);
     var particles = this.add.particles('spawner')
     var emitter = particles.createEmitter({
@@ -393,7 +394,7 @@ function create(){
     slashAtk.setDepth(1);
 
 
-    spawnDetector = this.add.rectangle(1200,1200,20,350,0xB14F37);                      // Spawn Detector
+    spawnDetector = this.add.rectangle(1100,1600,20,170,0xB14F37);                      // Spawn Detector
     this.physics.add.existing(spawnDetector);
     //spawnDetector.setData('Active', false)
     //spawnDetector.setVisible(false)
@@ -410,7 +411,7 @@ function create(){
 
     // TEXT
 
-    text = this.add.text(1145,1095, 'version : O.46 | 14.11.22' , {fontFamily : 'PixelFont'}).setScrollFactor(0,0);
+    text = this.add.text(1145,1095, 'version : O.47 | 14.11.22' , {fontFamily : 'PixelFont'}).setScrollFactor(0,0);
     personalBestText = this.add.text(1450,672,'YOUR BEST : 0',{ fontFamily : 'PixelFont'}).setScrollFactor(0,0);
     scoreText = this.add.text(1700,672, 'SCORE : 0',{ fontFamily : 'PixelFont'}).setScrollFactor(0,0);
     gameOverText = this.add.text(1218,780, 'GAME OVER \n score : 0 \n press any to restart', { fontFamily : 'PixelFont', fontSize : '60px'}).setScrollFactor(0,0);
@@ -581,7 +582,7 @@ function create(){
             spawnCounter ++;
 
             detector.body.position.x = player.body.position.x +700
-            detector.body.position.y = player.body.position.y -150
+            detector.body.position.y = player.body.position.y 
 
             //console.log(spawnCounter);
             //console.log(spawn);
@@ -2227,7 +2228,10 @@ function update(time, delta){
         if(Phaser.Input.Keyboard.JustDown(enterKey) && startGame === true ||
         theGamePad.X && startGame === true){     
             player.x = 600;
-            player.y = 1150;
+            player.y = 1890;
+            // player.x = 20000;
+            // player.y = 850;
+            spawnDetector.body.position.y = 1790
             startGame = false;
             rageCloud.anims.play('rage',true);
             soundVolume = 1;
