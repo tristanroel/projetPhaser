@@ -263,6 +263,12 @@ function create(){
     const ResetTile = map.createLayer('Reset', tileset, -200, 0)
     const DieTile = map.createLayer('DieTiles', tileset, -200, 0)
     const Spawner = map.createLayer('Spawners', tileset, -200, 0)
+    const SpawnerCrossBow = map.createLayer('SpawnersCrossBow', tileset, -200, 0)
+    const SpawnerAssassin = map.createLayer('SpawnersAssassin', tileset, -200, 0)
+    const SpawnerSpearMan = map.createLayer('SpawnersSpearMan', tileset, -200, 0)
+    const SpawnerPoleAxe = map.createLayer('SpawnersPoleAxe', tileset, -200, 0)
+    const SpawnerRunMan = map.createLayer('SpawnersRunMan', tileset, -200, 0)
+    const SpawnerBox = map.createLayer('SpawnersBox', tileset, -200, 0)
     const BackGround = map.createLayer('Fond', tileset, -200, 0)
     const newPlatform = map.createLayer('Ground', tileset, -200, 0)
     CrossPlatform = map.createLayer('CrossGround', tileset, -200, 0)
@@ -274,6 +280,12 @@ function create(){
     ResetTile.setCollisionByProperty({collides : true})
     DieTile.setCollisionByProperty({collides : true})
     Spawner.setCollisionByProperty({collides : true})
+    SpawnerCrossBow.setCollisionByProperty({collides : true})
+    SpawnerAssassin.setCollisionByProperty({collides : true})
+    SpawnerSpearMan.setCollisionByProperty({collides : true})
+    SpawnerPoleAxe.setCollisionByProperty({collides : true})
+    SpawnerRunMan.setCollisionByProperty({collides : true})
+    SpawnerBox.setCollisionByProperty({collides : true})
     newPlatform.setCollisionByProperty({collides : true})
     CrossPlatform.setCollisionByProperty({collides : true})
 
@@ -282,7 +294,19 @@ function create(){
     ResetTile.setScale(2);
     DieTile.setScale(2);
     Spawner.setScale(2);
-    Spawner.setVisible(false);
+    SpawnerCrossBow.setScale(2);
+    SpawnerAssassin.setScale(2);
+    SpawnerSpearMan.setScale(2);
+    SpawnerPoleAxe.setScale(2);
+    SpawnerRunMan.setScale(2);
+    SpawnerBox.setScale(2);
+    Spawner.setVisible(false); //
+    SpawnerCrossBow.setVisible(false); //
+    SpawnerAssassin.setVisible(false); //
+    SpawnerSpearMan.setVisible(false); //
+    SpawnerPoleAxe.setVisible(false); //
+    SpawnerRunMan.setVisible(false); //
+    SpawnerBox.setVisible(false); //
     BackGround.setScale(2);
     newPlatform.setScale(2);
     CrossPlatform.setScale(2);
@@ -394,10 +418,10 @@ function create(){
     slashAtk.setDepth(1);
 
 
-    spawnDetector = this.add.rectangle(1100,1600,20,170,0xB14F37);                      // Spawn Detector
+    spawnDetector = this.add.rectangle(820,100,780,420,0xB14F37);                      // Spawn Detector
     this.physics.add.existing(spawnDetector);
     //spawnDetector.setData('Active', false)
-    //spawnDetector.setVisible(false)
+    spawnDetector.setVisible(false)
     spawnDetector.body.allowGravity = false;
 //console.log();
     // spawnReActivator = this.add.rectangle(400,1000,50,400,0x3F88E8);
@@ -411,7 +435,7 @@ function create(){
 
     // TEXT
 
-    text = this.add.text(1145,1095, 'version : O.48 | 14.11.22' , {fontFamily : 'PixelFont'}).setScrollFactor(0,0);
+    text = this.add.text(1145,1095, 'version : O.49 | 14.11.22' , {fontFamily : 'PixelFont'}).setScrollFactor(0,0);
     personalBestText = this.add.text(1450,672,'YOUR BEST : 0',{ fontFamily : 'PixelFont'}).setScrollFactor(0,0);
     scoreText = this.add.text(1700,672, 'SCORE : 0',{ fontFamily : 'PixelFont'}).setScrollFactor(0,0);
     gameOverText = this.add.text(1218,780, 'GAME OVER \n score : 0 \n press any to restart', { fontFamily : 'PixelFont', fontSize : '60px'}).setScrollFactor(0,0);
@@ -443,6 +467,7 @@ function create(){
     // this.cameras.main.setZoom(4);
 
     cameraPlayer = this.cameras.main.startFollow(player).setZoom(4);
+   
     // cameraPlayer.main.setZoom(4);
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -571,7 +596,78 @@ function create(){
             reset.collideRight = false
             reset.collideUp = false
         });
+        this.physics.add.collider(SpawnerCrossBow, spawnDetector, function(detector, spawn){    // spawn crossBow
+            console.log(spawn);
+            spawn.collideDown = false
+            spawn.collideLeft = false
+            spawn.collideRight = false
+            spawn.collideUp = false
+            spawnCounter ++;
 
+            detector.body.position.x = player.body.position.x - 390
+            detector.body.position.y = player.body.position.y - 240
+            createEnemies(spawn,'CrossBow',false);
+        });
+        this.physics.add.collider(SpawnerAssassin, spawnDetector, function(detector, spawn){    // spawn crossBow
+            console.log(spawn);
+            spawn.collideDown = false
+            spawn.collideLeft = false
+            spawn.collideRight = false
+            spawn.collideUp = false
+            spawnCounter ++;
+
+            detector.body.position.x = player.body.position.x - 390
+            detector.body.position.y = player.body.position.y - 240
+            createEnemies(spawn,'Assassin',false);
+        });
+        this.physics.add.collider(SpawnerSpearMan, spawnDetector, function(detector, spawn){    // spawn crossBow
+            console.log(spawn);
+            spawn.collideDown = false
+            spawn.collideLeft = false
+            spawn.collideRight = false
+            spawn.collideUp = false
+            spawnCounter ++;
+
+            detector.body.position.x = player.body.position.x - 390
+            detector.body.position.y = player.body.position.y - 240
+            createEnemies(spawn,'SpearMan',false);
+        });
+        this.physics.add.collider(SpawnerPoleAxe, spawnDetector, function(detector, spawn){    // spawn crossBow
+            console.log(spawn);
+            spawn.collideDown = false
+            spawn.collideLeft = false
+            spawn.collideRight = false
+            spawn.collideUp = false
+            spawnCounter ++;
+
+            detector.body.position.x = player.body.position.x - 390
+            detector.body.position.y = player.body.position.y - 240
+            createEnemies(spawn,'PoleAxe',false);
+        });
+        this.physics.add.collider(SpawnerRunMan, spawnDetector, function(detector, spawn){    // spawn crossBow
+            console.log(spawn);
+            spawn.collideDown = false
+            spawn.collideLeft = false
+            spawn.collideRight = false
+            spawn.collideUp = false
+            spawnCounter ++;
+
+            detector.body.position.x = player.body.position.x - 390
+            detector.body.position.y = player.body.position.y - 240
+            createEnemies(spawn,'RunMan',false);
+        });
+        this.physics.add.collider(SpawnerBox, spawnDetector, function(detector, spawn){    // spawn crossBow
+            console.log(spawn);
+            spawn.collideDown = false
+            spawn.collideLeft = false
+            spawn.collideRight = false
+            spawn.collideUp = false
+            spawnCounter ++;
+
+            detector.body.position.x = player.body.position.x - 390
+            detector.body.position.y = player.body.position.y - 240
+            createEnemies(spawn,'box',false);
+        });
         this.physics.add.collider(Spawner, spawnDetector, function(detector, spawn){    // spawn collider
             
             spawn.collideDown = false
@@ -581,27 +677,103 @@ function create(){
 
             spawnCounter ++;
 
-            detector.body.position.x = player.body.position.x +700
-            detector.body.position.y = player.body.position.y 
+            detector.body.position.x = player.body.position.x - 390
+            detector.body.position.y = player.body.position.y - 240
+            // detector.body.position.x = (spawn.pixelX * 2)-200
+            // detector.body.position.y = (spawn.pixelY * 2)-200
+            createEnemies(spawn,'Enemy1',false);
+            console.log(spawnCounter);
+            // console.log(spawn.pixelX);
+            // console.log(detector.x);
+            // detector.body.checkCollision.none = true
+            // setTimeout(()=>{detector.body.checkCollision.none = false},400)
+            // switch(spawnCounter){
+                // case 1: createEnemies(spawn,'SpearMan',false); break;
+                // case 2: createEnemies(spawn,'RunMan',false); break;
+                // case 3: createEnemies(spawn,'Enemy1',false); break;
+                // case 4: createEnemies(spawn,'box',false); break;
+                // case 5: createEnemies(spawn,'Enemy1',false); break;
+                // case 6: createEnemies(spawn,'box',false); break;
+                // case 7: createEnemies(spawn,'SpearMan',false); break;
+                // case 8: createEnemies(spawn,'box',false); break;
+                // case 9: createEnemies(spawn,'CrossBow',false); break;
+                // case 10: createEnemies(spawn,'box',false); break;
+                // case 11: createEnemies(spawn,'PoleAxe',true); break;
+                // case 12: createEnemies(spawn,'box',false); break;
+                // case 13: createEnemies(spawn,'Assassin',false); break;
+                // case 14: createEnemies(spawn,'Enemy1',true); break;
+                // case 15: createEnemies(spawn,'CrossBow',true); break;
+                // case 16: createEnemies(spawn,'SpearMan',true); break;
+                // case 17: createEnemies(spawn,'box',true); break;
+                // case 18: createEnemies(spawn,'RunMan',true); break;
+                // case 19: createEnemies(spawn,'box',false); break;
+                // case 20: createEnemies(spawn,'box',false); break;
+                // case 21: createEnemies(spawn,'Enemy1',true); break;
+                // case 22: createEnemies(spawn,'PoleAxe',false); break;
+                // case 23: createEnemies(spawn,'box',false); break;
+                // case 24: createEnemies(spawn,'CrossBow',true); break;
+                // case 25: createEnemies(spawn,'box',false); break;
+                // case 26: createEnemies(spawn,'box',false); break;
+                // case 27: createEnemies(spawn,'SpearMan',true); break;
+                // case 28: createEnemies(spawn,'CrossBow',true); break;
+                // case 29: createEnemies(spawn,'Enemy1',false); break;
+                // case 30: createEnemies(spawn,'Assassin',true); break;
+                // case 31: createEnemies(spawn,'box',false); break;
+                // case 32: createEnemies(spawn,'Enemy1',true); break;
+                // case 33: createEnemies(spawn,'RunMan',false); break;
+                // case 34: createEnemies(spawn,'SpearMan',true); break;
+                // case 35: createEnemies(spawn,'box',false); break;
+                // case 36: createEnemies(spawn,'PoleAxe',true); break;
+                // case 37: createEnemies(spawn,'Enemy1',true); break;
+                // case 38: createEnemies(spawn,'Enemy1',true); break;
+                // case 39: createEnemies(spawn,'Assassin',true); break;
+                // case 40: createEnemies(spawn,'SpearMan',true); break;
+                // case 41: createEnemies(spawn,'CrossBow',true); break;
+                // case 42: createEnemies(spawn,'box',true); break;
+                // case 43: createEnemies(spawn,'PoleAxe',true); break;
+                // case 44: createEnemies(spawn,'box',true); break;
+                // case 45: createEnemies(spawn,'box',true); break;
+                // case 46: createEnemies(spawn,'Assassin',true); break;
+                // case 47: createEnemies(spawn,'SpearMan',true); break;
+                // case 48: createEnemies(spawn,'Enemy1',true); break;
+                // case 49: createEnemies(spawn,'CrossBow',true); break;
+                // case 50: createEnemies(spawn,'box',true); break;
+                // case 51: createEnemies(spawn,'SpearMan',true); break;
+                // case 52: createEnemies(spawn,'Enemy1',true); break;
+                // case 53: createEnemies(spawn,'box',true); break;
+                // case 54: createEnemies(spawn,'SpearMan',true); break;
+                // case 55: createEnemies(spawn,'Assassin',true); break;
+                // case 56: createEnemies(spawn,'box',true); break;
+                // case 57: createEnemies(spawn,'PoleAxe',false); break;
+                // case 58: createEnemies(spawn,'RunMan',false); break;
+                // case 59: createEnemies(spawn,'RunMan',false); break;
+                // case 60: createEnemies(spawn,'PoleAxe',true); break;
+                // case 61: createEnemies(spawn,'PoleAxe',false); break;
+                // case 62: createEnemies(spawn,'PoleAxe',true); break;
+                // case 63: createEnemies(spawn,'PoleAxe',false); break;
+                // case 64: createEnemies(spawn,'CrossBow',false); break;
+                // case 65: createEnemies(spawn,'box',false); break;
+                // case 66: createEnemies(spawn,'PoleAxe',true); break;
+                // case 67: createEnemies(spawn,'PoleAxe',true); break;
+                // case 68: createEnemies(spawn,'Enemy1',false); break;
+                // case 69: createEnemies(spawn,'RunMan',false); break;
+                // case 70: createEnemies(spawn,'Enemy1',false); break;
+                // case 71: createEnemies(spawn,'CrossBow',false); break;
+                // case 72: createEnemies(spawn,'Assassin',true); break;
+                // case 73: createEnemies(spawn,'RunMan',false); break;
+                // case 74: createEnemies(spawn,'SpearMan',true); break;
+                // case 75: createEnemies(spawn,'Assassin',true); break;
+                // case 76: createEnemies(spawn,'box',true); break;
+                // case 77: createEnemies(spawn,'CrossBow',true); break;
+                // case 78: createEnemies(spawn,'box',true); break;
+                // case 79: createEnemies(spawn,'Assassin',true); break;
+                // case 80: createEnemies(spawn,'PoleAxe',true); break;
+                // case 81: createEnemies(spawn,'RunMan',false); break;
+                // case 82: createEnemies(spawn,'CrossBow',true); break;
+                // case 83: createEnemies(spawn,'box',true); break;
 
-            //console.log(spawnCounter);
-            //console.log(spawn);
-            // console.log(detector);
-            detector.body.checkCollision.none = true
-            setTimeout(()=>{detector.body.checkCollision.none = false},400)
-            switch(spawnCounter){
-                case 1: createEnemies(detector,'SpearMan'); break;
-                case 2: createEnemies(detector,'RunMan'); break;
-                case 3: createEnemies(detector,'Enemy1'); break;
-                case 4: createEnemies(detector,'box'); break;
-                case 5: createEnemies(detector,'CrossBow'); break;
-                case 6: createEnemies(detector,'box'); break;
-                case 7: createEnemies(detector,'Enemy1'); break;
-                case 8: createEnemies(detector,'box'); break;
-                case 9: createEnemies(detector,'PoleAxe'); break;
-                case 10: createEnemies(detector,'Assassin'); break;
-                case 11: spawnCounter = 0; detector.body.checkCollision.none = true; break;
-            }
+                // case 84: spawnCounter = 0; detector.body.checkCollision.none = true; break;
+            // }
         })
 
         // this.physics.add.collider(Spawner, spawnReActivator, function(spawn,detector){
@@ -1648,6 +1820,12 @@ function create(){
         frameRate: 15,
         repeat: -1
     });
+    this.anims.create({
+        key: 'HomeAnim',
+        frames: this.anims.generateFrameNumbers('controlHelp',{frames: [9,9, 10]}),
+        frameRate: 2,
+        repeat: -1
+    });
     // this.anims.pauseAll();
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1758,6 +1936,9 @@ function update(time, delta){
     // gameOverText.y = player.body.position.y
     spawnDetector.body.velocity.x = player.body.velocity.x ;
     spawnDetector.body.velocity.y = player.body.velocity.y ;
+
+    // spawnDetector.x = player.x ;
+    // spawnDetector.y = player.y ;
     funText.setText(''+ messageFunTextList[comboValue]);
 
     if(comboValue <= 0){
@@ -1814,7 +1995,8 @@ function update(time, delta){
     // spawnDetector.y = player.body.position.y;
     if(startGame === true){
         controlHelp.setVisible(true)
-        controlHelp.setFrame(9);
+        //controlHelp.setFrame(9);
+        controlHelp.anims.play('HomeAnim', true)
     }
     else{
 
@@ -2231,7 +2413,8 @@ function update(time, delta){
             player.y = 1890;
             // player.x = 20000;
             // player.y = 850;
-            spawnDetector.body.position.y = 1790
+            spawnDetector.body.position.x = player.x - 390
+            spawnDetector.body.position.y = player.y - 240
             startGame = false;
             rageCloud.anims.play('rage',true);
             soundVolume = 1;
@@ -2944,8 +3127,8 @@ function createSlashGuard(){
     });
 }
 
-function createEnemies(enemySpawner, typeOfEnemy){                                                      //create Enemies
-    var enemyone = hittableObject.create(enemySpawner.x, enemySpawner.y -100,'enemy', 0, true);
+function createEnemies(enemySpawner, typeOfEnemy,stopmove){                                                      //create Enemies
+    var enemyone = hittableObject.create((enemySpawner.pixelX * 2)-200, (enemySpawner.pixelY * 2)+100,'enemy', 0, true);
     // console.log(enemySpawner.y);
     var animsName = 'stance'+typeOfEnemy;
     var id = enemyNumberId++;
@@ -2957,7 +3140,7 @@ function createEnemies(enemySpawner, typeOfEnemy){                              
     enemyone.setData('AttackIsFinish', true);
     enemyone.setData('AtkCollide', false);
     enemyone.setData('EnemyIsDie', false);
-    enemyone.setData('stopMove', false);
+    enemyone.setData('stopMove',stopmove);
     enemyone.setData('IsInvulnerable', false);
     enemyone.setData('health', 8);
     enemyone.setData('name', 'EnemyOne');
@@ -3259,13 +3442,13 @@ function createArrow(enemy){                                                    
         {
             currentArrow.flipX = true;
             currentArrow.setX(enemy.x + 35)
-            currentArrow.setVelocityX(200)
+            currentArrow.setVelocityX(300)
         }
         else
         {
             currentArrow.flipX = false;
             currentArrow.setX(enemy.x - 35) 
-            currentArrow.setVelocityX(-200)
+            currentArrow.setVelocityX(-300)
         }
     }
 }
