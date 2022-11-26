@@ -84,7 +84,7 @@ var enemyCrossBowSpawn;
 var boxSpawn;
 
 
-var enemyNumberId;
+var enemyNumberId = 0;
 var colideATK;
 
 var box;    // caisse en bois : sprite
@@ -116,7 +116,7 @@ var spawnReActivator;
 var spawnCounter = 0;
 var CrossPlatform;
 
-var spebar;
+// var spebar;
 var countTest = 0;
 
 //song
@@ -164,7 +164,8 @@ function preload(){
     this.load.image('ATK1','assets/TRlogo.png');
     this.load.image('spawner','assets/ROELprod.png');
     this.load.image('carreau', 'assets/carreau.png');
-    this.load.image('spebar', 'assets/Spebar.png');
+    //this.load.image('spebar', 'assets/Spebar.png');
+    this.load.spritesheet('spebar', 'assets/Sprites/Spebar.png',{frameWidth : 74, frameHeight : 10});
     this.load.image('oldTvFilter', 'assets/IMG_0567.jpg');
     this.load.spritesheet('sfx','assets/Sprites/SFXGROUPE.png', {frameWidth : 170, frameHeight : 170});
     
@@ -269,6 +270,8 @@ function create(){
     const SpawnerPoleAxe = map.createLayer('SpawnersPoleAxe', tileset, -200, 0)
     const SpawnerRunMan = map.createLayer('SpawnersRunMan', tileset, -200, 0)
     const SpawnerBox = map.createLayer('SpawnersBox', tileset, -200, 0)
+    const SpawnerItemOne = map.createLayer('ItemOne', tileset, -200, 0)
+    const SpawnerItemTwo = map.createLayer('ItemTwo', tileset, -200, 0)
     const BackGround = map.createLayer('Fond', tileset, -200, 0)
     const newPlatform = map.createLayer('Ground', tileset, -200, 0)
     CrossPlatform = map.createLayer('CrossGround', tileset, -200, 0)
@@ -286,6 +289,8 @@ function create(){
     SpawnerPoleAxe.setCollisionByProperty({collides : true})
     SpawnerRunMan.setCollisionByProperty({collides : true})
     SpawnerBox.setCollisionByProperty({collides : true})
+    SpawnerItemOne.setCollisionByProperty({collides : true})
+    SpawnerItemTwo.setCollisionByProperty({collides : true})
     newPlatform.setCollisionByProperty({collides : true})
     CrossPlatform.setCollisionByProperty({collides : true})
 
@@ -300,6 +305,8 @@ function create(){
     SpawnerPoleAxe.setScale(2);
     SpawnerRunMan.setScale(2);
     SpawnerBox.setScale(2);
+    SpawnerItemOne.setScale(2);
+    SpawnerItemTwo.setScale(2);
     Spawner.setVisible(false); //
     SpawnerCrossBow.setVisible(false); //
     SpawnerAssassin.setVisible(false); //
@@ -307,6 +314,8 @@ function create(){
     SpawnerPoleAxe.setVisible(false); //
     SpawnerRunMan.setVisible(false); //
     SpawnerBox.setVisible(false); //
+    SpawnerItemOne.setVisible(false); //
+    SpawnerItemTwo.setVisible(false); //
     BackGround.setScale(2);
     newPlatform.setScale(2);
     CrossPlatform.setScale(2);
@@ -337,7 +346,7 @@ function create(){
         visible : false,
     });           
 
-    healthBar = this.add.rectangle(1205,685,120,10,0xB14F37).setStrokeStyle(2, 0xFFFFFF);    //healthbar
+    healthBar = this.add.rectangle(1205,685,120,10,0xB14F37);    //healthbar
     healthBar.setScrollFactor(0,0);
     healthBar.setDepth(2);
 
@@ -345,8 +354,14 @@ function create(){
     specialBar.setScrollFactor(0,0);
     specialBar.setDepth(2);
 
-    spebar = this.add.image(1215,705,'spebar').setScale(2).setDepth(2);
+    var heabar = this.add.image(1215,685,'spebar',1).setScale(2).setDepth(2);
+    heabar.setScrollFactor(0,0);
+
+    var spebar = this.add.image(1215,705,'spebar',0).setScale(2).setDepth(2);
     spebar.setScrollFactor(0,0);
+
+    var sealbar = this.add.image(1385,685,'spebar',2).setScale(2).setDepth(2);
+    sealbar.setScrollFactor(0,0);
     
 
     Coin = this.physics.add.group({                                                     // Coin
@@ -358,6 +373,9 @@ function create(){
     colideATKEnemy = this.physics.add.group({allowGravity : false})                     // collide attack enemies
 
     Arrow = this.physics.add.group({allowGravity : false})                              // Arrow 
+    var Item = this.physics.add.group({allowGravity : false})                              // Item 
+        
+    
 
     seal = this.physics.add.sprite(4700,1100,'seal').setScale(2);
     seal.body.setSize(25, 58) 
@@ -372,21 +390,26 @@ function create(){
     oldfilter.alpha = 0.05
     //console.log(oldfilter);
     var particles = this.add.particles('spawner')
+    //particles.setScale(2);
     var emitter = particles.createEmitter({
-        x : seal.x,
-        y : seal.y,
-        lifespan: 1000,
-        gravityY: 1000,
+        x : 0,
+        y : -999,
+        lifespan: 2000,
+        //gravityY: 1000,
         bounce: 0.9,
-        scale: { start: 0.1, end: 0 },
+        scale: { start: 0.12, end: 0 },
         //bounds: { x: 50, y: 0, w: 50, h: 0 },
-        angle: { min: 225, max: 315 },
-        speed: { min: 100, max: 300 },
+        //angle: { min: 225, max: 315 },
+        //speed: { min: 100, max: 300 },
+        speed: 200 ,
         //bounds: { x: 0, y: 100, w: 350, h: 200 },
+        //frequency: 1,
         blendMode: 'ADD',
         delay : 1,
+        
     });
-    emitter.active = false;
+    emitter.stop()
+    // emitter.active = false;
 
     hittableObject = this.physics.add.group({immovable: true})                          // enemy and other...
 
@@ -436,8 +459,8 @@ function create(){
     // TEXT
 
     text = this.add.text(1145,1095, 'version : O.49 | 14.11.22' , {fontFamily : 'PixelFont'}).setScrollFactor(0,0);
-    personalBestText = this.add.text(1450,672,'YOUR BEST : 0',{ fontFamily : 'PixelFont'}).setScrollFactor(0,0);
-    scoreText = this.add.text(1700,672, 'SCORE : 0',{ fontFamily : 'PixelFont'}).setScrollFactor(0,0);
+    personalBestText = this.add.text(1480,672,'YOUR BEST : 0',{ fontFamily : 'PixelFont'}).setScrollFactor(0,0);
+    scoreText = this.add.text(1710,672, 'SCORE : 0',{ fontFamily : 'PixelFont'}).setScrollFactor(0,0);
     gameOverText = this.add.text(1218,780, 'GAME OVER \n score : 0 \n press any to restart', { fontFamily : 'PixelFont', fontSize : '60px'}).setScrollFactor(0,0);
     comboText = this.add.text(1600,740,'COMBO X0',{ fontFamily : 'PixelFont'}).setScrollFactor(0,0);
     funText = this.add.text(1600,760,'',{ fontFamily : 'PixelFont'}).setScrollFactor(0,0);
@@ -493,13 +516,27 @@ function create(){
         slashAtk.rotation = Phaser.Math.Between(0,2);
 
         arrow.setY(0)
+        //arrow.setX(player.x + 500)
+
     })
 
     this.physics.add.overlap(seal, player, function(theseal,theplayer){
         // console.log(theseal);
         theseal.setVisible(false)
-        emitter.active = true
+        //emitter.active = true
         setTimeout(()=>{emitter.stop()},200)
+    })
+    this.physics.add.overlap(Item, player, function(theplayer,item){
+        //console.log(item);
+        emitter.active = true
+        emitter.start()
+        if(item.data.list.id === 1){
+            sealbar.setFrame(sealbar.frame.name + 1)
+            item.destroy();
+        }else{
+            item.destroy();
+        }
+        setTimeout(()=>{emitter.stop();},250)
     })
 
 
@@ -589,7 +626,7 @@ function create(){
 
         this.physics.add.collider(ResetTile, player, function(theplayer, reset){   // collision reset et joueur 
             hittableObject.children.entries.length = 0
-            //console.log('reset');
+            console.log(hittableObject);
 
             reset.collideDown = false
             reset.collideLeft = false
@@ -597,7 +634,7 @@ function create(){
             reset.collideUp = false
         });
         this.physics.add.collider(SpawnerCrossBow, spawnDetector, function(detector, spawn){    // spawn crossBow
-            console.log(spawn);
+            //console.log(spawn);
             spawn.collideDown = false
             spawn.collideLeft = false
             spawn.collideRight = false
@@ -609,7 +646,7 @@ function create(){
             createEnemies(spawn,'CrossBow',false);
         });
         this.physics.add.collider(SpawnerAssassin, spawnDetector, function(detector, spawn){    // spawn crossBow
-            console.log(spawn);
+            //console.log(spawn);
             spawn.collideDown = false
             spawn.collideLeft = false
             spawn.collideRight = false
@@ -621,7 +658,7 @@ function create(){
             createEnemies(spawn,'Assassin',false);
         });
         this.physics.add.collider(SpawnerSpearMan, spawnDetector, function(detector, spawn){    // spawn crossBow
-            console.log(spawn);
+           // console.log(spawn);
             spawn.collideDown = false
             spawn.collideLeft = false
             spawn.collideRight = false
@@ -633,7 +670,7 @@ function create(){
             createEnemies(spawn,'SpearMan',false);
         });
         this.physics.add.collider(SpawnerPoleAxe, spawnDetector, function(detector, spawn){    // spawn crossBow
-            console.log(spawn);
+           // console.log(spawn);
             spawn.collideDown = false
             spawn.collideLeft = false
             spawn.collideRight = false
@@ -645,7 +682,7 @@ function create(){
             createEnemies(spawn,'PoleAxe',false);
         });
         this.physics.add.collider(SpawnerRunMan, spawnDetector, function(detector, spawn){    // spawn crossBow
-            console.log(spawn);
+            //console.log(spawn);
             spawn.collideDown = false
             spawn.collideLeft = false
             spawn.collideRight = false
@@ -657,7 +694,7 @@ function create(){
             createEnemies(spawn,'RunMan',false);
         });
         this.physics.add.collider(SpawnerBox, spawnDetector, function(detector, spawn){    // spawn crossBow
-            console.log(spawn);
+            //console.log(spawn);
             spawn.collideDown = false
             spawn.collideLeft = false
             spawn.collideRight = false
@@ -667,6 +704,50 @@ function create(){
             detector.body.position.x = player.body.position.x - 390
             detector.body.position.y = player.body.position.y - 240
             createEnemies(spawn,'box',false);
+        });
+        this.physics.add.collider(SpawnerItemOne, spawnDetector, function(detector, spawn){    // spawn ItemOne
+            let spawnX = (spawn.pixelX * 2)-200
+            let spawnY = (spawn.pixelY * 2)+100
+            spawn.collideDown = false
+            spawn.collideLeft = false
+            spawn.collideRight = false
+            spawn.collideUp = false
+            spawnCounter ++;
+
+            detector.body.position.x = player.body.position.x - 390
+            detector.body.position.y = player.body.position.y - 240
+            emitter.x.propertyValue = spawnX
+            emitter.y.propertyValue = spawnY
+
+            var clover = Item.create(spawnX,spawnY,'seal',0,true);
+            clover.setScale(1.5);
+            clover.body.setSize(25, 25);
+            clover.setData('id',0);   
+            clover.anims.play('clover',true)
+            
+            
+        });
+        this.physics.add.collider(SpawnerItemTwo, spawnDetector, function(detector, spawn){    // spawn ItemOne
+            let spawnX = (spawn.pixelX * 2)-200
+            let spawnY = (spawn.pixelY * 2)+100
+            spawn.collideDown = false
+            spawn.collideLeft = false
+            spawn.collideRight = false
+            spawn.collideUp = false
+            spawnCounter ++;
+
+            detector.body.position.x = player.body.position.x - 390
+            detector.body.position.y = player.body.position.y - 240
+            emitter.x.propertyValue = spawnX
+            emitter.y.propertyValue = spawnY
+
+            var seal = Item.create(spawnX,spawnY,'seal',0,true);
+            seal.setScale(1.5);
+            seal.body.setSize(25, 25);
+            seal.setData('id',1);   
+            seal.anims.play('sealflame',true)
+            
+            
         });
         this.physics.add.collider(Spawner, spawnDetector, function(detector, spawn){    // spawn collider
             
@@ -682,7 +763,7 @@ function create(){
             // detector.body.position.x = (spawn.pixelX * 2)-200
             // detector.body.position.y = (spawn.pixelY * 2)-200
             createEnemies(spawn,'Enemy1',false);
-            console.log(spawnCounter);
+            //console.log(spawnCounter);
             // console.log(spawn.pixelX);
             // console.log(detector.x);
             // detector.body.checkCollision.none = true
@@ -857,6 +938,10 @@ function create(){
         this.physics.add.collider(DieTile, hittableObject, function(enemy, die){
             enemy.data.list.health = 0;
             //console.log(enemy);
+        });
+        this.physics.add.collider(DieTile, Coin, function(piepiece,die){
+            // console.log(piepiece);
+            piepiece.destroy();
         });
 
         this.physics.add.collider(DieTile, player, function(plyr, die){
@@ -1821,6 +1906,12 @@ function create(){
         repeat: -1
     });
     this.anims.create({
+        key: 'clover',
+        frames: this.anims.generateFrameNumbers('seal',{frames: [16, 17, 18, 19]}),
+        frameRate: 5,
+        repeat: -1
+    });
+    this.anims.create({
         key: 'HomeAnim',
         frames: this.anims.generateFrameNumbers('controlHelp',{frames: [9,9, 10]}),
         frameRate: 2,
@@ -1925,7 +2016,7 @@ function update(time, delta){
     // console.log((player.body.position.x / 1000)-(player.body.position.x - 1));
     //console.log(player.body.position.x);
 
-    healthBar.width = player.data.list.health * 12;
+    healthBar.width = player.data.list.health * 13;
     specialBar.width = player.data.list.special * 22;
 
     scoreText.setText('SCORE : '+ Score);                                                            // maj score
@@ -2190,28 +2281,36 @@ function update(time, delta){
                 if(currentEnemy.data.list.EnemyIsDie === true)                                              // Delete Enemies 
                 {
                     //console.log(currentEnemy.data.list.randomValue);
-                    for(let i = 0;i < currentEnemy.data.list.randomValue / 3; i++){
+                    for(let i = 0;i < currentEnemy.data.list.randomValue / 4; i++){
                         createCoin(currentEnemy)
                     }
                     // Delete arrow for the crossbow enemy
                     if(currentEnemy.data.list.type == "CrossBow")
                     {
-                        var currentArrow = null;
+                        // console.log(currentEnemy.data.list.id_arrow);
+                        // console.log(Arrow.children.entries[i].data.list.id);
+                        //console.log(Arrow);
 
-                        for(var i = 0; i < Arrow.children.entries.length; i++)
-                        {
-                            if(currentEnemy.data.list.id_arrow == Arrow.children.entries[i].data.list.id)
-                            {
-                                currentArrow = Arrow.children.entries[i]; // Arrow found
-                                break;
-                            }
-                        }
+                        // var currentArrow = null;
 
-                        if(currentArrow != null)
-                        {
-                            Phaser.Utils.Array.RemoveAt(Arrow.children.entries, i);
-                            currentArrow.destroy()
-                        }
+                        // for(var i = 0; i < Arrow.children.entries.length; i++)
+                        // {
+                        //     if(currentEnemy.data.list.id_arrow == Arrow.children.entries[i].data.list.id)
+                        //     {
+                        //         currentArrow = Arrow.children.entries[i]; // Arrow found
+                        //         // break;
+                        //     }
+                        // }
+
+                        // if(currentArrow != null)
+                        // {
+                        //     Phaser.Utils.Array.RemoveAt(Arrow.children.entries, i);
+                        //     currentArrow.destroy()
+                        // }
+                            //  Phaser.Utils.Array.RemoveAt(Arrow.children.entries, 0);
+                            //  Arrow.children.entries[0].destroy();
+                            destroyObject(Arrow.children.entries, 0)
+                        
                     }
 
                     // Delete enemy
@@ -2257,7 +2356,9 @@ function update(time, delta){
     //console.log(touchesAttack.isDown);
     //console.log(-26 * 6);
     //console.log(player.data.list.Climb);
-    //console.log(hittableObject.children.entries);
+    //console.log('enemyList = '+hittableObject.children.entries.length);
+    //console.log('ArrowList = '+Arrow.children.entries.length);
+    
     //console.log(hittableObject.children.entries[0].data.list.CounterMove);
     //console.log(currentEnemy);
     //console.log(player.anims.currentAnim);
@@ -2409,9 +2510,9 @@ function update(time, delta){
 
         if(Phaser.Input.Keyboard.JustDown(enterKey) && startGame === true ||
         theGamePad.X && startGame === true){     
-            player.x = 600;
+            player.x = 680;
             player.y = 1890;
-            // player.x = 20000;
+            // player.x = 10000;
             // player.y = 850;
             spawnDetector.body.position.x = player.x - 390
             spawnDetector.body.position.y = player.y - 240
@@ -3146,7 +3247,6 @@ function createEnemies(enemySpawner, typeOfEnemy,stopmove){                     
     enemyone.setData('name', 'EnemyOne');
     enemyone.setData('type', typeOfEnemy);
     enemyone.setData('id', id);
-    enemyone.setData('id_arrow', id);
     enemyone.setData('randomValue',Phaser.Math.Between(25,100));
     enemyone.body.checkCollision.up = false
     //enemyone.setMass(22)
@@ -3160,6 +3260,7 @@ function createEnemies(enemySpawner, typeOfEnemy,stopmove){                     
         arrow.setSize(20, 4);
         arrow.setScale(2)
         arrow.setData('id', id);
+        //enemyone.setData('id_arrow', id);
     }
     if(typeOfEnemy === 'PoleAxe'){
         enemyone.setData('health', 20);
@@ -3427,11 +3528,11 @@ function createArrow(enemy){                                                    
 
     for(var i = 0; i < Arrow.children.entries.length; i++)
     {
-        if(Arrow.children.entries[i].data.list.id === enemy.data.list.id_arrow)
-        {
+        // if(Arrow.children.entries[i].data.list.id === enemy.data.list.id_arrow)
+        // {
             currentArrow = Arrow.children.entries[i];
             break;
-        }
+        // }
     }
 
     if(currentArrow != null)
@@ -3697,6 +3798,12 @@ function knockBox(enmy){
         }
     });
 
+}
+function destroyObject(Object){ //Test
+    // Phaser.Utils.Array.RemoveAt(Arrow.children.entries, 0);
+    Phaser.Utils.Array.RemoveAt(Object);
+    // Object.destroy();
+   //console.log(Object);
 }
 
 function setCombo(){
