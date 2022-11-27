@@ -102,6 +102,10 @@ var messageFunTextList;
 
 var healthBar; 
 var specialBar;
+var healthBarBoss;
+var theBossIsHere;
+var dealMode;
+var Item;
 
 var Coin;  //pieces
 var skyBg; //ciel
@@ -109,7 +113,6 @@ var Arrow;
 var DestroyArrow;
 var rageCloud;
 var oldfilter;
-var seal;
 
 var spawnDetector;
 var spawnReActivator;
@@ -194,17 +197,19 @@ function preload(){
     this.load.spritesheet('ultimate', 'assets/Sprites/SuperAttack.png',{frameWidth: 170, frameHeight: 170});
     //this.load.spritesheet('pushBox', 'assets/Sprites/pousse.png',{frameWidth: 170, frameHeight: 170});
     this.load.spritesheet('heroClimb', 'assets/Sprites/escalade.png',{frameWidth: 170, frameHeight: 170});
+    this.load.spritesheet('merchant', 'assets/Sprites/marchand.png',{frameWidth: 200, frameHeight: 200});
     //this.load.spritesheet('carreau', 'assets/carreau.png',{frameWidth: 20, frameHeight: 4});
 
     // this.load.spritesheet('powerSlash', 'assets/PowerSlash.png',{frameWidth: 100, frameHeight: 100});
     this.load.spritesheet('box', 'assets/box.png',{frameWidth: 62, frameHeight: 62});
     this.load.spritesheet('theEnemy', 'assets/Enemy/enemiaxe.png',{frameWidth: 170, frameHeight: 170});
-    this.load.spritesheet('theEnemyfall', 'assets/Enemy/enemi1falling.png',{frameWidth: 170, frameHeight: 170});
+    // this.load.spritesheet('theEnemyfall', 'assets/Enemy/enemi1falling.png',{frameWidth: 170, frameHeight: 170});
     this.load.spritesheet('theEnemyCrossBow', 'assets/Enemy/arbaletrier.png',{frameWidth: 170, frameHeight: 170});
     this.load.spritesheet('theEnemyPoleAxe', 'assets/Enemy/poleaxegiant.png',{frameWidth: 180, frameHeight: 170});
     this.load.spritesheet('theEnemySpearMan', 'assets/Enemy/spearman.png',{frameWidth: 190, frameHeight: 170});
     this.load.spritesheet('theEnemyAssassin', 'assets/Enemy/assassin.png',{frameWidth: 170, frameHeight: 170});
     this.load.spritesheet('theEnemyRunMan', 'assets/Enemy/runman.png',{frameWidth: 170, frameHeight: 170});
+    this.load.spritesheet('theEnemyBoss', 'assets/Enemy/boss1.png',{frameWidth: 288, frameHeight: 288});
 
 }
 
@@ -219,7 +224,9 @@ function create(){
         personalBest = localStorage.getItem('score');                                               //best score in localStorage
     }
     /// SET VARIABLE  
-
+    dealMode = false;
+    theBossIsHere = false
+    var resetBlockCounter = 0;
     startGame = true;
     attackintheair = false;
     counterMovePlayer = 0;
@@ -231,9 +238,9 @@ function create(){
     gamePadCombo = [];
     enemyNumberId = 0;
     rageMode = false;
-    canShoryu = true
+    canShoryu = true;
     messageFunTextList = ['pouet','Good!', 'Nice!','Yes!','Great!','Cool!','Perfect!','Graceful!','Nicely Done! ','Impressive!','Remarkable!','Powerful!','Very Nice!!','Excellent!!','Slice!!','RAGE MODE !','Good Job!','Well-Done!','Crush!!','Super!','Spreads!','Really Good!!','Nice Trick!!','Ruthless!','','Nice Butchery!!','YES!!','Technical!','Killings!!','Execution!!','Excessive!!','PrettyDanceStep!!','"Baked-Ham"','FATALITY!!!','Continue?','Rhythmic!!','Nice Synthesis!!','Fatal Sequence!!!','OVERDRIVE!!!','High Velocity!!','Dithirambic!!','You Are Scary!!','Well!!','Right!!','Without Respite!','Tenseiken Slash!!','Finish Them!!','DESTRUCTOR-MODE','Relentless!!','In Mind!!','INSANE!!','Merciless!!!','WhatAreYourLimits!?','BELLISSIMO!!','Tasty!!!!','Still COOL!!','DRY!!','Hard!!!','Impressed!!!','Don\'t Cry Baby!!','','GRANDIOSE!!!','SunlightYellowOverdrive!!','EXPLOSIVE!','DestroyYourEnemies!!','Very Cool!','FeedsYourBladeWithBlood!','Bullying!!!','Too Fast!!','I can\'t Follow!!','Nice Try!!','Easy to Break!','Emotional Damage!!','BURNING!!','Very Well!','Obliterate!!!','Grinding!!','Blade Infusion!!!','Splash!!','Quarter Circle!!','Divide!!','BreezeFromTheAir!!','splits!','Angry Kid!!','BROKEN!!','Without Limit!','UNBELIEVABLE!!','Enraged!!','Delicately!','Strike!','Famous!!','Magic!!','Very Good!','For Honor!!','Deadly Dance!!!','Heroic Madness!!!','Last Breath!!','Twisted Barrel!!','Unlimited!!','Wind Dance!!!','Slash!!','Iron Wall!!','Great Performance!','SUCCESS!!!','Cutting Edge!!','Brilliant!!','Human Blade!!!','Audacious!','Sharpness!!!','SHRED!!','Fatal Blow!!! ','LETHAL!','Quick Destruction!','BURNING!!','Synchronized!!','Pungent!','SPICY!','Efficient!!','Okey!!','COMBO-BREAKER!!!','Deadly!!!','Lethal Shot!!!','SERIOUS SEQUENCE!','You Got It, Baby?!!','Effective!!','CLEAN!!','it\'s not possible!?','OUGISHIPUKOGETSUSAN!','Fast Fury!!!','INTENSE!!','Sword Master!!','Destroy Them All!!','Slices The Universe!!','WAOUH!!!','Rapid Anger','Incredible!!','Marvelous!!','Oh My God!','OneTooMany?!','Unthinkable!!','OWN!!','Gracious!!','MAD!!','Powerful!!','STRONG!!','Fast Combo!!!','HowAreYouToday?','Dance Of Death!!','KILL THEM ALL!!','MASSACRE!!','Beautifull!!','No Time To Die !!!','For Glory!!!','Sensational!!','OK!!!','WonderFull!!!','Gorgeous!','NO MERCY','Excellent!!!','Mesmerizing!!','Quick And Efficient!','HEAVY!!','CumberSome!!!','BERSERKER!!','Crazed!!','Fabulous!!','So Bulky!','Overwhelming!!','OVERKILL!!!','In Trance State!','BIG FLOW!!','High-intensity!!!','Invincible!!','Overly Strong!!!','Amazing!!!','OverPowering!','Hypnotic!!','Stupefying!!','You\'re a GOD!!','Beyond the Limits!', 'CRAZY!!!', 'IMPOSSIBLE!!!','Take My Virginity!!','DIVINE !!','You\'re a MONSTER!!']
-
+    var Alphabet = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'];
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// SONG
     themeSong = this.sound.add('theme',{volume: 0.08});
@@ -339,12 +346,12 @@ function create(){
     // var sol2 = this.add.sprite(511, 550, 'ground');//image sol
     // var sol3 = this.add.sprite(900, 600, 'ground');//image sol
 
-    enemy1Spawn = this.add.image(1600, 1100, 'spawner').setVisible(false);              //spawn enemy
-    enemyCrossBowSpawn = this.add.image(700, 300, 'spawner').setVisible(false);         //spawn enemy
-    boxSpawn = this.add.group({
-        key : 'box',
-        visible : false,
-    });           
+    // enemy1Spawn = this.add.image(1000, 1790, 'spawner').setVisible(true);              //spawn enemy
+    // enemyCrossBowSpawn = this.add.image(700, 300, 'spawner').setVisible(false);         //spawn enemy
+    // boxSpawn = this.add.group({
+    //     key : 'box',
+    //     visible : false,
+    // });           
 
     healthBar = this.add.rectangle(1205,685,120,10,0xB14F37);    //healthbar
     healthBar.setScrollFactor(0,0);
@@ -353,6 +360,13 @@ function create(){
     specialBar = this.add.rectangle(1205,705,120,10,0xFDCA7F);                               //specialbar
     specialBar.setScrollFactor(0,0);
     specialBar.setDepth(2);
+
+    healthBarBoss = this.add.rectangle(1495,1075,600,20,0xB14F37);    //healthbar
+    // var healthBarBoss = new Phaser.GameObjects.Rectangle(this,1495,1075,600,20,0xB14F37);    //healthbar
+    healthBarBoss.setScrollFactor(0,0);
+    healthBarBoss.setStrokeStyle(8, 0xFFFFFF)
+    healthBarBoss.setDepth(2);
+    healthBarBoss.setVisible(false);
 
     var heabar = this.add.image(1215,685,'spebar',1).setScale(2).setDepth(2);
     heabar.setScrollFactor(0,0);
@@ -373,13 +387,13 @@ function create(){
     colideATKEnemy = this.physics.add.group({allowGravity : false})                     // collide attack enemies
 
     Arrow = this.physics.add.group({allowGravity : false})                              // Arrow 
-    var Item = this.physics.add.group({allowGravity : false})                              // Item 
-        
-    
 
-    seal = this.physics.add.sprite(4700,1100,'seal').setScale(2);
-    seal.body.setSize(25, 58) 
-    seal.body.allowGravity = false;
+    Item = this.physics.add.group({allowGravity : false})                              // Item 
+        
+
+    // seal = this.physics.add.sprite(4700,1100,'seal').setScale(2);
+    // seal.body.setSize(25, 58) 
+    // seal.body.allowGravity = false;
     
     rageCloud = this.add.sprite(1490,880,'sfx').setScale(2)
     rageCloud.setScrollFactor(0,0);
@@ -418,23 +432,25 @@ function create(){
 
 
     player = this.physics.add.sprite(600, 1150,'hero').setScale(2);                     // player
-    player.body.setSize(25, 58)                                         
-    player.setData('health', 10)
-    player.setData('special', 6)
+    player.body.setSize(25, 58);                                         
+    player.setData('health', 10);
+    player.setData('special', 6);
     player.setData('Guard', false);
     player.setData('Climb', false);
-    // player.setData('Expulse', false);
+    player.setData('Expulse', false);
     player.setData('Eject', 0);
     player.body.checkCollision.up = false;
     
     DestroyArrow = this.add.sprite(1600,850,'sfx').setScale(2);                      // Destroy Arrow
     DestroyArrow.setScrollFactor(0,0);
+    SlashEnemy = this.add.sprite(1600,850,'sfx').setScale(0.8);;                      // SlashEnemy
+    
     // console.log(DestroyArrow.flipX = true);
     //console.log(player.body.touching);
 
     colideATK = this.add.rectangle(-800,0,100,100,0xB14F37)                                // collision attack final
     this.physics.add.existing(colideATK);
-    colideATK.setVisible(false)
+    colideATK.setVisible(false);
     colideATK.body.allowGravity = false;
 
     slashAtk = this.add.sprite(-1000,-1000,'slash').setScale(4);                                // img Slash
@@ -458,7 +474,7 @@ function create(){
 
     // TEXT
 
-    text = this.add.text(1145,1095, 'version : O.49 | 14.11.22' , {fontFamily : 'PixelFont'}).setScrollFactor(0,0);
+    text = this.add.text(1145,1095, 'version : O.50 | 14.11.22' , {fontFamily : 'PixelFont'}).setScrollFactor(0,0);
     personalBestText = this.add.text(1480,672,'YOUR BEST : 0',{ fontFamily : 'PixelFont'}).setScrollFactor(0,0);
     scoreText = this.add.text(1710,672, 'SCORE : 0',{ fontFamily : 'PixelFont'}).setScrollFactor(0,0);
     gameOverText = this.add.text(1218,780, 'GAME OVER \n score : 0 \n press any to restart', { fontFamily : 'PixelFont', fontSize : '60px'}).setScrollFactor(0,0);
@@ -519,24 +535,30 @@ function create(){
         //arrow.setX(player.x + 500)
 
     })
-
-    this.physics.add.overlap(seal, player, function(theseal,theplayer){
-        // console.log(theseal);
-        theseal.setVisible(false)
-        //emitter.active = true
-        setTimeout(()=>{emitter.stop()},200)
-    })
+ 
+    // this.physics.add.overlap(seal, player, function(theseal,theplayer){
+    //     // console.log(theseal);
+    //     theseal.setVisible(false)
+    //     //emitter.active = true
+    //     setTimeout(()=>{emitter.stop()},200)
+    // })
     this.physics.add.overlap(Item, player, function(theplayer,item){
         //console.log(item);
         emitter.active = true
         emitter.start()
+        setTimeout(()=>{
+            dealMode = false
+            emitter.stop();
+        },250)
+
         if(item.data.list.id === 1){
             sealbar.setFrame(sealbar.frame.name + 1)
             item.destroy();
+        }else if(item.data.list.id === 2){
+             dealMode = true;
         }else{
             item.destroy();
         }
-        setTimeout(()=>{emitter.stop();},250)
     })
 
 
@@ -626,8 +648,9 @@ function create(){
 
         this.physics.add.collider(ResetTile, player, function(theplayer, reset){   // collision reset et joueur 
             hittableObject.children.entries.length = 0
-            console.log(hittableObject);
-
+            //console.log(hittableObject);
+            resetBlockCounter ++
+            console.log(resetBlockCounter);
             reset.collideDown = false
             reset.collideLeft = false
             reset.collideRight = false
@@ -719,13 +742,26 @@ function create(){
             emitter.x.propertyValue = spawnX
             emitter.y.propertyValue = spawnY
 
-            var clover = Item.create(spawnX,spawnY,'seal',0,true);
-            clover.setScale(1.5);
-            clover.body.setSize(25, 25);
-            clover.setData('id',0);   
-            clover.anims.play('clover',true)
-            
-            
+            if(resetBlockCounter === 2){
+                Item.children.entries.length = 0;
+                var clover = Item.create(spawnX,spawnY + 15,'merchant',0,true);
+                clover.setScale(2);
+                clover.flipX = true
+                clover.body.setSize(80, 24);
+                clover.setData('id',2);   
+                clover.anims.play('dealer',true);
+            }
+            else if(resetBlockCounter === 5){
+                createEnemies(spawn,'Boss',false);
+                theBossIsHere = true;
+                healthBarBoss.setVisible(true);
+            }else{
+                var clover = Item.create(spawnX,spawnY,'seal',0,true);
+                clover.setScale(1.5);
+                clover.body.setSize(25, 25);
+                clover.setData('id',0);   
+                clover.anims.play('clover',true)
+            }
         });
         this.physics.add.collider(SpawnerItemTwo, spawnDetector, function(detector, spawn){    // spawn ItemOne
             let spawnX = (spawn.pixelX * 2)-200
@@ -740,14 +776,12 @@ function create(){
             detector.body.position.y = player.body.position.y - 240
             emitter.x.propertyValue = spawnX
             emitter.y.propertyValue = spawnY
-
+            
             var seal = Item.create(spawnX,spawnY,'seal',0,true);
             seal.setScale(1.5);
             seal.body.setSize(25, 25);
             seal.setData('id',1);   
             seal.anims.play('sealflame',true)
-            
-            
         });
         this.physics.add.collider(Spawner, spawnDetector, function(detector, spawn){    // spawn collider
             
@@ -760,9 +794,10 @@ function create(){
 
             detector.body.position.x = player.body.position.x - 390
             detector.body.position.y = player.body.position.y - 240
-            // detector.body.position.x = (spawn.pixelX * 2)-200
-            // detector.body.position.y = (spawn.pixelY * 2)-200
+            
             createEnemies(spawn,'Enemy1',false);
+            //createEnemies(spawn,'Boss',false);
+
             //console.log(spawnCounter);
             // console.log(spawn.pixelX);
             // console.log(detector.x);
@@ -1646,6 +1681,11 @@ function create(){
         frameRate: 6,
     });
     this.anims.create({
+        key: 'stanceBoss',
+        frames: this.anims.generateFrameNumbers('theEnemyBoss',{frames : [12]}),
+        frameRate: 6,
+    });
+    this.anims.create({
         key: 'walkEnemy1',
         frames: this.anims.generateFrameNumbers('theEnemy',{frames : [1, 2, 3, 4]}),
         frameRate: 4,
@@ -1678,6 +1718,12 @@ function create(){
     this.anims.create({
         key: 'walkRunMan',
         frames: this.anims.generateFrameNumbers('theEnemyRunMan',{frames : [1, 2, 3, 4]}),
+        frameRate: 4,
+        repeat : -1,
+    });
+    this.anims.create({
+        key: 'walkBoss',
+        frames: this.anims.generateFrameNumbers('theEnemyBoss',{frames : [0, 1, 2, 3, 4, 5]}),
         frameRate: 4,
         repeat : -1,
     });
@@ -1739,7 +1785,17 @@ function create(){
         key: 'attackRunMan',
         frames: this.anims.generateFrameNumbers('theEnemyRunMan',{frames : [ 5, 5, 6, 6, 7, 7, 7, 8, 9, 10, 10, 10, 0, 0, 0]}),
         frameRate: 10,
-    })
+    });
+    this.anims.create({
+        key: 'attackBoss',
+        frames: this.anims.generateFrameNumbers('theEnemyBoss',{frames : [ 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22]}),
+        frameRate: 10,
+    });
+    this.anims.create({
+        key: 'attackTwoBoss',
+        frames: this.anims.generateFrameNumbers('theEnemyBoss',{frames : [ 23, 24, 24, 24, 24, 24, 24, 24, 24, 25, 26 ,26 ,26 ,26, 26, 26, 26, 26, 26, 26 ,27, 27]}),
+        frameRate: 10,
+    });
     this.anims.create({
         key: 'knockbackEnemy1',
         frames: this.anims.generateFrameNumbers('theEnemy',{frames : [ 10, 11, 11, 11, 11, 11, 11, 11, 0]}),
@@ -1770,14 +1826,19 @@ function create(){
         frames: this.anims.generateFrameNumbers('theEnemyRunMan',{frames : [11, 12, 12, 12, 12, 12, 12, 12, 0]}),
         frameRate: 9,
     });
+    this.anims.create({
+        key: 'knockbackBoss',
+        frames: this.anims.generateFrameNumbers('theEnemyBoss',{frames : [28, 29, 29, 29, 29, 29, 29, 29, 12]}),
+        frameRate: 9,
+    });
     // this.anims.create({
-    //     key: 'knockbackbox',
-    //     frames: this.anims.generateFrameNumbers('box',{frames : [ 0]}),
-    //     frameRate: 20,
-    // });
+    //     key: 'fallEnemy1',
+    //     frames: this.anims.generateFrameNumbers('theEnemyfall',{frames : [0, 1, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3]}),
+    //     frameRate: 8,
+    // })
     this.anims.create({
         key: 'fallEnemy1',
-        frames: this.anims.generateFrameNumbers('theEnemyfall',{frames : [0, 1, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3]}),
+        frames: this.anims.generateFrameNumbers('theEnemy',{frames : [10, 11, 12, 13, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14]}),
         frameRate: 8,
     })
     this.anims.create({
@@ -1806,13 +1867,18 @@ function create(){
         frameRate: 8,
     })
     this.anims.create({
+        key: 'fallBoss',
+        frames: this.anims.generateFrameNumbers('theEnemyBoss',{frames : [30, 30, 30, 31, 31, 31, 31, 31, 31, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32]}),
+        frameRate: 8,
+    })
+    this.anims.create({
         key: 'fallbox',
         frames: this.anims.generateFrameNumbers('box',{frames : [15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 24, 24, 24, 24, 24]}),
         frameRate: 15,
     })
     this.anims.create({
         key: 'ejectEnemy1',
-        frames: this.anims.generateFrameNumbers('theEnemyfall',{frames : [1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3]}),
+        frames: this.anims.generateFrameNumbers('theEnemy',{frames : [11, 11, 11, 11, 11, 11, 12, 12, 12, 12, 12, 12, 13, 13, 13, 13, 13, 13, 13, 13]}),
         frameRate: 8,
     })
     this.anims.create({
@@ -1838,6 +1904,11 @@ function create(){
     this.anims.create({
         key: 'ejectRunMan',
         frames: this.anims.generateFrameNumbers('theEnemyRunMan',{frames : [12, 12, 12, 12, 12, 12, 13, 13, 13, 13, 14, 14, 15, 15, 15, 15, 15, 15, 15, 15]}),
+        frameRate: 8,
+    })
+    this.anims.create({
+        key: 'ejectBoss',
+        frames: this.anims.generateFrameNumbers('theEnemyBoss',{frames : [27, 27, 27, 27, 27, 27, 30, 30, 30, 30, 31, 31, 31, 32, 32, 32, 32, 32, 32, 32]}),
         frameRate: 8,
     })
     this.anims.create({
@@ -1870,7 +1941,11 @@ function create(){
         frames: this.anims.generateFrameNumbers('theEnemyRunMan',{frames : [16, 17, 17, 17, 17, 17, 17, 16, 16]}),
         frameRate: 8,
     })
-
+    this.anims.create({
+        key: 'expulseBoss',
+        frames: this.anims.generateFrameNumbers('theEnemyBoss',{frames : [29, 29, 28, 28, 28, 28, 28, 28, 28]}),
+        frameRate: 8,
+    })
     // coin animation
     this.anims.create({
         key: 'turnPiecette',
@@ -1884,14 +1959,19 @@ function create(){
         frameRate: 10,
     });
     this.anims.create({
-        key: 'breackArrow',
-        frames: this.anims.generateFrameNumbers('sfx',{frames: [1, 2, 3, 4, 5, 6, 7, 8, 0]}),
-        frameRate: 10,
-    });
-    this.anims.create({
         key: 'slashedGuard',
         frames: this.anims.generateFrameNumbers('slashGuard',{frames: [0, 1, 2, 3, 4]}),
         frameRate: 30,
+    });
+    this.anims.create({
+        key: 'slashEnemy',
+        frames: this.anims.generateFrameNumbers('seal',{frames: [ 22, 23, 15]}),
+        frameRate: 15,
+    });
+    this.anims.create({
+        key: 'breackArrow',
+        frames: this.anims.generateFrameNumbers('sfx',{frames: [1, 2, 3, 4, 5, 6, 7, 8, 0]}),
+        frameRate: 10,
     });
     this.anims.create({
         key: 'rage',
@@ -1912,6 +1992,12 @@ function create(){
         repeat: -1
     });
     this.anims.create({
+        key: 'dealer',
+        frames: this.anims.generateFrameNumbers('merchant',{frames: [0, 1, 2, 3, 4]}),
+        frameRate: 8,
+        repeat: -1
+    });
+    this.anims.create({
         key: 'HomeAnim',
         frames: this.anims.generateFrameNumbers('controlHelp',{frames: [9,9, 10]}),
         frameRate: 2,
@@ -1921,8 +2007,9 @@ function create(){
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // CREATE ENEMIES
-seal.anims.play('sealflame', true)
-    //createEnemies(enemy1Spawn,'RunMan');
+
+    
+    
     // createEnemies(enemy1Spawn,'Enemy1');
     // createEnemies(enemyCrossBowSpawn,'Enemy1');
     // createEnemies(enemyCrossBowSpawn,'Enemy1');
@@ -1944,7 +2031,7 @@ seal.anims.play('sealflame', true)
 
     //console.log(localStorage);
 
-    if(player.body.position.x == 950){console.log('hello');}
+    //if(player.body.position.x == 950){console.log('hello');}
     // if(GameOver === true){
         // setTimeout(()=>{
         //     this.registry.destroy(); // destroy registry
@@ -1954,7 +2041,7 @@ seal.anims.play('sealflame', true)
         //     Score = 0;
         // },9000)
     // }
-    
+    // console.log(`${performance.memory.usedJSHeapSize / Math.pow(1000, 2)} MB`);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////  
@@ -1962,6 +2049,8 @@ seal.anims.play('sealflame', true)
 
 function update(time, delta){
 
+    //console.log(dealMode);
+   
 // if(GameOver === false){
     //BACKGROUND AND TEXT
         // if(theGamePad.leftStick.x < 0){
@@ -2018,6 +2107,11 @@ function update(time, delta){
 
     healthBar.width = player.data.list.health * 13;
     specialBar.width = player.data.list.special * 22;
+    if(theBossIsHere === true){
+        if(hittableObject.children.entries[0] != undefined){
+            healthBarBoss.width = hittableObject.children.entries[0].data.list.health * 6
+        }
+    }
 
     scoreText.setText('SCORE : '+ Score);                                                            // maj score
     gameOverText.setText('   GAME OVER \n   score : '+ Score + '\npress "J" to restart');                                                           // maj score
@@ -2025,8 +2119,11 @@ function update(time, delta){
     comboText.setText('COMBO X '+ comboValue);                                                       // maj combo
     // gameOverText.x = player.body.position.x - 260
     // gameOverText.y = player.body.position.y
-    spawnDetector.body.velocity.x = player.body.velocity.x ;
-    spawnDetector.body.velocity.y = player.body.velocity.y ;
+
+    // spawnDetector.body.velocity.x = player.body.velocity.x ;
+    // spawnDetector.body.velocity.y = player.body.velocity.y ;
+//console.log(player.body);
+    this.physics.moveToObject(spawnDetector, player, 600);
 
     // spawnDetector.x = player.x ;
     // spawnDetector.y = player.y ;
@@ -2154,33 +2251,42 @@ function update(time, delta){
                 if(counterMovePlayer != 35){
                     if(htblobjct.data.list.AtkCollide === true){                                        // collision Player Guard                     
                         if(plyr.data.list.Guard === true){
-                            swordImpact2.play();
+                            
                             player.data.list.special = player.data.list.special - 1;
                             // htblobjct.data.list.AtkCollide = false;
                             if(plyr.flipX === false && htblobjct.flipX === false){
+                                swordImpact2.play();
                                 counterMovePlayer = 14;
                                 htblobjct.data.list.AtkCollide = false;
                             }
 
                             else if(plyr.flipX === true && htblobjct.flipX === true){
+                                swordImpact2.play();
                                 counterMovePlayer = 14;
                                 //console.log(plyr.body.velocity);
                                 htblobjct.data.list.AtkCollide = false;
 
                             }else if(plyr.flipX === true && htblobjct.flipX === false){
-                                
+                                swordImpact.play();
                                 counterMovePlayer = 28
                             }
 
                             else if(plyr.flipX === false && htblobjct.flipX === true){
-                                
+                                swordImpact.play();
                                 counterMovePlayer = 28
                             }
                         }else{                                                                          // collision Player KnockBack
+                            // console.log(htblobjct);
                             swordImpact.play();
                             counterMovePlayer = 28
                             plyr.data.list.health--;
                             htblobjct.data.list.AtkCollide = false;
+
+                            SlashEnemy.anims.play('slashEnemy',true);
+                            SlashEnemy.y = htblobjct.y - 15;
+
+                            if(htblobjct.flipX === false){SlashEnemy.x = htblobjct.x - 100;SlashEnemy.flipX = false}
+                            if(htblobjct.flipX === true){SlashEnemy.x = htblobjct.x + 100;SlashEnemy.flipX = true}
 
                         }
                     }else{
@@ -2234,8 +2340,20 @@ function update(time, delta){
             Phaser.Math.Distance.BetweenPoints(currentEnemy,player) > 101){
                 //console.log('bim');
             }
+            if(Phaser.Math.Distance.BetweenPoints(currentEnemy,player) < 310 &&                         // attack 2 Boss
+            Phaser.Math.Distance.BetweenPoints(currentEnemy,player) > 300 &&
+            currentEnemy.data.list.AttackIsFinish === true &&
+            currentEnemy.data.list.EnemyIsAttack === true && 
+            currentEnemy.data.list.type === 'Boss'){
 
-            if(Phaser.Math.Distance.BetweenPoints(currentEnemy,player) <= 90 + rdmNbr &&                        // action enemies
+                currentEnemy.data.list.AttackIsFinish = false
+                currentEnemy.data.list.EnemyIsAttack = false
+                currentEnemy.data.list.CounterMove = 6;
+            }
+            //console.log(Phaser.Math.Distance.BetweenPoints(currentEnemy,player));
+
+            if(Phaser.Math.Distance.BetweenPoints(currentEnemy,player) <= 95 + rdmNbr &&                        // action enemies
+            //Phaser.Math.Distance.BetweenPoints(currentEnemy,player) > 70 &&
             currentEnemy.data.list.type != 'box' &&
             currentEnemy.data.list.EnemyIsAttack === true && 
             currentEnemy.data.list.AttackIsFinish === true){
@@ -2359,7 +2477,7 @@ function update(time, delta){
     //console.log('enemyList = '+hittableObject.children.entries.length);
     //console.log('ArrowList = '+Arrow.children.entries.length);
     
-    //console.log(hittableObject.children.entries[0].data.list.CounterMove);
+    //console.log(hittableObject.children.entries[0]);
     //console.log(currentEnemy);
     //console.log(player.anims.currentAnim);
     //console.log(player.anims.currentAnim);
@@ -2395,6 +2513,10 @@ function update(time, delta){
     }
     if(player.data.list.special <= 0){
         player.data.list.special = 0;
+    }
+    if( healthBarBoss.width  <= 0){
+        healthBarBoss.width  = 0;
+        //this.anims.pauseAll();
     }
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -2437,7 +2559,6 @@ function update(time, delta){
                 counterMovePlayer = 0;
                 //console.log(theGamePad);
                 //console.log(gamePadCombo.includes);
-                
             }
         },5000)
     }
@@ -2494,8 +2615,12 @@ function update(time, delta){
             player.anims.play('guard', true);
             player.data.list.Guard = true;
             setCombo()
+            if(dealMode === true){
+                dealEvent();
+            }
         }else if(touchesGuard.isUp && playerInGround === true && counterMovePlayer != 14){
-             player.data.list.Guard = false}
+            player.data.list.Guard = false
+        }
         
         if(Phaser.Input.Keyboard.JustDown(touchesAttack) || gamepadAttack === true){                            //attack     
             gamepadAttack = false;
@@ -2512,17 +2637,15 @@ function update(time, delta){
         theGamePad.X && startGame === true){     
             player.x = 680;
             player.y = 1890;
-            // player.x = 10000;
-            // player.y = 850;
+            // player.x = 37000; // boss
+            // player.y = 550;
             spawnDetector.body.position.x = player.x - 390
             spawnDetector.body.position.y = player.y - 240
             startGame = false;
             rageCloud.anims.play('rage',true);
             soundVolume = 1;
             swordAir.volume = 0.4;
-            themeSong.play();
-            
-            // this.anims.resumeAll();
+            // themeSong.play();
         }
 // }  
 }
@@ -3264,7 +3387,12 @@ function createEnemies(enemySpawner, typeOfEnemy,stopmove){                     
     }
     if(typeOfEnemy === 'PoleAxe'){
         enemyone.setData('health', 20);
-        enemyone.setData('randomValue',Phaser.Math.Between(10,50));
+        enemyone.setData('randomValue',Phaser.Math.Between(10,70));
+    }
+    if(typeOfEnemy === 'Boss'){
+        enemyone.setSize(30, 73);
+        enemyone.setData('health', 100);
+        enemyone.setData('randomValue',150);
     }
     if(typeOfEnemy === 'box'){                                                                          //create box
         enemyone.setSize(35, 35);
@@ -3310,7 +3438,7 @@ enemy1.setBounce(0, 0)
 
 function enemyWalkBack(enemy1,target,game){                                                             // enemy walkBack
     //enemy1.body.setSize(25,56) 
-
+    //console.log(enemy1.data.list.IsInvulnerable = false);
 
     enemy1.setBounce(0, 0)
     var animsName = 'walk'+enemy1.data.list.type;
@@ -3477,6 +3605,35 @@ function enemyAttack(enemyone, currentArrow){
                 enemyone.data.list.AttackIsFinish = true
             }
         }
+        if('attackBoss' === enemyone.anims.currentAnim.key){                                              //attack Boss
+            if(enemyone.anims.currentFrame.index === 6){
+                enemyone.data.list.AtkCollide = true
+
+                enemyone.setSize(160,73)
+                setTimeout(()=>{
+                    enemyone.setSize(30,73);
+                    enemyone.data.list.AtkCollide = false;
+                },50)
+            }
+            if(enemyone.anims.currentFrame.index === 14){
+                enemyone.data.list.AtkCollide = true
+                enemyone.data.list.IsInvulnerable = false
+                enemyone.setSize(170,73)
+                setTimeout(()=>{
+                    enemyone.setSize(30, 73)
+                    enemyone.data.list.AtkCollide = false
+                },50)
+            }
+            if(enemyone.anims.currentFrame.index <= 4){ 
+                enemyone.data.list.IsInvulnerable = true
+            }
+            if(enemyone.anims.currentFrame.index >= 17){ 
+                enemyone.data.list.IsInvulnerable = false
+
+                enemyone.data.list.CounterMove = 0
+                enemyone.data.list.AttackIsFinish = true
+            }
+        }
         
 
     });
@@ -3517,10 +3674,60 @@ function enemyAttackTwo(enemyone){
                 enemyone.data.list.CounterMove = 0 
                 enemyone.data.list.AttackIsFinish = true
             }
+        }
+        if('attackTwoBoss' === enemyone.anims.currentAnim.key){
+            if(enemyone.anims.currentFrame.index <= 9){
+                enemyone.setVelocityY(-800); 
+                enemyone.data.list.IsInvulnerable = true
+            }
+            if(enemyone.anims.currentFrame.index >= 10 ){
+                enemyone.setVelocityY(1800); 
+            }
+            // if(enemyone.anims.currentFrame.index >= 11 &&
+            // enemyone.anims.currentFrame.index <= 12 ){
+                
+            //     //enemyone.setVelocityY(0); 
+            // }
+            if(enemyone.anims.currentFrame.index >= 11 ){
+                enemyone.data.list.AtkCollide = true
 
+                enemyone.setSize(100,73)
+                // setTimeout(()=>{
+                //     enemyone.setSize(24,56)
+                //     enemyone.data.list.AtkCollide = false
+                // },50)
+            }
+            if(enemyone.anims.currentFrame.index <= 10 ){
+                    if(enemyone.flipX === true){enemyone.setVelocityX(1600)}
+                    if(enemyone.flipX === false){enemyone.setVelocityX(-1600)}
+            }
+            if(enemyone.anims.currentFrame.index >= 16 ){
+                enemyone.data.list.AtkCollide = false
+                enemyone.setSize(30,73)
+
+            }
+            if(enemyone.anims.currentFrame.index === 15 ){
+                cameraPlayer.shakeEffect.intensity.x = 0.001
+                    cameraPlayer.shakeEffect.intensity.y = 0.001
+                    cameraPlayer.shakeEffect.duration = 200
+                    cameraPlayer.shakeEffect.isRunning = true
+                    
+                    //console.log(cameraPlayer.shakeEffect);cameraPlayer.shakeEffect.intensity.x = 0.001
+                    cameraPlayer.shakeEffect.intensity.y = 0.001
+                    cameraPlayer.shakeEffect.duration = 200
+                    cameraPlayer.shakeEffect.isRunning = true
+                    
+                    //console.log(cameraPlayer.shakeEffect);
+            }
+            if(enemyone.anims.currentFrame.index >= 22 ){ 
+                enemyone.data.list.CounterMove = 0 
+                enemyone.data.list.AttackIsFinish = true
+                enemyone.data.list.IsInvulnerable = false
+                cameraPlayer.shakeEffect.progress = 0                                                   //shaker camera reset
+                cameraPlayer.shakeEffect._elapsed = 0
+            }
         }
     });
-
 }
 
 function createArrow(enemy){                                                                             // call Arrow 
@@ -3722,8 +3929,13 @@ function enemyDie(enmyOne){
                 // if(enmyOne.anims.currentFrame.index === 14){
                 //     setTimeout(()=>{createCoin(enmyOne)},0);
                 //  }
-                if(enmyOne.anims.currentFrame.index >= 14){ 
-                    enmyOne.data.list.EnemyIsDie = true;
+                if(enmyOne.anims.currentFrame.index >= 14){
+                    if(enmyOne.data.list.type === 'Boss'){
+                        enmyOne.anims.pauseAll()
+                        enmyOne.anims.currentFrame.index = 14
+                    }else{
+                        enmyOne.data.list.EnemyIsDie = true;
+                    } 
                     
                     // enmyOne.body.destroy(); 
                 }
@@ -3740,12 +3952,18 @@ function collisionAtkEnemies(htblObjct,atk){
     slashAtk.setY(player.y)
     comboValue ++;
 
-    //if(rageMode === true){
-        player.data.list.special = player.data.list.special + rageValue;
-    //}
-    // console.log(htblObjct.flipX);
-    if(player.flipX === true){slashAtk.setX(player.x -100)}
-    if(player.flipX === false){slashAtk.setX(player.x +100)}
+   
+    player.data.list.special = player.data.list.special + rageValue;
+    
+
+    if(player.flipX === true){
+        htblObjct.flipX = true;
+        slashAtk.setX(player.x -100)
+    }
+    if(player.flipX === false){
+        slashAtk.setX(player.x +100)
+        htblObjct.flipX = false;
+    }
 
     slashAtk.anims.play('slashed', true)
     slashAtk.rotation = Phaser.Math.Between(0,2);
@@ -3757,6 +3975,9 @@ function collisionAtkEnemies(htblObjct,atk){
         setTimeout(()=>{
             enemyCanDie = true
         },3000)   
+    }else{
+        htblObjct.flipX = false
+        enemyCanDie = true;
     }
     if(htblObjct.data.list.IsInvulnerable === false)
     {
@@ -3841,12 +4062,24 @@ if(comboValue >= 100){
 }
 return comboValue = 0
 }
-// function stopEnemies(enemy){
-//     enemy.data.list.stopMove = true
-//     // enemy.data.list.CounterMove = 74;
-//     console.log('kikoou' + enemy.data.list.CounterMove);
-//     console.log(enemy.data.list);
-// }
+function dealEvent(){
+    dealMode = false;
+    if(Score >= 1000){
+        var merchant = Item.children.entries[0].body
+        merchant.checkCollision.none = true;
+        // Item.children.entries[0].body.checkCollision.none = true;
+        Score = Score - 1000;
+        var clover = Item.create(merchant.x + 200,merchant.y,'seal',0,true);
+                clover.setScale(1.5);
+                clover.body.setSize(25, 25);
+                clover.setData('id',0);   
+                clover.anims.play('clover',true)
+        // setTimeout(()=>{emitter.stop()},200)
+        
+    }else{
+        console.log('oops, not enough money brother');
+    }
+}
 
 
 
