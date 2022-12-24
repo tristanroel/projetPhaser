@@ -25,7 +25,7 @@ var configuration = {
     physics :{
         default : 'arcade',
         arcade :{
-                    debug : false,
+                    debug : true,
                     tileBias : 36,
                     gravity : {y : 1000},
                 }
@@ -40,12 +40,12 @@ var game = new Phaser.Game(configuration);
 var cameraPlayer;
 
 var startGame; //Boolean
+var scoreView; //Boolean
 var controlHelp;
-//var touchesClavier; //touches de direction
 var leftkey;
 var rightkey;
 var upkey;
-var touchesAttack; // touche d'attaque    
+var touchesAttack;    
 
 
 ///Provisoire
@@ -55,24 +55,21 @@ var gamepadAttack; // : boolean
 /////////////////////////////////
 var gamePadCombo;
 
-var TouchLeft;
-var TouchRight;
-var TouchUp;
-var TouchDown;
-var TouchJump;
-var TouchAttack;
+// var TouchLeft;
+// var TouchRight;
+// var TouchUp;
+// var TouchDown;
+// var TouchJump;
+// var TouchAttack;
 
 var rageValue;
 
 var player;
 var playerVelocityX;
 var playerInGround; // : boolean
-var counterMovePlayer; // compteur combo attack : number
-var playerFlip; // direction du joueur : boulean
+var counterMovePlayer; // compter combo attack : number
 var PlayerTouchEnemy; // : boolean
-var colideATK1; // collision attaque 1 : sprite
-var colideATK2; // collision attaque 1 : sprite
-var attackintheair; // verifie si attaque en l'air : boolean
+var attackintheair; // attack on air : boolean
 var attackinground;
 var playerCanFall; // : boolean
 var rageMode; // : boolean
@@ -87,18 +84,20 @@ var boxSpawn;
 var enemyNumberId = 0;
 var colideATK;
 
-var box;    // caisse en bois : sprite
-
 var comboValue = 0;
 var comboText;
 var text;  // info command list
 var Score = 0; // Score
+var UserName = '';
 var personalBestText;
 var scoreText;
+var HighScore;
+var HighScoreText;
 var gameOverText;
 var funText;
 var messageFunText = '';
 var messageFunTextList;
+var NameText;
 
 var healthBar; 
 var specialBar;
@@ -107,8 +106,8 @@ var theBossIsHere;
 var dealMode;
 var Item;
 
-var Coin;  //pieces
-var skyBg; //ciel
+var Coin;  
+var skyBg; 
 var Arrow;
 var DestroyArrow;
 var rageCloud;
@@ -136,6 +135,10 @@ var enemyCanDie = false;
 
 var personalBest;                                               //best score in localStorage
 var GameOver = false;
+var Alphabet;
+var AlphabetCount = 1;
+var NameValueArray;
+var EnterNameIsFinish;
 
 function preload(){
 ////////////////////////////////////////////////////// LOADING
@@ -163,7 +166,7 @@ function preload(){
     // this.load.scenePlugin('AnimatedTiles', 'https://raw.githubusercontent.com/nkholski/phaser-animated-tiles/master/dist/AnimatedTiles.js', 'animatedTiles', 'animatedTiles');   
     this.load.scenePlugin('AnimatedTiles', 'animatedTiles.js', 'animatedTiles', 'animatedTiles');   
     this.load.image('sky','assets/Thesky.png');
-    this.load.image('ground','assets/solPave.png');
+    // this.load.image('ground','assets/solPave.png');
     this.load.image('ATK1','assets/TRlogo.png');
     this.load.image('spawner','assets/ROELprod.png');
     this.load.image('carreau', 'assets/carreau.png');
@@ -183,13 +186,14 @@ function preload(){
     this.load.spritesheet('seal','assets/Sprites/Sealofinfinity.png', {frameWidth : 170, frameHeight : 170});
 
     this.load.spritesheet('hero', 'assets/Sprites/stancearmed.png',{frameWidth: 170, frameHeight: 170});
+    //this.load.spritesheet('hero1', 'assets/Sprites/hero.png',{frameWidth: 170, frameHeight: 170});
     this.load.spritesheet('heroAttack', 'assets/Sprites/swordattackmove.png',{frameWidth: 170, frameHeight: 170});
     this.load.spritesheet('heroAttackthree', 'assets/Sprites/3ndhit.png',{frameWidth: 170, frameHeight: 170});
     this.load.spritesheet('herorun', 'assets/Sprites/walkarmed.png',{frameWidth: 170, frameHeight: 170});
     this.load.spritesheet('herojump', 'assets/Sprites/jumparmed.png',{frameWidth: 170, frameHeight: 170});
     this.load.spritesheet('herojumpAtk', 'assets/Sprites/jump_sword_attack.png',{frameWidth: 170, frameHeight: 170});
     this.load.spritesheet('specialairslash', 'assets/Sprites/specialairslash.png',{frameWidth: 170, frameHeight: 170});
-    this.load.spritesheet('heroGuard', 'assets/Sprites/guard.png',{frameWidth: 170, frameHeight: 170});
+    this.load.spritesheet('heroGuard', 'assets/Sprites/Untitled50.png',{frameWidth: 170, frameHeight: 170});
     this.load.spritesheet('heroProtectGuard', 'assets/Sprites/Playerkbtest.png',{frameWidth: 170, frameHeight: 170});
     this.load.spritesheet('heroKnockBack', 'assets/Sprites/KnockBack.png',{frameWidth: 170, frameHeight: 170});
     this.load.spritesheet('shoryu', 'assets/Sprites/shoryu.png',{frameWidth: 170, frameHeight: 170});
@@ -216,21 +220,39 @@ function preload(){
 /////////////////////////////////////////////////////////////////////////////////////       CREATE
 function create(){
 
-    //	You can listen for each of these events from Phaser.Loader
 
+    //	You can listen for each of these events from Phaser.Loader
+    downloadScore();
     if(localStorage.getItem('score') === null){
         personalBest = 0;
     }else{
+   
+            // var tagName = localStorage.getItem('name');
+            // console.log(tagName + tagName.length);
+            // if(tagName.length < 10){
+            //     var number = Math.abs(tagName.length - 10);
+            //     console.log(number);
+            //     var space = '_';
+            //     for(let i = 0; i < number; i++){
+            //         tagName = tagName + space;
+            //         console.log(tagName);
+            //     }
+            //     uploadScore(tagName, personalBest);
+            // }
+        
         personalBest = localStorage.getItem('score');                                               //best score in localStorage
     }
+
+
     /// SET VARIABLE  
     dealMode = false;
     theBossIsHere = false
     var resetBlockCounter = 0;
-    startGame = true;
+    startGame = false;
+    scoreView = true;
     attackintheair = false;
     counterMovePlayer = 0;
-    playerVelocityX = 270;
+    playerVelocityX = 0;
     playerInGround = false;
     PlayerTouchEnemy = false;
     attackinground = false;
@@ -239,8 +261,10 @@ function create(){
     enemyNumberId = 0;
     rageMode = false;
     canShoryu = true;
+    NameValueArray = [];
+    EnterNameIsFinish = false;
     messageFunTextList = ['pouet','Good!', 'Nice!','Yes!','Great!','Cool!','Perfect!','Graceful!','Nicely Done! ','Impressive!','Remarkable!','Powerful!','Very Nice!!','Excellent!!','Slice!!','RAGE MODE !','Good Job!','Well-Done!','Crush!!','Super!','Spreads!','Really Good!!','Nice Trick!!','Ruthless!','','Nice Butchery!!','YES!!','Technical!','Killings!!','Execution!!','Excessive!!','PrettyDanceStep!!','"Baked-Ham"','FATALITY!!!','Continue?','Rhythmic!!','Nice Synthesis!!','Fatal Sequence!!!','OVERDRIVE!!!','High Velocity!!','Dithirambic!!','You Are Scary!!','Well!!','Right!!','Without Respite!','Tenseiken Slash!!','Finish Them!!','DESTRUCTOR-MODE','Relentless!!','In Mind!!','INSANE!!','Merciless!!!','WhatAreYourLimits!?','BELLISSIMO!!','Tasty!!!!','Still COOL!!','DRY!!','Hard!!!','Impressed!!!','Don\'t Cry Baby!!','','GRANDIOSE!!!','SunlightYellowOverdrive!!','EXPLOSIVE!','DestroyYourEnemies!!','Very Cool!','FeedsYourBladeWithBlood!','Bullying!!!','Too Fast!!','I can\'t Follow!!','Nice Try!!','Easy to Break!','Emotional Damage!!','BURNING!!','Very Well!','Obliterate!!!','Grinding!!','Blade Infusion!!!','Splash!!','Quarter Circle!!','Divide!!','BreezeFromTheAir!!','splits!','Angry Kid!!','BROKEN!!','Without Limit!','UNBELIEVABLE!!','Enraged!!','Delicately!','Strike!','Famous!!','Magic!!','Very Good!','For Honor!!','Deadly Dance!!!','Heroic Madness!!!','Last Breath!!','Twisted Barrel!!','Unlimited!!','Wind Dance!!!','Slash!!','Iron Wall!!','Great Performance!','SUCCESS!!!','Cutting Edge!!','Brilliant!!','Human Blade!!!','Audacious!','Sharpness!!!','SHRED!!','Fatal Blow!!! ','LETHAL!','Quick Destruction!','BURNING!!','Synchronized!!','Pungent!','SPICY!','Efficient!!','Okey!!','COMBO-BREAKER!!!','Deadly!!!','Lethal Shot!!!','SERIOUS SEQUENCE!','You Got It, Baby?!!','Effective!!','CLEAN!!','it\'s not possible!?','OUGISHIPUKOGETSUSAN!','Fast Fury!!!','INTENSE!!','Sword Master!!','Destroy Them All!!','Slices The Universe!!','WAOUH!!!','Rapid Anger','Incredible!!','Marvelous!!','Oh My God!','OneTooMany?!','Unthinkable!!','OWN!!','Gracious!!','MAD!!','Powerful!!','STRONG!!','Fast Combo!!!','HowAreYouToday?','Dance Of Death!!','KILL THEM ALL!!','MASSACRE!!','Beautifull!!','No Time To Die !!!','For Glory!!!','Sensational!!','OK!!!','WonderFull!!!','Gorgeous!','NO MERCY','Excellent!!!','Mesmerizing!!','Quick And Efficient!','HEAVY!!','CumberSome!!!','BERSERKER!!','Crazed!!','Fabulous!!','So Bulky!','Overwhelming!!','OVERKILL!!!','In Trance State!','BIG FLOW!!','High-intensity!!!','Invincible!!','Overly Strong!!!','Amazing!!!','OverPowering!','Hypnotic!!','Stupefying!!','You\'re a GOD!!','Beyond the Limits!', 'CRAZY!!!', 'IMPOSSIBLE!!!','Take My Virginity!!','DIVINE !!','You\'re a MONSTER!!']
-    var Alphabet = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'];
+    Alphabet = ['end','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','',' Confirm'];
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// SONG
     themeSong = this.sound.add('theme',{volume: 0.08});
@@ -335,25 +359,9 @@ function create(){
 
     Spawner.setData('Activate', false);
 
-
-    // Fond.setScale(1.5)
-
-    // console.log(CrossPlatform);
-
     ////////////////////////////////////////////////////////////////////
 
-    // var sol1 = this.add.sprite(300, 400, 'ground');//image sol
-    // var sol2 = this.add.sprite(511, 550, 'ground');//image sol
-    // var sol3 = this.add.sprite(900, 600, 'ground');//image sol
-
-    // enemy1Spawn = this.add.image(1000, 1790, 'spawner').setVisible(true);              //spawn enemy
-    // enemyCrossBowSpawn = this.add.image(700, 300, 'spawner').setVisible(false);         //spawn enemy
-    // boxSpawn = this.add.group({
-    //     key : 'box',
-    //     visible : false,
-    // });           
-
-    healthBar = this.add.rectangle(1205,685,120,10,0xB14F37);    //healthbar
+    healthBar = this.add.rectangle(1205,685,120,10,0xB14F37);                                   //healthbar
     healthBar.setScrollFactor(0,0);
     healthBar.setDepth(2);
 
@@ -361,8 +369,8 @@ function create(){
     specialBar.setScrollFactor(0,0);
     specialBar.setDepth(2);
 
-    healthBarBoss = this.add.rectangle(1495,1075,600,20,0xB14F37);    //healthbar
-    // var healthBarBoss = new Phaser.GameObjects.Rectangle(this,1495,1075,600,20,0xB14F37);    //healthbar
+    healthBarBoss = this.add.rectangle(1495,1075,600,20,0xB14F37);                              //healthbarBoss
+    // var healthBarBoss = new Phaser.GameObjects.Rectangle(this,1495,1075,600,20,0xB14F37);    
     healthBarBoss.setScrollFactor(0,0);
     healthBarBoss.setStrokeStyle(8, 0xFFFFFF)
     healthBarBoss.setDepth(2);
@@ -376,6 +384,10 @@ function create(){
 
     var sealbar = this.add.image(1385,685,'spebar',2).setScale(2).setDepth(2);
     sealbar.setScrollFactor(0,0);
+
+    var itembar = this.add.image(1385,705,'spebar',11).setScale(2).setDepth(2);
+    itembar.setScrollFactor(0,0);
+    console.log(itembar);
     
 
     Coin = this.physics.add.group({                                                     // Coin
@@ -424,6 +436,14 @@ function create(){
     });
     emitter.stop()
     // emitter.active = false;
+    // AlphabetCount.tweens.add({
+    //     targets: graphics,
+    //     alpha: 0,
+    //     ease: 'Cubic.easeOut',  
+    //     duration: 500,
+    //     repeat: -1,
+    //     yoyo: true
+    //   });
 
     hittableObject = this.physics.add.group({immovable: true})                          // enemy and other...
 
@@ -431,7 +451,7 @@ function create(){
     controlHelp.setScrollFactor(0,0);
 
 
-    player = this.physics.add.sprite(600, 1150,'hero').setScale(2);                     // player
+    player = this.physics.add.sprite(600, 1850,'hero').setScale(2);                     // player
     player.body.setSize(25, 58);                                         
     player.setData('health', 10);
     player.setData('special', 6);
@@ -439,6 +459,7 @@ function create(){
     player.setData('Climb', false);
     player.setData('Expulse', false);
     player.setData('Eject', 0);
+    player.setData('Potion', false);
     player.body.checkCollision.up = false;
     
     DestroyArrow = this.add.sprite(1600,850,'sfx').setScale(2);                      // Destroy Arrow
@@ -462,13 +483,6 @@ function create(){
     //spawnDetector.setData('Active', false)
     spawnDetector.setVisible(false)
     spawnDetector.body.allowGravity = false;
-//console.log();
-    // spawnReActivator = this.add.rectangle(400,1000,50,400,0x3F88E8);
-    // this.physics.add.existing(spawnReActivator);
-    // //spawnDetector.setData('Active', false)
-    // //spawnDetector.setVisible(false)
-    // spawnReActivator.body.allowGravity = false;
-    
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -477,27 +491,42 @@ function create(){
     text = this.add.text(1145,1095, 'version : O.50 | 14.11.22' , {fontFamily : 'PixelFont'}).setScrollFactor(0,0);
     personalBestText = this.add.text(1480,672,'YOUR BEST : 0',{ fontFamily : 'PixelFont'}).setScrollFactor(0,0);
     scoreText = this.add.text(1710,672, 'SCORE : 0',{ fontFamily : 'PixelFont'}).setScrollFactor(0,0);
-    gameOverText = this.add.text(1218,780, 'GAME OVER \n score : 0 \n press any to restart', { fontFamily : 'PixelFont', fontSize : '60px'}).setScrollFactor(0,0);
+    gameOverText = this.add.text(1432,975, '', { fontFamily : 'PixelFont', fontSize : '40px'}).setScrollFactor(0,0);
     comboText = this.add.text(1600,740,'COMBO X0',{ fontFamily : 'PixelFont'}).setScrollFactor(0,0);
     funText = this.add.text(1600,760,'',{ fontFamily : 'PixelFont'}).setScrollFactor(0,0);
+    NameText = this.add.text(1313,895,'',{ fontFamily : 'PixelFont', fontSize : '50px', color: '#3d3d3d'}).setScrollFactor(0,0);
+    // HighScoreText = this.add.text(1176,675,'',{ fontFamily : 'PixelFont', fontSize : '15px'}).setScrollFactor(0,0);
+    //HighScoreText = this.add.bitmapText(1176, 675, { fontFamily : 'PixelFont', fontSize : '15px'}, 'Phaser 3\nBitmap Text\nOrigin and Scale', 48, 1);
     gameOverText.setDepth(-2);
     text.setDepth(2);
     funText.setDepth(2);
     scoreText.setDepth(2);
     personalBestText.setDepth(2);
     comboText.setDepth(2);
+    NameText.setDepth(2);
+    NameText.setVisible(false);
+    
+    //var string = 'Phaser 3\nBitmapText\nScaling\nwith bounds';
+    HighScoreText = this.text = this.add.text(1240, -4600,'',{ fontFamily : 'PixelFont', align: 'center'}).setScrollFactor(0,0)
+    .setFontSize(32).setStroke('#f15d70', 16);
+    HighScoreText.setDepth(3);
+    // HighScoreText.setWordWrapWidth(400);
 
-    // var tween = this.tweens.add({
-    //     targets : player,
-    //     ease: 'Power1',
-    //     duration: 9000,
-    //     x : 5,
-    //     y : 5,
-    //     yoyo : true,
-    //     repeat: -1
+//     this.graphics = this.add.graphics({ x: 0, y: 0, lineStyle: { thickness: 1, color: 0xffff00, alpha: 1 } });
 
-    // })
-    //text.setFontSize(text.fontSize - 2);
+    this.tweens.add({
+    targets: HighScoreText,
+    duration: 40000,
+    // scaleX: 2,
+    y : 760,
+    speed: 400,
+    delay : 1500,
+    //ease: 'Quint.easeInOut',
+    //repeat: -1,
+    //yoyo: true,
+});
+    
+
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     
     // CAMERA
@@ -556,6 +585,15 @@ function create(){
             item.destroy();
         }else if(item.data.list.id === 2){
              dealMode = true;
+             //console.log(controlHelp.originX = 0.4);
+             //console.log(item.body.height = 10);
+             //console.log(item.body);
+             
+            controlHelp.setFrame(16);
+        }else if(item.data.list.id === 3){
+            itembar.setFrame(12);
+            player.data.list.Potion = true
+            item.destroy();
         }else{
             item.destroy();
         }
@@ -742,12 +780,13 @@ function create(){
             emitter.x.propertyValue = spawnX
             emitter.y.propertyValue = spawnY
 
-            if(resetBlockCounter === 2){
+            if(resetBlockCounter === 1 ||
+                resetBlockCounter === 3 ){
                 Item.children.entries.length = 0;
-                var clover = Item.create(spawnX,spawnY + 15,'merchant',0,true);
+                var clover = Item.create(spawnX,spawnY-10,'merchant',0,true);
                 clover.setScale(2);
                 clover.flipX = true
-                clover.body.setSize(80, 24);
+                clover.body.setSize(15, 57).setOffset(50,70);
                 clover.setData('id',2);   
                 clover.anims.play('dealer',true);
             }
@@ -981,20 +1020,30 @@ function create(){
 
         this.physics.add.collider(DieTile, player, function(plyr, die){
             plyr.data.list.health = 0;
-            counterMovePlayer = 28;
-            //console.log(plyr);
+
+            // counterMovePlayer = 28;
+            counterMovePlayer = 999;
+            playerInGround = true;
+
+            //console.log(die.collideUp = false);
+            die.collides = false;
+            //console.log(playerInGround);
         });
         
     
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////// 
 
     // ENTREES CLAVIER
+    
     enterKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER)
     leftkey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Q);
     rightkey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
     upkey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Z);
-    //touchesClavier = this.input.keyboard.addKeys('Q, Z, S, D'); //direction
+    downkey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S);
+    itemKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.K);
+    
     touchesAttack = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.J); //attack
+    touchesAttack.enabled = false;
     touchesGuard = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.I); //Guard
 
     var tornadoSlashLeft = this.input.keyboard.createCombo([83, 68, 74], {resetOnMatch:true, maxKeyDelay:700}); //300ms pour taper le combo, sinon se reinitialise
@@ -1005,6 +1054,22 @@ function create(){
 
     var ShieldAttackLeft = this.input.keyboard.createCombo([83,68,73], {resetOnMatch:true, maxKeyDelay:700}); 
     var ShieldAttackRight = this.input.keyboard.createCombo([83, 81, 73], {resetOnMatch:true, maxKeyDelay:700}); 
+
+    var SpinningSlashR = this.input.keyboard.createCombo([74, 73 ], {resetOnMatch:true, maxKeyDelay:100}); 
+    var SpinningSlashL = this.input.keyboard.createCombo([73, 74 ], {resetOnMatch:true, maxKeyDelay:100}); 
+    //var PickUpBox = this.input.keyboard.createCombo([83, 73], {resetOnMatch:true, maxKeyDelay:700}); 
+    this.input.keyboard.on('keydown-K', function (event) {
+        if(player.data.list.Potion === true){
+            player.data.list.Potion = false;
+            player.data.list.health = 10;
+            itembar.setFrame(11);
+            console.log('item');
+        } 
+    });
+    this.input.keyboard.on('keydown-J', function (event) {     
+        theGamePad.X = false 
+        startGameEvent() 
+    });
 
     this.input.keyboard.on('keycombomatch', function(combo){ //verification du secialAtk entrée
 
@@ -1053,6 +1118,20 @@ function create(){
                     shieldTackle();
                     counterMovePlayer = 36;
                 }
+                // console.log('Sal');
+            }
+            if(combo.keyCodes == SpinningSlashR.keyCodes){
+                //if(player.data.list.special >= 2){
+                    spinningSlash();
+                    counterMovePlayer = 35;
+                //}
+                // console.log('Sal');
+            }
+            if(combo.keyCodes == SpinningSlashL.keyCodes){
+                //if(player.data.list.special >= 2){
+                    spinningSlash();
+                    counterMovePlayer = 35;
+                //}
                 // console.log('Sal');
             }
         }else{
@@ -1145,12 +1224,20 @@ function create(){
             // gamePadCombo = gamePadCombo + 'A';
             gamePadCombo.push(74);
             //gamepadAttack = true;
+            startGameEvent();
+            
         }
         if(pad._RCTop.pressed){    //Protect
             gamePadCombo.push(73);
         }
         if(pad._RCRight.pressed){    //Rond/B
             gamePadCombo.push('D');
+            if(player.data.list.Potion === true){
+                player.data.list.Potion = false;
+                player.data.list.health = 10;
+                itembar.setFrame(11);
+                console.log('item');
+            } 
         }
         if(pad._RCBottom.pressed){    //X/A/jump
             gamePadCombo.push('J');
@@ -1177,14 +1264,25 @@ function create(){
         //console.log(player.data.list.special);
         // console.log(pad);
         // console.log(pad.leftStick.x);
+        let checker = (arr, target) => target.every(v => arr.includes(v));
         let comboResponse;
         for(let i = 0; i < gamePadCombo.length; i++){
             comboResponse = 0;
-            setTimeout(()=>{gamePadCombo = []},275);//270
+            //setTimeout(()=>{gamePadCombo = []},500);//270
             if(playerInGround === true){
 
+                if(checker(gamePadCombo, SpinningSlashL.keyCodes) == true){
+                    spinningSlash();
+                    counterMovePlayer = 35;
+                }
+                
                 if(gamePadCombo[i] == 83){
-
+                    if(counterMovePlayer === 999){
+                        AlphabetCount-- 
+                        if(AlphabetCount < 0){AlphabetCount = 26}
+                        console.log(counterMovePlayer);
+                        gamePadCombo = [];
+                    }
                     let val = i + 1;
                     if(gamePadCombo[val] == 81){
                         let val2 = val + 1;
@@ -1192,10 +1290,12 @@ function create(){
                             //console.log('shoryu');
                             comboResponse++   
                             gamePadCombo = [];
+                            break;
                         }
                         else if(gamePadCombo[val2] == 73){ //shieldTackle
                             comboResponse += 3
                             gamePadCombo = [];
+                            break;
                         }
                     }else if(gamePadCombo[val] == 68){
                         let val2 = val + 1;
@@ -1203,10 +1303,12 @@ function create(){
                             //console.log('shoryu');
                             comboResponse++
                             gamePadCombo = [];
+                            break;
                         }
                         else if(gamePadCombo[val2] == 73){  //shieldTackle
                             comboResponse += 3
                             gamePadCombo = [];
+                            break;
                         }
                     }
                 }if(gamePadCombo[i] == 81){
@@ -1222,6 +1324,7 @@ function create(){
                                     comboResponse += 2
                                 //player.data.list.special++
                                 gamePadCombo = [];
+                                break;
                             }
                         }
                     }
@@ -1238,9 +1341,11 @@ function create(){
                                     comboResponse +=2
                                 //player.data.list.special++
                                 gamePadCombo = [];
+                                break;
                             }else if(gamePadCombo[val2] == 73){ //shieldTackle
                                 //comboResponse += 3
                                 gamePadCombo = [];
+                                break;
                             }
                         }
                     }
@@ -1249,7 +1354,16 @@ function create(){
                     //comboResponse +=7
                     gamepadAttack = true;
                     gamePadCombo = [];
+                    break;
 
+                }
+                if(gamePadCombo[i] == "H"){
+                    if(counterMovePlayer === 999){
+                        if(AlphabetCount > 26){AlphabetCount = 0};    
+                        AlphabetCount++ 
+                        console.log(gamePadCombo);
+                        gamePadCombo = [];       
+                    }
                 }
             }else{
                 if(gamePadCombo[i] == 83){
@@ -1260,10 +1374,12 @@ function create(){
                             //console.log('spejump');
                             comboResponse+= 5
                             gamePadCombo = [];
+                            break;
                         }
                         else if(gamePadCombo[val2] == 73){ //shieldTackle
                             //comboResponse += 3
                             gamePadCombo = [];
+                            break;
                         }
                     }else if(gamePadCombo[val] == 68){
                         let val2 = val + 1;
@@ -1271,6 +1387,7 @@ function create(){
                             //console.log('spejump');
                             comboResponse+=5
                             gamePadCombo = [];
+                            break;
                         }
                     }
                 }if(gamePadCombo[i] == 81){
@@ -1284,6 +1401,7 @@ function create(){
                                     comboResponse += 6
                                 //player.data.list.special++
                                 gamePadCombo = [];
+                                break;
                             }
                         }
                     }
@@ -1298,6 +1416,7 @@ function create(){
                                     comboResponse +=6
                                 //player.data.list.special++
                                 gamePadCombo = [];
+                                break;
                             }
                         }
                     }
@@ -1305,6 +1424,7 @@ function create(){
                     //comboResponse +=7
                     gamepadAttack = true;
                     gamePadCombo = [];
+                    break;
                 }
             }
         }
@@ -1312,14 +1432,14 @@ function create(){
         //console.log(comboResponse);
         // console.log(gamePadCombo);
         if(comboResponse == 1){
-            if(canShoryu === true){
+            //if(canShoryu === true){
                 if(player.data.list.special >= 1){
                 counterMovePlayer = 32;
                 attackintheair = true;
                 tornadoSlash();
                 // gamepadAttack = false
                 }
-            }
+            //}
         }
         if(comboResponse == 2){
             if(player.data.list.special >= 4){
@@ -1568,19 +1688,24 @@ function create(){
     });
     this.anims.create({
         key: 'guard',
-        frames: this.anims.generateFrameNumbers('heroGuard',{frames: [0]}),
+        frames: this.anims.generateFrameNumbers('heroGuard',{frames: [24]}),
         frameRate: 8,
         //repeat: -1
     });
     this.anims.create({
         key: 'protectGuard',
-        frames: this.anims.generateFrameNumbers('heroProtectGuard',{frames: [0, 1, 2, 3, 4, 4, 4, 4, 4, 4]}),
+        frames: this.anims.generateFrameNumbers('heroGuard',{frames: [24, 25, 26, 27, 28, 28, 28, 28, 28, 28]}),
         frameRate: 8,
         //repeat: -1
     });
     this.anims.create({
         key: 'knockBack',
         frames: this.anims.generateFrameNumbers('heroKnockBack',{frames: [5, 0, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5]}),
+        frameRate: 8,
+    });
+    this.anims.create({
+        key: 'pickupBox',
+        frames: this.anims.generateFrameNumbers('hero',{frames: [1, 2, 3]}),
         frameRate: 8,
     });
     this.anims.create({
@@ -1605,6 +1730,12 @@ function create(){
         frames: this.anims.generateFrameNumbers('specialairslash',{frames: [0, 1, 2, 2, 3, 4, 5, 6, 7, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8]}),
         frameRate: 16,
         repeat : -1,
+    });
+    this.anims.create({
+        key: 'spinningSlash',
+        frames: this.anims.generateFrameNumbers('heroGuard',{frames: [14, 15, 16, 17, 18, 19, 20, 21, 22, 18]}),
+        frameRate: 16,
+        //repeat: -1
     });
     this.anims.create({
         key: 'ultra',
@@ -1987,7 +2118,7 @@ function create(){
     });
     this.anims.create({
         key: 'clover',
-        frames: this.anims.generateFrameNumbers('seal',{frames: [16, 17, 18, 19]}),
+        frames: this.anims.generateFrameNumbers('seal',{frames: [16, 17, 18, 17]}),
         frameRate: 5,
         repeat: -1
     });
@@ -1999,7 +2130,7 @@ function create(){
     });
     this.anims.create({
         key: 'HomeAnim',
-        frames: this.anims.generateFrameNumbers('controlHelp',{frames: [9,9, 10]}),
+        frames: this.anims.generateFrameNumbers('controlHelp',{frames: [11, 11, 12]}),
         frameRate: 2,
         repeat: -1
     });
@@ -2007,7 +2138,7 @@ function create(){
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // CREATE ENEMIES
-
+    //uploadScore(UserName, Score)
     
     
     // createEnemies(enemy1Spawn,'Enemy1');
@@ -2114,19 +2245,13 @@ function update(time, delta){
     }
 
     scoreText.setText('SCORE : '+ Score);                                                            // maj score
-    gameOverText.setText('   GAME OVER \n   score : '+ Score + '\npress "J" to restart');                                                           // maj score
+    HighScoreText.setText(HighScore);                                                            // maj score
+    gameOverText.setText(' '+ Score + ' ');                                                           // maj score
     personalBestText.setText('YOUR BEST : '+ personalBest);                                          // maj score
     comboText.setText('COMBO X '+ comboValue);                                                       // maj combo
-    // gameOverText.x = player.body.position.x - 260
-    // gameOverText.y = player.body.position.y
+    NameText.setText(''+ NameValueArray.toString().replaceAll(',', '') + Alphabet[AlphabetCount]);                                                       // maj combo
+    this.physics.moveToObject(spawnDetector, player, 700, 40);                                           // spawnDetector position
 
-    // spawnDetector.body.velocity.x = player.body.velocity.x ;
-    // spawnDetector.body.velocity.y = player.body.velocity.y ;
-//console.log(player.body);
-    this.physics.moveToObject(spawnDetector, player, 600);
-
-    // spawnDetector.x = player.x ;
-    // spawnDetector.y = player.y ;
     funText.setText(''+ messageFunTextList[comboValue]);
 
     if(comboValue <= 0){
@@ -2181,44 +2306,59 @@ function update(time, delta){
     // spawnReActivator.body.velocity.x = player.body.velocity.x ;
     // spawnReActivator.body.velocity.y = player.body.velocity.y ;
     // spawnDetector.y = player.body.position.y;
-    if(startGame === true){
-        controlHelp.setVisible(true)
-        //controlHelp.setFrame(9);
-        controlHelp.anims.play('HomeAnim', true)
-    }
-    else{
+    if(GameOver === true){
+        controlHelp.setVisible(true);
+        //controlHelp.setFrame(15);
+    }else{
 
-     if(player.body.position.x < 950){
-        controlHelp.alpha = 2.150 - ((player.body.position.x / 1000) * 2)                                                // opacity // control help
-        controlHelp.setVisible(true)
-        controlHelp.setFrame(0);
-     }
-     else if(player.body.position.x > 1050 && player.body.position.x < 2030){
-        controlHelp.alpha = 1;
-        controlHelp.setVisible(true)
-        controlHelp.setFrame(1);
-     }
-     else if(player.body.position.x > 2040 && player.body.position.x < 2600){
-        controlHelp.setVisible(true)
-        controlHelp.setFrame(3);
-     }
-     else if(player.body.position.x > 2601 && player.body.position.x < 3000){
-        controlHelp.setVisible(true)
-        controlHelp.setFrame(4);
-     }
-     else if(player.body.position.x > 3100 && player.body.position.x < 4000){
-        controlHelp.setVisible(true)
-        controlHelp.setFrame(2);
-     }
-     else if(player.body.position.x > 4150 && player.body.position.x < 5374){
-        controlHelp.setVisible(true)
-        controlHelp.setFrame(5);
-     }
-     else if(player.body.position.x > 5600 && player.body.position.x < 6374){
-        controlHelp.setVisible(true)
-        controlHelp.setFrame(8);
-     }
-     else{controlHelp.setVisible(false)}
+        if(startGame === true){
+            controlHelp.setVisible(true)
+            //controlHelp.setFrame(9);
+            controlHelp.anims.play('HomeAnim', true)
+        }
+        else if(dealMode === true){
+            controlHelp.setVisible(true)
+        }
+        else{
+    
+         if(player.body.position.x < 950){
+             controlHelp.setVisible(true)
+             if(scoreView){
+                 controlHelp.setFrame(13);
+            }else{
+                controlHelp.alpha = 2.150 - ((player.body.position.x / 1000) * 2)                                                // opacity // control help
+                controlHelp.setFrame(0);
+            }
+         }
+         else if(player.body.position.x > 1050 && player.body.position.x < 2030){
+            controlHelp.alpha = 1;
+            controlHelp.setVisible(true)
+            controlHelp.setFrame(1);
+         }
+         else if(player.body.position.x > 2040 && player.body.position.x < 2600){
+            controlHelp.setVisible(true)
+            controlHelp.setFrame(3);
+         }
+         else if(player.body.position.x > 2601 && player.body.position.x < 3000){
+            controlHelp.setVisible(true)
+            controlHelp.setFrame(4);
+         }
+         else if(player.body.position.x > 3100 && player.body.position.x < 4000){
+            controlHelp.setVisible(true)
+            controlHelp.setFrame(2);
+         }
+         else if(player.body.position.x > 4150 && player.body.position.x < 5374){
+            controlHelp.setVisible(true)
+            controlHelp.setFrame(6);
+         }
+         else if(player.body.position.x > 5600 && player.body.position.x < 6374){
+            controlHelp.setVisible(true)
+            controlHelp.setFrame(10);
+         }
+         else{
+            controlHelp.setVisible(false)
+        }
+        }
     }
 
 
@@ -2259,23 +2399,20 @@ function update(time, delta){
                                 counterMovePlayer = 14;
                                 htblobjct.data.list.AtkCollide = false;
                             }
-
                             else if(plyr.flipX === true && htblobjct.flipX === true){
                                 swordImpact2.play();
                                 counterMovePlayer = 14;
-                                //console.log(plyr.body.velocity);
                                 htblobjct.data.list.AtkCollide = false;
-
-                            }else if(plyr.flipX === true && htblobjct.flipX === false){
+                            }
+                            else if(plyr.flipX === true && htblobjct.flipX === false){
                                 swordImpact.play();
                                 counterMovePlayer = 28
                             }
-
                             else if(plyr.flipX === false && htblobjct.flipX === true){
                                 swordImpact.play();
                                 counterMovePlayer = 28
                             }
-                        }else{                                                                          // collision Player KnockBack
+                        }else{                                                         // collision Player KnockBack
                             // console.log(htblobjct);
                             swordImpact.play();
                             counterMovePlayer = 28
@@ -2492,6 +2629,7 @@ function update(time, delta){
     // console.log(theGamePad);
     //console.log(theGamePad.gamepads);
     //console.log(gamePadCombo);
+    //console.log(gamepadAttack);
     //console.log(this.input.gamepad.total);
     //console.log(this.input.gamepad.gamepads.length);
     //if(player.flipX === true && player.body.velocity.x === 0){console.log('flip');}
@@ -2519,12 +2657,14 @@ function update(time, delta){
         //this.anims.pauseAll();
     }
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//console.log(GameOver);
 
     if(player.data.list.health <= 0){                                                              //Player Die 
         themeSong.stop();
         player.anims.play('knockBack', true);
         counterMovePlayer = 999;
         player.data.list.health = 0;
+        // console.log(touchesAttack.enabled = false);
         //console.log(theGamePad.x = false);
         //player.on('animationupdate', ()=>{
             // if(player.anims.currentFrame.index < 19){
@@ -2532,51 +2672,132 @@ function update(time, delta){
             // }
             // if(player.anims.currentFrame.index >= 19){
         player.on('animationcomplete', ()=>{                                             // GAME OVER
-                //console.log(player.anims.play('die',true))
-                
+                AlphabetCount = 1;
+                console.log('hola senor')
                 this.anims.pauseAll();
                 GameOver = true;
                 gameoverSong.play();
-                if(Score > personalBest){
-                    localStorage.setItem('score', Score)
-                }
+                //NameText.setVisible(true);
+
+                // if(Score > personalBest){
+                //     localStorage.setItem('score', Score)
+                //     var tagName = localStorage.getItem('name');
+                //     console.log(tagName + tagName.length);
+                //     if(tagName.length < 10){
+                //         var number = Math.abs(tagName.length - 10);
+                //         console.log(number);
+                //         var space = '_';
+                //         for(let i = 0; i < number; i++){
+                //             tagName = tagName + space;
+                //             console.log(tagName);
+                //             if(tagName.length === 10){
+                //                 uploadScore(tagName, Score);
+                //                 break;
+                //             }
+                //         }
+                //     }
+                // }
                 gameOverText.setDepth(3);
+                //console.log(NameValueArray.length);
                
             // }
         });
         setTimeout(()=>{
-            // console.log(player.anims.currentAnim.frames)
-            if(touchesAttack._justDown === true  && GameOver === true                             // Restart Game
-            || theGamePad.X && GameOver === true){
-                this.registry.destroy(); //destroy registry
-                this.events.off(); // disable all active events
-                this.scene.start(); // restart current scene
-                gameoverSong.stop();
-                spawnCounter = 0;
-                Score = 0;
-                GameOver = false;
-                this.anims.resumeAll();
-                counterMovePlayer = 0;
-                //console.log(theGamePad);
-                //console.log(gamePadCombo.includes);
-            }
-        },5000)
+            touchesAttack.enabled = true;
+            // if(touchesAttack._justDown === true  && GameOver === true                             // Restart Game
+            // || theGamePad.X && GameOver === true){
+
+            //if(touchesAttack._justDown === true  || theGamePad.X){
+                if(GameOver === true){
+                    if(Score < personalBest){
+                        EnterNameIsFinish = true;
+                        console.log(Score + personalBest);
+                        NameText.setVisible(false);
+                        controlHelp.setFrame(15);
+                    }else{
+                        NameText.setVisible(true);
+                        controlHelp.setFrame(14);
+                    }
+
+                    if(EnterNameIsFinish){ // === true
+                        
+                        if(Score > personalBest){
+                            localStorage.setItem('score', Score)
+                            var tagName = localStorage.getItem('name');
+                            var newBestScore = Score;
+                            console.log(Score + personalBest);
+                            if(tagName.length < 10){
+                                var number = Math.abs(tagName.length - 10);
+                                console.log(number);
+                                var space = '_';
+                                for(let i = 0; i < number; i++){
+                                    tagName = tagName + space;
+                                    console.log(tagName);
+                                    if(tagName.length === 10){
+
+                                        this.registry.destroy(); //destroy registry
+                                        this.events.off(); // disable all active events
+                                        this.scene.start(); // restart current scene
+                                        gameoverSong.stop();
+                                        spawnCounter = 0;
+                                        Score = 0;
+                                        GameOver = false;
+                                        this.anims.resumeAll();
+                                        counterMovePlayer = 0;
+                                        console.log(Score + personalBest);
+                                        uploadScore(tagName, newBestScore);
+                                        break;
+                                    }
+                                }
+                            }
+                        }else{
+                            if(touchesAttack._justDown === true  || theGamePad.X){
+                                this.registry.destroy(); //destroy registry
+                                            this.events.off(); // disable all active events
+                                            this.scene.start(); // restart current scene
+                                            gameoverSong.stop();
+                                            spawnCounter = 0;
+                                            Score = 0;
+                                            GameOver = false;
+                                            this.anims.resumeAll();
+                                            counterMovePlayer = 0;
+                                            console.log(Score + personalBest);
+                                            uploadScore(tagName, newBestScore);
+                            }
+                                        
+                        }
+
+                    }
+                }
+                // }
+            },5000)
     }
    
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        if(theGamePad.up && counterMovePlayer === 0){                                                       //up (climb pad)
-            if(playerInGround === false){
-                player.data.list.Climb = true
+        if(theGamePad.up){                                                       //up (climb pad)
+            if(counterMovePlayer === 0){
+                if(playerInGround === false){
+                    player.data.list.Climb = true
+                }
             }
+            // else if(counterMovePlayer === 999){
+            //     if(AlphabetCount > 26){AlphabetCount = 0};    
+            //     AlphabetCount++ 
+            //     console.log(gamePadCombo);       
+            // }    
         }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
         if (leftkey.isDown && counterMovePlayer === 0 || theGamePad.left  && counterMovePlayer === 0){              //left
                 heroLeft();
+   // this.physics.moveToObject(spawnDetector, player,200,10);                                           // spawnDetector position
+
             }
         else if (rightkey.isDown && counterMovePlayer === 0 || theGamePad.right && counterMovePlayer === 0){       //right
                 heroRight();
+    //this.physics.moveToObject(spawnDetector, player, 200,10);                                           // spawnDetector position
+
             }
         else if (player.setVelocityX(0)){                                                               //idle
                 if(playerInGround === true && counterMovePlayer === 0){
@@ -2589,12 +2810,42 @@ function update(time, delta){
                 }
             }
 
+        // if(Phaser.Input.Keyboard.JustDown(itemKey)){                                                        //item //Potion
+        //     if(player.data.list.Potion === true){
+        //         player.data.list.Potion = false;
+        //         itembar.setFrame(11);
+        //         console.log('item');
+        //     } 
+    
+
+        // }
+
         
-        if(Phaser.Input.Keyboard.JustDown(upkey) && counterMovePlayer === 0 
-        || gamepadJump === true && counterMovePlayer === 0){                                                //jump        
-                                                    
-           jumpAction();
-        }     
+        // if(Phaser.Input.Keyboard.JustDown(upkey) && counterMovePlayer === 0 
+        // || gamepadJump === true && counterMovePlayer === 0){                                                //jump     
+        //     console.log(Alphabet[AlphabetCount])              
+        //    jumpAction();
+        // }
+        if(Phaser.Input.Keyboard.JustDown(upkey) || gamepadJump === true){                                                //jump 
+            if(counterMovePlayer === 0){
+                jumpAction();
+            }else if(counterMovePlayer === 999){
+                AlphabetCount++ 
+                if(AlphabetCount > 26){AlphabetCount = 0};
+                
+                // console.log(Alphabet[AlphabetCount])              
+            }    
+        }
+       
+        
+        if(Phaser.Input.Keyboard.JustDown(downkey)){
+            if(counterMovePlayer === 999){
+                AlphabetCount-- 
+                if(AlphabetCount < 0){AlphabetCount = 26}
+                console.log(counterMovePlayer);
+            }
+        }  
+       
 
         if(player.body.velocity.y > 0 &&                                                                    //fall
             attackintheair === false &&                                    
@@ -2608,45 +2859,116 @@ function update(time, delta){
             gamepadJump = false
         }
         
-        if (touchesGuard.isDown && playerInGround === true && counterMovePlayer === 0 ||
-            theGamePad.Y && playerInGround === true && counterMovePlayer === 0 ){                             //guard
-            player.setVelocityX(0);
-            player.setVelocityY(0);
-            player.anims.play('guard', true);
-            player.data.list.Guard = true;
-            setCombo()
-            if(dealMode === true){
-                dealEvent();
+        // if (touchesGuard.isDown && playerInGround === true && counterMovePlayer === 0 ||
+        //     theGamePad.Y && playerInGround === true && counterMovePlayer === 0 ){                             //guard
+        if (touchesGuard.isDown || theGamePad.Y){      
+            //console.log('hey');
+            //NameValueArray.pop();
+            if(counterMovePlayer >= 999){
+                NameValueArray.pop();
+                console.log(NameValueArray);
+            }        
+            if(counterMovePlayer === 0 ){
+                if(playerInGround === true){
+                    player.setVelocityX(0);
+                    player.setVelocityY(0);
+                    player.anims.play('guard', true);
+                    player.data.list.Guard = true;
+                    setCombo()
+                    if(dealMode === true){
+                        dealEvent();
+                }
             }
+        }
+
+
         }else if(touchesGuard.isUp && playerInGround === true && counterMovePlayer != 14){
             player.data.list.Guard = false
         }
-        
+        //console.log(theGamePad);
+        // console.log(playerInGround);
         if(Phaser.Input.Keyboard.JustDown(touchesAttack) || gamepadAttack === true){                            //attack     
             gamepadAttack = false;
             counterMovePlayer++;
             cameraPlayer.shakeEffect.progress = 0                                                   //shaker camera reset
             cameraPlayer.shakeEffect._elapsed = 0
-            if (countTest === 2 && playerInGround === true){attackComboThree();}
-            if(counterMovePlayer === 1 && playerInGround === true){attackComboOne();}
-            else if (counterMovePlayer >= 2 && playerInGround === true){attackComboTwo();}
-            else if(counterMovePlayer === 1 && playerInGround === false){attackJump();}
+            // if (countTest === 2 && playerInGround === true){attackComboThree();}
+            // if(counterMovePlayer === 1 && playerInGround === true){attackComboOne();}
+            // else if (counterMovePlayer >= 2 && playerInGround === true){attackComboTwo();}
+            // else if(counterMovePlayer === 1 && playerInGround === false){attackJump();}
+            if(playerInGround){                         //playerInGround = true
+                if(countTest === 2){attackComboThree();}
+                if(counterMovePlayer === 1){attackComboOne();}
+                else if(counterMovePlayer >= 2){attackComboTwo();}
+                else if(counterMovePlayer === 1){attackJump();}
+                if(counterMovePlayer >= 999){
+                    
+                    if(NameValueArray.includes('end')){
+                        NameValueArray.pop();
+                        UserName = NameValueArray.toString().replaceAll(',', '')
+                        localStorage.setItem('name', UserName);
+                        NameValueArray[0] = UserName;
+                        NameValueArray = NameValueArray.shift();
+                        // AlphabetCount = 27;
+                        //console.log(AlphabetCount);
+                        EnterNameIsFinish = true;
+                       
+                    }else{
+                        if(NameValueArray.length <= 11){
+                            if(EnterNameIsFinish === false){
+                                NameValueArray.push(Alphabet[AlphabetCount]);
+                                AlphabetCount = 1;
+                            }else{ EnterNameIsFinish = true;}
+                        }else{
+                            NameValueArray.length = 10;
+                            NameValueArray.pop();
+                            NameValueArray.push(Alphabet[0]);
+                        }
+                    }
+                }
+            }else{                                      //playerInGround = false
+                if(counterMovePlayer === 1){attackJump();}
+            }
+            //console.log(counterMovePlayer);
+            //if(counterMovePlayer === 999){
+                // NameValueArray.push(Alphabet[AlphabetCount]);
+                // AlphabetCount = 0;
+            //}
         }  
-
-        if(Phaser.Input.Keyboard.JustDown(enterKey) && startGame === true ||
-        theGamePad.X && startGame === true){     
-            player.x = 680;
-            player.y = 1890;
-            // player.x = 37000; // boss
-            // player.y = 550;
-            spawnDetector.body.position.x = player.x - 390
-            spawnDetector.body.position.y = player.y - 240
-            startGame = false;
-            rageCloud.anims.play('rage',true);
-            soundVolume = 1;
-            swordAir.volume = 0.4;
-            // themeSong.play();
-        }
+        
+        // if(Phaser.Input.Keyboard.JustDown(enterKey) || theGamePad.X){     
+        //     theGamePad.X = false
+        //     // if(Phaser.Input.Keyboard.JustDown(enterKey) || gamePadCombo){     
+        //     if(startGame){
+        //         if(scoreView){
+        //             console.log(scoreView + startGame);
+        //         }else{
+        //             // player.x = 680;
+        //             // player.y = 1890;
+        //             player.x = 15000;
+        //             player.y = 1890;
+        //             playerVelocityX = 270;
+        //             touchesAttack.enabled = true;
+        //             // player.x = 37000; // boss
+        //             // player.y = 550;
+        //             spawnDetector.body.position.x = player.x - 390
+        //             spawnDetector.body.position.y = player.y - 240
+        //             startGame = false;
+        //             rageCloud.anims.play('rage',true);
+        //             soundVolume = 1;
+        //             swordAir.volume = 0.4;
+        //             this.cameras.main.flash();
+        //             themeSong.play();
+        //         }
+                
+        //     }else{
+        //         if(scoreView === true){
+        //             startGame = true;
+        //             scoreView = false;
+        //             HighScoreText.setVisible(false);
+        //         }
+        //     }
+        // }
 // }  
 }
 
@@ -2681,10 +3003,10 @@ function attackComboOne(){                                                      
                 if(nameAttack === player.anims.currentAnim.key){
                     if(4 === player.anims.currentFrame.index){
                             player.data.list.Eject = 0;
-                            if(playerFlip === true){colideATK.setX(player.x -50);colideATK.setY(player.y);}
-                            if(playerFlip === false){colideATK.setX(player.x +50);colideATK.setY(player.y)}    
-                            if(playerFlip === true){player.setVelocityX(-100)}
-                            if(playerFlip === false){player.setVelocityX(100)}
+                            if(player.flipX === true){colideATK.setX(player.x -50);colideATK.setY(player.y);}
+                            if(player.flipX === false){colideATK.setX(player.x +50);colideATK.setY(player.y)}    
+                            if(player.flipX === true){player.setVelocityX(-100)}
+                            if(player.flipX === false){player.setVelocityX(100)}
                     };
                     if(player.anims.currentFrame.index >= 5){
                         colideATK.setX(0)
@@ -2716,13 +3038,13 @@ if(player.anims.currentAnim.key === 'attackOne'){
     player.on('animationupdate', ()=>{
         if(nameAttack2 === player.anims.currentAnim.key){
             if(player.anims.currentFrame.index <= 3){
-                if(playerFlip === true){player.setVelocityX(-200)}
-                if(playerFlip === false){player.setVelocityX(200)}
+                if(player.flipX === true){player.setVelocityX(-200)}
+                if(player.flipX === false){player.setVelocityX(200)}
             }
             if(player.anims.currentFrame.index === 4){
                 player.data.list.Eject = 2;
-                if(playerFlip === true){colideATK.setX(player.x -50);colideATK.setY(player.y)}
-                if(playerFlip === false){colideATK.setX(player.x +50);colideATK.setY(player.y)}
+                if(player.flipX === true){colideATK.setX(player.x -50);colideATK.setY(player.y)}
+                if(player.flipX === false){colideATK.setX(player.x +50);colideATK.setY(player.y)}
             }
             if(player.anims.currentFrame.index >= 5){
                 colideATK.setX(0)
@@ -2763,12 +3085,12 @@ function attackComboThree(){
     player.on('animationupdate', ()=>{
         if(nameAttack === player.anims.currentAnim.key){
             if(player.anims.currentFrame.index === 5){
-                if(playerFlip === true){colideATK.setX(player.x -80);colideATK.setY(player.y)}
-                if(playerFlip === false){colideATK.setX(player.x +80);colideATK.setY(player.y)}
+                if(player.flipX === true){colideATK.setX(player.x -80);colideATK.setY(player.y)}
+                if(player.flipX === false){colideATK.setX(player.x +80);colideATK.setY(player.y)}
             }
             if(player.anims.currentFrame.index <= 6){
-                if(playerFlip === true){player.setVelocityX(-200)}
-                if(playerFlip === false){player.setVelocityX(200)}
+                if(player.flipX === true){player.setVelocityX(-200)}
+                if(player.flipX === false){player.setVelocityX(200)}
                 player.data.list.Eject = 3;
                 countTest = 0;
                 canShoryu = true
@@ -2835,13 +3157,11 @@ function attackJump(){                                                          
     var velocityX = player.body.velocity.x
     player.data.list.Eject = 3;
 
-
-
     player.on('animationupdate', ()=>{
         if(nameAttack4 === player.anims.currentAnim.key){
             if(player.anims.currentFrame.index === 4){
-                if(playerFlip === true){colideATK.setX(player.x -65);colideATK.setY(player.y +20)}
-                if(playerFlip === false){colideATK.setX(player.x +65);colideATK.setY(player.y +20)} 
+                if(player.flipX === true){colideATK.setX(player.x -65);colideATK.setY(player.y +20)}
+                if(player.flipX === false){colideATK.setX(player.x +65);colideATK.setY(player.y +20)} 
             }
             if(player.anims.currentFrame.index >= 5){
                 colideATK.setX(0)
@@ -2870,7 +3190,6 @@ function powerAttackJump(){                                                     
         }else{
             rageValue = 1;
         }
-        
         player.on('animationupdate', ()=>{
             if('specialAirSlash' === player.anims.currentAnim.key){
                 if(player.anims.currentFrame.index == 1){
@@ -2948,26 +3267,26 @@ function shieldTackle(){                                                        
     player.on('animationupdate', ()=>{
         if('shieldAttack' === player.anims.currentAnim.key){
             if(player.anims.currentFrame.index <= 13 ){
-                if(playerFlip === true){player.setVelocityX(-playerVelocityX * 2)}
-                if(playerFlip === false){player.setVelocityX(playerVelocityX * 2)}
+                if(player.flipX === true){player.setVelocityX(-playerVelocityX * 2)}
+                if(player.flipX === false){player.setVelocityX(playerVelocityX * 2)}
                 playerCanFall = false;
                 player.setGravityY(-10);
             }
             if(player.anims.currentFrame.index === 9){
-                if(playerFlip === true){colideATK.setX(player.x -40);colideATK.setY(player.y)}
-                if(playerFlip === false){colideATK.setX(player.x +40);colideATK.setY(player.y)}
+                if(player.flipX === true){colideATK.setX(player.x -40);colideATK.setY(player.y)}
+                if(player.flipX === false){colideATK.setX(player.x +40);colideATK.setY(player.y)}
                 player.data.list.Eject = 2;
 
             }
             if(player.anims.currentFrame.index === 10){
-                if(playerFlip === true){colideATK.setX(player.x -60);colideATK.setY(player.y)}
-                if(playerFlip === false){colideATK.setX(player.x +60);colideATK.setY(player.y)}
+                if(player.flipX === true){colideATK.setX(player.x -60);colideATK.setY(player.y)}
+                if(player.flipX === false){colideATK.setX(player.x +60);colideATK.setY(player.y)}
                 player.data.list.Eject = 0;
 
             }
             if(player.anims.currentFrame.index === 11){
-                if(playerFlip === true){colideATK.setX(player.x -70);colideATK.setY(player.y)}
-                if(playerFlip === false){colideATK.setX(player.x +70);colideATK.setY(player.y)}
+                if(player.flipX === true){colideATK.setX(player.x -70);colideATK.setY(player.y)}
+                if(player.flipX === false){colideATK.setX(player.x +70);colideATK.setY(player.y)}
                 player.data.list.Eject = 3;
 
             }
@@ -3009,16 +3328,16 @@ function tornadoSlash(){                                                        
             if(player.anims.currentFrame.index <= 3 ){
                 canShoryu = false
                 player.setGravityY(-1200);
-                if(playerFlip === true){player.setVelocityX(-playerVelocityX * 4)}
-                if(playerFlip === false){player.setVelocityX(playerVelocityX * 4)} 
+                if(player.flipX === true){player.setVelocityX(-playerVelocityX * 4)}
+                if(player.flipX === false){player.setVelocityX(playerVelocityX * 4)} 
                 // console.log(player.body.checkCollision.left = false);
                 // console.log(player.body.checkCollision.right = false);
             }
 
             if(player.anims.currentFrame.index === 2 ){
                 //player.anims.stop()
-                if(playerFlip === true){colideATK.setX(player.x -50);colideATK.setY(player.y +10)}
-                if(playerFlip === false){colideATK.setX(player.x +50);colideATK.setY(player.y +10)} 
+                if(player.flipX === true){colideATK.setX(player.x -50);colideATK.setY(player.y +10)}
+                if(player.flipX === false){colideATK.setX(player.x +50);colideATK.setY(player.y +10)} 
             }
             if(player.anims.currentFrame.index >= 3 ){
                 player.data.list.Eject = 0;
@@ -3031,8 +3350,8 @@ function tornadoSlash(){                                                        
                 player.data.list.Eject = 1;
                 //player.anims.stop()
                 playerInGround = false
-                if(playerFlip === true){colideATK.setX(player.x -60);colideATK.setY(player.y -32)}
-                if(playerFlip === false){colideATK.setX(player.x +60);colideATK.setY(player.y -32)} 
+                if(player.flipX === true){colideATK.setX(player.x -60);colideATK.setY(player.y -32)}
+                if(player.flipX === false){colideATK.setX(player.x +60);colideATK.setY(player.y -32)} 
             }
             
             if(player.anims.currentFrame.index === 5 ){
@@ -3047,8 +3366,8 @@ function tornadoSlash(){                                                        
                 //player.anims.stop()
                 colideATK.setY(player.y -120)
                 player.data.list.Eject = 1;
-                if(playerFlip === true){colideATK.setX(player.x -30);}
-                if(playerFlip === false){colideATK.setX(player.x +30);} 
+                if(player.flipX === true){colideATK.setX(player.x -30);}
+                if(player.flipX === false){colideATK.setX(player.x +30);} 
             }
             
             if(player.anims.currentFrame.index === 7 ){
@@ -3122,37 +3441,37 @@ function UltraSlash(){
 
                 //player.anims.stop()
                 player.data.list.Eject = 0;
-                if(playerFlip === true){colideATK.setX(player.x -75);colideATK.setY(player.y +10)}
-                if(playerFlip === false){colideATK.setX(player.x +75);colideATK.setY(player.y +10)} 
+                if(player.flipX === true){colideATK.setX(player.x -75);colideATK.setY(player.y +10)}
+                if(player.flipX === false){colideATK.setX(player.x +75);colideATK.setY(player.y +10)} 
             }
             if(player.anims.currentFrame.index === 6){
             swordAir.play();
             
                 player.data.list.Eject = 2;
                 //player.anims.stop()
-                if(playerFlip === true){colideATK.setX(player.x -60);colideATK.setY(player.y +10)}
-                if(playerFlip === false){colideATK.setX(player.x +60);colideATK.setY(player.y +10)} 
+                if(player.flipX === true){colideATK.setX(player.x -60);colideATK.setY(player.y +10)}
+                if(player.flipX === false){colideATK.setX(player.x +60);colideATK.setY(player.y +10)} 
             }
             if(player.anims.currentFrame.index === 10){
             swordAir.play();
 
                 player.data.list.Eject = 0;
-                if(playerFlip === true){colideATK.setX(player.x -75);colideATK.setY(player.y +10)}
-                if(playerFlip === false){colideATK.setX(player.x +75);colideATK.setY(player.y +10)} 
+                if(player.flipX === true){colideATK.setX(player.x -75);colideATK.setY(player.y +10)}
+                if(player.flipX === false){colideATK.setX(player.x +75);colideATK.setY(player.y +10)} 
             }
             if(player.anims.currentFrame.index === 14){
             swordAir.play();
 
                 player.data.list.Eject = 2;
-                if(playerFlip === true){colideATK.setX(player.x -60);colideATK.setY(player.y +10)}
-                if(playerFlip === false){colideATK.setX(player.x +60);colideATK.setY(player.y +10)} 
+                if(player.flipX === true){colideATK.setX(player.x -60);colideATK.setY(player.y +10)}
+                if(player.flipX === false){colideATK.setX(player.x +60);colideATK.setY(player.y +10)} 
             }
             if(player.anims.currentFrame.index === 17){
             swordAir.play();
 
                 player.data.list.Eject = 0;
-                if(playerFlip === true){colideATK.setX(player.x -75);colideATK.setY(player.y +10)}
-                if(playerFlip === false){colideATK.setX(player.x +75);colideATK.setY(player.y +10)} 
+                if(player.flipX === true){colideATK.setX(player.x -75);colideATK.setY(player.y +10)}
+                if(player.flipX === false){colideATK.setX(player.x +75);colideATK.setY(player.y +10)} 
             }
             // if(player.anims.currentFrame.index === 18){
             //     player.data.list.Eject = 2;
@@ -3163,64 +3482,64 @@ function UltraSlash(){
             swordAir.play();
 
                 player.data.list.Eject = 0;
-                if(playerFlip === true){colideATK.setX(player.x -75);colideATK.setY(player.y +10)}
-                if(playerFlip === false){colideATK.setX(player.x +75);colideATK.setY(player.y +10)} 
+                if(player.flipX === true){colideATK.setX(player.x -75);colideATK.setY(player.y +10)}
+                if(player.flipX === false){colideATK.setX(player.x +75);colideATK.setY(player.y +10)} 
             }
             if(player.anims.currentFrame.index === 24){
             swordAir.play();
 
                 player.data.list.Eject = 2;
-                if(playerFlip === true){colideATK.setX(player.x -70);colideATK.setY(player.y +10)}
-                if(playerFlip === false){colideATK.setX(player.x +70);colideATK.setY(player.y +10)} 
+                if(player.flipX === true){colideATK.setX(player.x -70);colideATK.setY(player.y +10)}
+                if(player.flipX === false){colideATK.setX(player.x +70);colideATK.setY(player.y +10)} 
             }
             if(player.anims.currentFrame.index === 26){
             swordAir.play();
 
                 player.data.list.Eject = 0;
-                if(playerFlip === true){colideATK.setX(player.x -80);colideATK.setY(player.y +10)}
-                if(playerFlip === false){colideATK.setX(player.x +80);colideATK.setY(player.y +10)} 
+                if(player.flipX === true){colideATK.setX(player.x -80);colideATK.setY(player.y +10)}
+                if(player.flipX === false){colideATK.setX(player.x +80);colideATK.setY(player.y +10)} 
             }
             if(player.anims.currentFrame.index === 30){
             swordAir.play();
 
                 player.data.list.Eject = 2;
-                if(playerFlip === true){colideATK.setX(player.x -70);colideATK.setY(player.y +10)}
-                if(playerFlip === false){colideATK.setX(player.x +70);colideATK.setY(player.y +10)} 
+                if(player.flipX === true){colideATK.setX(player.x -70);colideATK.setY(player.y +10)}
+                if(player.flipX === false){colideATK.setX(player.x +70);colideATK.setY(player.y +10)} 
             }
             if(player.anims.currentFrame.index === 36){
             swordAir.play();
 
                 player.data.list.Eject = 0;
-                if(playerFlip === true){colideATK.setX(player.x -65);colideATK.setY(player.y +10)}
-                if(playerFlip === false){colideATK.setX(player.x +65);colideATK.setY(player.y +10)} 
+                if(player.flipX === true){colideATK.setX(player.x -65);colideATK.setY(player.y +10)}
+                if(player.flipX === false){colideATK.setX(player.x +65);colideATK.setY(player.y +10)} 
             }
             if(player.anims.currentFrame.index === 42){
             swordAir.play();
 
                 player.data.list.Eject = 2;
-                if(playerFlip === true){colideATK.setX(player.x -80);colideATK.setY(player.y +10)}
-                if(playerFlip === false){colideATK.setX(player.x +80);colideATK.setY(player.y +10)} 
+                if(player.flipX === true){colideATK.setX(player.x -80);colideATK.setY(player.y +10)}
+                if(player.flipX === false){colideATK.setX(player.x +80);colideATK.setY(player.y +10)} 
             }
             if(player.anims.currentFrame.index === 50){
             swordAir.play();
 
                 player.data.list.Eject = 1;
-                if(playerFlip === true){colideATK.setX(player.x -70);colideATK.setY(player.y +10)}
-                if(playerFlip === false){colideATK.setX(player.x +70);colideATK.setY(player.y +10)} 
+                if(player.flipX === true){colideATK.setX(player.x -70);colideATK.setY(player.y +10)}
+                if(player.flipX === false){colideATK.setX(player.x +70);colideATK.setY(player.y +10)} 
             }
             if(player.anims.currentFrame.index === 54){
                 swordAir.play();
                 player.data.list.Eject = 2;
-                if(playerFlip === true){colideATK.setX(player.x -60);colideATK.setY(player.y +10)}
-                if(playerFlip === false){colideATK.setX(player.x +60);colideATK.setY(player.y +10)} 
+                if(player.flipX === true){colideATK.setX(player.x -60);colideATK.setY(player.y +10)}
+                if(player.flipX === false){colideATK.setX(player.x +60);colideATK.setY(player.y +10)} 
             }
             if(player.anims.currentFrame.index === 58){
             swordAir.play();
 
                 player.data.list.Eject = 1;
                 player.setVelocityX(0);
-                if(playerFlip === true){colideATK.setX(player.x -85);colideATK.setY(player.y +10)}
-                if(playerFlip === false){colideATK.setX(player.x +85);colideATK.setY(player.y +10)} 
+                if(player.flipX === true){colideATK.setX(player.x -85);colideATK.setY(player.y +10)}
+                if(player.flipX === false){colideATK.setX(player.x +85);colideATK.setY(player.y +10)} 
             }
             if(player.anims.currentFrame.index >= 64){
 
@@ -3234,6 +3553,51 @@ function UltraSlash(){
             }
         }
     })
+}
+function spinningSlash(){
+    player.anims.play('spinningSlash',true)
+    player.on('animationupdate', ()=>{
+        if('spinningSlash' === player.anims.currentAnim.key){
+            if(player.anims.currentFrame.index <= 2){
+                if(player.flipX === true){colideATK.setX(player.x +60);colideATK.setY(player.y +10)}
+                if(player.flipX === false){colideATK.setX(player.x -60);colideATK.setY(player.y +10)} 
+                player.data.list.Eject = 3;
+            }
+            if(player.anims.currentFrame.index === 3){
+                if(player.flipX === true){colideATK.setX(player.x -60);colideATK.setY(player.y +10)}
+                if(player.flipX === false){colideATK.setX(player.x +60);colideATK.setY(player.y +10)} 
+                player.data.list.Eject = 3;
+            }
+            if(player.anims.currentFrame.index === 4){
+                if(player.flipX === true){colideATK.setX(player.x -40);colideATK.setY(player.y +10)}
+                if(player.flipX === false){colideATK.setX(player.x +40);colideATK.setY(player.y +10)} 
+                player.data.list.Eject = 1;
+            }
+            if(player.anims.currentFrame.index === 6){
+                if(player.flipX === true){colideATK.setX(player.x +60);colideATK.setY(player.y +10)}
+                if(player.flipX === false){colideATK.setX(player.x -60);colideATK.setY(player.y +10)} 
+                player.data.list.Eject = 3;
+            }
+            if(player.anims.currentFrame.index === 7){
+                if(player.flipX === true){colideATK.setX(player.x +40);colideATK.setY(player.y +10)}
+                if(player.flipX === false){colideATK.setX(player.x -40);colideATK.setY(player.y +10)} 
+                player.data.list.Eject = 1;
+            }
+            if(player.anims.currentFrame.index === 9){
+                if(player.flipX === true){colideATK.setX(player.x -60);colideATK.setY(player.y +10)}
+                if(player.flipX === false){colideATK.setX(player.x +60);colideATK.setY(player.y +10)} 
+                player.data.list.Eject = 3;
+            }
+            if(player.anims.currentFrame.index >= 10){
+                colideATK.setX(0);colideATK.setY(0);
+                player.data.list.Eject = 0;
+                counterMovePlayer = 0; 
+            }
+        }
+    })
+}
+function actionBox(){
+    player.anims.play('pickupBox',true);
 }
 
 function KnockBack(){                                                                                  // Knock Back
@@ -3264,7 +3628,8 @@ function KnockBack(){                                                           
                         counterMovePlayer = 0;
                     }
                 }else{
-                    player.setGravityY(-1500)
+                    player.setGravityY(-1500);
+                    touchesAttack.enabled = false
                     // player.body.checkCollision.right = false;
                     // player.body.checkCollision.left = false;
                     if(player.flipX === true){
@@ -3299,8 +3664,8 @@ function GuardKnockBack(){
     player.on('animationupdate', ()=>{
         if(nameAction === player.anims.currentAnim.key){
             if(player.anims.currentFrame.index <=4){
-                if(playerFlip === true){player.setVelocityX(300)}
-                if(playerFlip === false){player.setVelocityX(-300)} 
+                if(player.flipX === true){player.setVelocityX(300)}
+                if(player.flipX === false){player.setVelocityX(-300)} 
             }
             if(player.anims.currentFrame.index >=5){
                 if(player.body.velocity.y != 0){
@@ -3491,7 +3856,15 @@ function enemyAttack(enemyone, currentArrow){
             if(enemyone.anims.currentFrame.index === 5){
                 enemyone.data.list.AtkCollide = true
                 
-                enemyone.setSize(100,56)
+                enemyone.setSize(50,56)
+                if(enemyone.flipX === true){
+                    enemyone.setOffset(75, 56)
+                }
+                if(enemyone.flipX === false){
+                    enemyone.setOffset(45, 56)
+                }
+                //enemyone.anims.pause();
+
                 setTimeout(()=>{
                     enemyone.setSize(24,56)
                     enemyone.data.list.AtkCollide = false
@@ -3511,8 +3884,15 @@ function enemyAttack(enemyone, currentArrow){
             if(enemyone.anims.currentFrame.index === 5){
                 enemyone.data.list.AtkCollide = true
                 
-                enemyone.setSize(165,56)
+                enemyone.setSize(60,26)
+                if(enemyone.flipX === true){
+                    enemyone.setOffset(115, 90)
+                }
+                if(enemyone.flipX === false){
+                    enemyone.setOffset(15, 90)
+                }
                 setTimeout(()=>{
+                    //enemyone.anims.pause();
                     enemyone.setSize(24,56)
                     enemyone.data.list.AtkCollide = false
                 },50)
@@ -3957,12 +4337,12 @@ function collisionAtkEnemies(htblObjct,atk){
     
 
     if(player.flipX === true){
-        htblObjct.flipX = true;
+        //htblObjct.flipX = true;
         slashAtk.setX(player.x -100)
     }
     if(player.flipX === false){
         slashAtk.setX(player.x +100)
-        htblObjct.flipX = false;
+        //htblObjct.flipX = false;
     }
 
     slashAtk.anims.play('slashed', true)
@@ -3976,7 +4356,7 @@ function collisionAtkEnemies(htblObjct,atk){
             enemyCanDie = true
         },3000)   
     }else{
-        htblObjct.flipX = false
+        //htblObjct.flipX = false
         enemyCanDie = true;
     }
     if(htblObjct.data.list.IsInvulnerable === false)
@@ -3989,7 +4369,7 @@ function collisionAtkEnemies(htblObjct,atk){
             player.anims.resume()
             slashAtk.setX(0);
             //atk.body.enable = true;
-        },150)
+        },140)
         // htblObjct.data.list.health = htblObjct.data.list.health - 1; 
         //console.log(htblObjct.data.list.health);
         //console.log(htblObjct.data.list);
@@ -4063,21 +4443,84 @@ if(comboValue >= 100){
 return comboValue = 0
 }
 function dealEvent(){
-    dealMode = false;
     if(Score >= 1000){
         var merchant = Item.children.entries[0].body
         merchant.checkCollision.none = true;
-        // Item.children.entries[0].body.checkCollision.none = true;
         Score = Score - 1000;
-        var clover = Item.create(merchant.x + 200,merchant.y,'seal',0,true);
-                clover.setScale(1.5);
-                clover.body.setSize(25, 25);
-                clover.setData('id',0);   
-                clover.anims.play('clover',true)
-        // setTimeout(()=>{emitter.stop()},200)
+        var clover = Item.create(merchant.x + 200,merchant.y + 95,'seal',23,true);
+        clover.setScale(1.5);
+        clover.body.setSize(25, 25);
+        clover.setData('id',3);   
+        controlHelp.setFrame(18);
+        controlHelp.setVisible(true)
+        
+        dealMode = false;
+       
         
     }else{
-        console.log('oops, not enough money brother');
+        if(dealMode === true){
+            console.log('oops, not enough money brother');
+            controlHelp.setFrame(17);
+        }
+    }
+}
+function uploadScore(username, score) {
+    var request = new XMLHttpRequest();
+    request.onreadystatechange = function () {
+        if (this.readyState == 4 && this.status == 200) {
+            //document.getElementById("test").innerHTML = this.responseText;
+            console.log('ok');
+            console.log(username + score);
+        }
+    }
+    request.open("GET", "uploadscore.php?user=" + username + "&score=" + score);
+    request.setRequestHeader("Content-type", "application/json");
+    request.send();
+}
+
+function downloadScore(){
+    HighScore = [];
+    var requete = new XMLHttpRequest();
+    requete.onload = function() {
+    //La variable à passer est alors contenue dans l'objet response et l'attribut responseText.
+    var variable = this.responseText;
+    HighScore = variable;
+    console.log(HighScore);
+    console.log(Alphabet);
+    };
+    requete.open("GET", "downloadScore.php", true); //True pour que l'exécution du script continue pendant le chargement, false pour attendre.
+    requete.send();
+}
+function startGameEvent(){
+    if(startGame){
+        if(scoreView){
+            console.log(scoreView + startGame);
+        }else{
+            player.x = 680;
+            player.y = 1890;
+            // player.x = 15000; //mid map
+            // player.y = 1890;
+            playerVelocityX = 270;
+            touchesAttack.enabled = true;
+            // player.x = 37000; // boss
+            // player.y = 550;
+            spawnDetector.body.position.x = player.x - 390
+            spawnDetector.body.position.y = player.y - 240
+            startGame = false;
+            rageCloud.anims.play('rage',true);
+            soundVolume = 1;
+            swordAir.volume = 0.4;
+            //this.cameras.main.flash();
+            //console.log(cameraPlayer.flashEffect.alpha = 2);
+            themeSong.play();
+        }
+        
+    }else{
+        if(scoreView === true){
+            startGame = true;
+            scoreView = false;
+            HighScoreText.setVisible(false);
+        }
     }
 }
 
