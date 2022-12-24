@@ -25,7 +25,7 @@ var configuration = {
     physics :{
         default : 'arcade',
         arcade :{
-                    debug : true,
+                    debug : false,
                     tileBias : 36,
                     gravity : {y : 1000},
                 }
@@ -488,7 +488,7 @@ function create(){
 
     // TEXT
 
-    text = this.add.text(1145,1095, 'version : O.50 | 14.11.22' , {fontFamily : 'PixelFont'}).setScrollFactor(0,0);
+    text = this.add.text(1145,1095, 'version : O.51 | 24.12.22' , {fontFamily : 'PixelFont'}).setScrollFactor(0,0);
     personalBestText = this.add.text(1480,672,'YOUR BEST : 0',{ fontFamily : 'PixelFont'}).setScrollFactor(0,0);
     scoreText = this.add.text(1710,672, 'SCORE : 0',{ fontFamily : 'PixelFont'}).setScrollFactor(0,0);
     gameOverText = this.add.text(1432,975, '', { fontFamily : 'PixelFont', fontSize : '40px'}).setScrollFactor(0,0);
